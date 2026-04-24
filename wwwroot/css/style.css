@@ -319,7 +319,7 @@ body {
     }
 
 .topbar {
-    height: var(--topbar-height);
+    height:auto;
     background: var(--bg-card);
     box-shadow: var(--shadow-sm);
     display: flex;
