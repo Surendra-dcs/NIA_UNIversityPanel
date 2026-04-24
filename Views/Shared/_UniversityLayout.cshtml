@@ -126,8 +126,12 @@
             <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="INSTITUTE">
-                <h4 style="font-size: xx-large;">NATIONAL INSTITUTE OF AYURVEDA</h4>
+            <div style="width:100%;text-align:center">
+                <h1 class="hindi text-lg sm:text-xl font-bold" style="background:linear-gradient(90deg,#065f46,#0f766e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                    राष्ट्रीय आयुर्वेद संस्थान
+                </h1>
+                <p class="hindi text-[11px] text-slate-500 leading-tight">मानद विश्वविद्यालय (डी. नोवो) | आयुष मंत्रालय, भारत सरकार</p>
+                <p class="text-[10px] font-semibold text-emerald-700 tracking-wide uppercase mt-0.5">National Institute of Ayurveda (Deemed to be University)</p>
             </div>
             <div class="topbar-right">
                 <div class="admin-info">
@@ -145,6 +149,18 @@
         </footer>
     </div>
 	<script src="~/script.js"></script>
+    <script>
+            document.querySelectorAll(".onlyNumber").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+        document.querySelectorAll(".onlyText").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+            });
+        });
+    </script>
     <script>
         document.querySelectorAll(".onlyNumber").forEach(function (input) {
             input.addEventListener("input", function () {
