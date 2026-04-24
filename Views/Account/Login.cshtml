@@ -1,0 +1,64 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "Login";
+    var mobile = ViewBag.Mobile as string;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="card shadow-lg p-4" style="width: 400px; border-radius: 12px;">
+
+            <h4 class="text-center mb-4">🔐 Login with OTP</h4>
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger text-center">
+                    @ViewBag.Error
+                </div>
+            }
+            <form method="post" asp-action="Login" asp-controller="Account">
+                <div id="mobileSection" style="@(mobile != null ? "display:none" : "")">
+
+                    <div class="mb-3">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" name="mobile" class="form-control" placeholder="Enter Mobile Number" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Send OTP</button>
+                </div>
+            </form>
+
+            <!-- STEP 2: OTP -->
+            @if (mobile != null)
+            {
+                <form method="post" asp-action="VerifyOtp" asp-controller="Account">
+                    <input type="hidden" name="mobile" value="@mobile" />
+
+                    <div id="otpSection">
+                        <div class="mb-3">
+                            <label class="form-label">Enter OTP</label>
+                            <input type="text" name="otp" class="form-control text-center" maxlength="6" placeholder="••••••" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Verify & Login</button>
+                    </div>
+                </form>
+            }
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

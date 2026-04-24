@@ -1,0 +1,138 @@
+﻿
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<div class="stats-grid">
+    <div class="stat-card card-students">
+        <div class="stat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+        </div>
+        <div class="stat-body">
+            <div class="stat-label">Total Students</div>
+            <div class="stat-number" data-target="@Model.TotalStudents">0</div>
+            <div class="stat-badge badge-up">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
+                +12% this month
+            </div>
+        </div>
+        <div class="stat-sparkline">
+            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
+                <polyline points="0,25 15,18 28,22 40,10 55,14 70,6 80,9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="stat-card card-courses">
+        <div class="stat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+        </div>
+        <div class="stat-body">
+            <div class="stat-label">Total Courses</div>
+            <div class="stat-number" data-target="@Model.TotalCourses">0</div>
+            <div class="stat-badge badge-up">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
+                +5 new courses
+            </div>
+        </div>
+        <div class="stat-sparkline">
+            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
+                <polyline points="0,22 15,19 28,15 40,17 55,9 70,11 80,7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="stat-card card-programs">
+        <div class="stat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+        </div>
+        <div class="stat-body">
+            <div class="stat-label">Total Programs</div>
+            <div class="stat-number" data-target="@Model.TotalPrograms">0</div>
+            <div class="stat-badge badge-neutral">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                Same as last month
+            </div>
+        </div>
+        <div class="stat-sparkline">
+            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
+                <polyline points="0,15 15,14 28,16 40,13 55,15 70,14 80,14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="stat-card card-admissions">
+        <div class="stat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+        </div>
+        <div class="stat-body">
+            <div class="stat-label">New Admissions</div>
+            <div class="stat-number" data-target="@Model.TotalNewAdmissions">0</div>
+            <div class="stat-badge badge-up">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
+                +28% this week
+            </div>
+        </div>
+        <div class="stat-sparkline">
+            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
+                <polyline points="0,26 15,20 28,17 40,12 55,8 70,5 80,3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
+            </svg>
+        </div>
+    </div>
+</div>
+<div class="section-card">
+    <div class="section-header">
+        <h2 class="section-title">Recent Admissions</h2>       
+    </div>
+    <div class="table-wrap table table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Program</th>
+                    <th>Admission Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var item in Model.RecentAdmissions)
+                {
+                    <tr>
+                        <td class="row-num">@i</td>
+                        <td>
+                            <div class="student-cell">
+                                <span>@item.StudentName</span>
+                            </div>
+                        </td>
+                        <td>@item.CourseName</td>
+                        <td>@item.ProgramName</td>
+                        <td>@item.AdmissionDate.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <span class="status-pill status-@item.Status.ToLower()">@item.Status</span>
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

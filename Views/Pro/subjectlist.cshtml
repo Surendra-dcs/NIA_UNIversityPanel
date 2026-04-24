@@ -1,0 +1,311 @@
+﻿
+@{
+    ViewData["Title"] = "subjectlist";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+
+    <div class="table-header">
+        <h3 class="table-title">Subjetc List</h3>
+        <div class="table-actions">
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <button class="btn btn-success" onclick="openSubjectModal()">Add Subject</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="subjectTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>Sr.No.</th>
+                    <th>Program Name</th>
+                    <th>Course Name</th>
+                    <th>Subject Name</th>
+                    <th>Subject Code</th>
+                    <th>Semester/Part</th>
+                    <th>Status</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="subjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Add / Edit Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <input type="hidden" id="subjectId" value="0" />
+
+                <div class="row g-3">
+                    <!-- ✅ spacing fix -->
+
+                    <div class="col-md-6">
+                        <label class="form-label">Program</label>
+                        <select id="programDropdown" class="form-select">
+                            <option value="">Select Program</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Course</label>
+                        <select id="courseDropdown" class="form-select">
+                            <option value="">Select Course</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" id="subjectName" class="form-control" placeholder="Enter Subject Name">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Subject Code</label>
+                        <input type="text" id="subjectCode" class="form-control" placeholder="Enter Subject Code">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <select id="status" class="form-select">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCourseModal()" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveSubject()">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+@* <div class="modal fade" id="subjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Add / Edit Subject</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <input type="hidden" id="subjectId" value="0" />
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Program</label>
+                        <select id="programDropdown" class="form-select">
+                            <option value="">Select Program</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Course</label>
+                        <select id="courseDropdown" class="form-select">
+                            <option value="">Select Course</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" id="subjectName" class="form-control" placeholder="Enter Subject Name" />
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Subject Code</label>
+                        <input type="text" id="subjectCode" class="form-control" placeholder="Enter Subject Code" />
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status</label>
+                        <select id="status" class="form-select">
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeCourseModal()" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveSubject()">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div> *@
+
+<script>
+    $(document).ready(function () {
+      $('#subjectTable').DataTable({
+        ajax: {
+            url: ApiBaseUrl + 'Subject/list', 
+            type: 'GET',
+            dataSrc: ''
+        },
+        columns: [
+            {
+                data: null,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            { data: 'programName' }, 
+            { data: 'courseName' },
+            { data: 'subjectName' },
+            { data: 'subjectCode' },
+            { data: 'semPart' },
+
+            {
+                data: 'status',
+                render: function (data) {
+                    return data
+                        ? '<span class="status-pill status-active">Active</span>'
+                        : '<span class="status-pill status-inactive">Inactive</span>';
+                }
+            },
+
+            {
+                data: 'subjectId',
+                render: function (data, type, row) {
+                    return `
+                        <button class="btn btn-edit" onclick="editSubject(${data})">Edit</button>
+                        <button class="btn btn-delete" onclick="deleteSubject(${data})">Delete</button>
+                    `;
+                }
+            }
+        ],
+
+        pageLength: 10,
+        lengthMenu: [10, 25, 50],
+        language: {
+            search: "🔍 Search:",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ subjects"
+        }
+    });
+    loadPrograms();
+   });
+
+     function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programDropdown').html(opt);
+        });
+    }
+     document.getElementById("programDropdown").addEventListener("change", function () {
+        let programId = this.value;
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseDropdown");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                    courseDropdown.innerHTML += `<option value="${item.courseId}">${item.course_Name}</option>`;
+                });
+            });
+    });
+    function closeCourseModal() {
+        $('#subjectModal').hide();
+    }
+
+     function saveSubject() {
+        let model = {
+            subjectId: document.getElementById("subjectId").value,
+            programId: document.getElementById("programDropdown").value,
+            courseId: document.getElementById("courseDropdown").value,
+            subjectName: document.getElementById("subjectName").value,
+            subjectCode: document.getElementById("subjectCode").value,
+            status: document.getElementById("status").value === "true"
+        };
+
+        fetch(ApiBaseUrl + 'Subject/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(model)
+        })
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            $('#subjectTable').DataTable().ajax.reload();
+            $("#subjectModal").hide();
+        });
+    }
+     function openSubjectModal() {
+        document.getElementById("subjectId").value = 0;
+        document.getElementById("programDropdown").value = "";
+        document.getElementById("courseDropdown").innerHTML = '<option value="">Select Course</option>';
+        document.getElementById("subjectName").value = "";
+        document.getElementById("subjectCode").value = "";
+        document.getElementById("status").value = "true";
+        $('#subjectModal').css('display', 'flex');
+    }
+        function editSubject(id) {
+
+        fetch(ApiBaseUrl + `Subject/get/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("subjectId").value = data.subjectId;
+                document.getElementById("programDropdown").value = data.programId;
+                fetch(ApiBaseUrl + `Subject/courses/${data.programId}`)
+                    .then(res => res.json())
+                    .then(courseData => {
+
+                        let courseDropdown = document.getElementById("courseDropdown");
+                        courseDropdown.innerHTML = '<option value="">Select Course</option>';
+
+                        courseData.forEach(item => {
+                            courseDropdown.innerHTML += `<option value="${item.courseId}">${item.course_Name}</option>`;
+                        });
+
+                        document.getElementById("courseDropdown").value = data.courseId;
+                    });
+
+                document.getElementById("subjectName").value = data.subjectName;
+                document.getElementById("subjectCode").value = data.subjectCode;
+                document.getElementById("status").value = data.status.toString();
+
+                 $('#subjectModal').css('display', 'flex');
+            });
+    }
+
+        function deleteSubject(id) {
+        if (!confirm("Are you sure you want to delete?")) return;
+        fetch(ApiBaseUrl + `Subject/delete/${id}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            $('#subjectTable').DataTable().ajax.reload();
+        });
+    }
+     
+       $('#statusFilter').on('change', function () {
+           var table = $('#courseTable').DataTable();
+          table.column(2).search(this.value).draw();
+      });
+</script>
+

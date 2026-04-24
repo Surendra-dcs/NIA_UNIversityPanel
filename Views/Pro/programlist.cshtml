@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewData["Title"] = "programlist";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Program List</h3>
+        <div class="table-actions">
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <button type="button" class="btn btn-primary" onclick="openAddModal()">+ Add Program</button>          
+        </div>       
+    </div>
+    <div class="table-responsive">
+        <table id="programTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>Sr.No.</th>
+                    <th>Program Name</th>
+                    <th>Status</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div id="programModal" class="modal">
+    <div class="modal-box">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h3 id="modalTitle">Add Program</h3>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body">
+            <input type="hidden" id="programId" />
+
+            <div class="form-group">
+                <label>Program Name</label>
+                <input type="text" id="programName" placeholder="Enter program name" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <select id="isActive">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-save" onclick="saveProgram()">Save</button>
+        </div>
+
+    </div>
+</div>
+<script>  
+
+       $(document).ready(function () {
+        $('#programTable').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Program/GetPrograms',
+                dataSrc: ''
+            },
+            columns: [
+                {
+                    data: null,
+                    render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                   }
+                 },
+                { data: 'programName' },
+                {
+                    data: 'isActive',
+                    render: function (data) {
+                        return data
+                            ? '<span class="status-pill status-active">Active</span>'
+                            : '<span class="status-pill status-inactive">Inactive</span>';
+                    }
+                },
+                {
+                    data: 'programId',
+                    render: function (data) {
+                        return `
+                            <button class="btn btn-edit" onclick="editProgram(${data})">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteProgram(${data})">Delete</button>
+                        `;
+                    }
+                }
+            ],
+
+            pageLength: 10,
+            lengthMenu: [10, 25, 50],
+            language: {
+                search: "🔍 Search:",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ programs"
+            }
+        });
+
+    });
+
+        function openAddModal() {
+        $('#modalTitle').text('Add Program');
+        $('#programId').val('');
+        $('#programName').val('');
+        $('#isActive').val('true');
+        $('#programModal').css('display', 'flex');
+    }
+
+    function closeModal() {
+        $('#programModal').hide();
+    }
+
+    // EDIT
+    function editProgram(id) {
+
+        let table = $('#programTable').DataTable();
+        let data = table.rows().data().toArray().find(x => x.programId == id);
+
+        $('#modalTitle').text('Edit Program');
+        $('#programId').val(data.programId);
+        $('#programName').val(data.programName);
+        $('#isActive').val(data.isActive.toString());
+
+        $('#programModal').css('display', 'flex');
+    }
+
+    // SAVE (ADD + UPDATE)
+    function saveProgram() {
+        debugger
+            let model = {
+        programId: parseInt($('#programId').val()) || 0,
+        programName: $('#programName').val(),
+        isActive: $('#isActive').val() === 'true'
+    };
+
+    let url = model.programId > 0
+        ? ApiBaseUrl + 'Program/Update'
+        : ApiBaseUrl + 'Program/Add';
+
+    let type = model.programId > 0 ? 'PUT' : 'POST';
+        $.ajax({
+            url: url,
+            type: type,
+            contentType: 'application/json',
+            data: JSON.stringify(model),
+            success: function (res) {
+                if(res=="Added")
+                {
+                alert('Saved successfully');
+                $('#programModal').hide();
+                $('#programTable').DataTable().ajax.reload();
+                }
+                else{
+                alert('Updated successfully');
+                $('#programModal').hide();
+                $('#programTable').DataTable().ajax.reload();
+                }
+                
+            },
+            error: function () {
+                alert('Error');
+            }
+        });
+    }
+
+        function deleteProgram(id) {
+        if (!confirm("Are you sure you want to delete this program?")) return;
+        $.ajax({
+            url: ApiBaseUrl + 'Program/Delete/' + id,
+            type: 'DELETE',
+            success: function (res) {
+                alert(res.message || "Deleted successfully");
+                $('#programTable').DataTable().ajax.reload(null, false);
+            },
+            error: function (xhr) {
+                if (xhr.status === 404) {
+                    alert("Record not found");
+                }
+                else {
+                    alert("Something went wrong");
+                }
+                console.error(xhr.responseText);
+            }
+        });
+    }
+    $('#statusFilter').on('change', function () {
+        var table = $('#programTable').DataTable();
+        table.column(2).search(this.value).draw();
+    });
+</script>

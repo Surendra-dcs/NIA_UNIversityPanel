@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewData["Title"] = "examlist";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Exam List</h3>
+        <div class="table-actions">
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <button type="button" class="btn btn-primary">Add Exam</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="examTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>Sr.No.</th>
+                    <th>Course Name</th>
+                    <th>Exam Name</th>                    
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(function () {
+         $('#examTable').DataTable({
+             ajax: {
+                 url: ApiBaseUrl + 'Program/GetEaxmList',
+                 dataSrc: ''
+             },
+             columns: [
+                  {
+                     data: null,
+                     render: function (data, type, row, meta) {
+                     return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                  },
+
+                 { data: 'course_name'},
+                 { data: 'exam_name' },                
+                 {
+                      data: 'exam_id',
+                     render: function (data) {
+                         return `
+                             <button class="btn btn-edit" onclick="editCourse(${data})">Edit</button>
+                              <button class="btn btn-delete" onclick="deleteCourse(${data})">Delete</button>
+                         `;
+                     }
+                 }
+             ],
+             pageLength: 10,
+             lengthMenu: [10, 25, 50],
+             language: {
+                 search: "🔍 Search:",
+                 lengthMenu: "Show _MENU_ entries",
+                 info: "Showing _START_ to _END_ of _TOTAL_ programs"
+             }
+         });
+
+     });
+
+     // function editProgram(id) {
+     //     alert("Edit ID: " + id);
+     // }
+
+     // function deleteProgram(id) {
+     //     if (confirm("Are you sure to delete?")) {
+     //         $.ajax({
+     //             url: '/api/Program/Delete/' + id,
+     //             type: 'DELETE',
+     //             success: function () {
+     //                 alert("Deleted");
+     //                 loadPrograms();
+     //             }
+     //         });
+
+     //     }
+     // }
+       $('#statusFilter').on('change', function () {
+           var table = $('#courseTable').DataTable();
+          table.column(2).search(this.value).draw();
+      });
+</script>
+

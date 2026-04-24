@@ -1,0 +1,196 @@
+﻿
+@{
+    ViewData["Title"] = "courselist";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+
+    <div class="table-header">
+        <h3 class="table-title">Course List</h3>
+        <div class="table-actions">
+            <select id="statusFilter" class="filter-select">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <button type="button" class="btn btn-primary" onclick="openAddCourseModal()"> +Add Course</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="courseTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>Sr.No.</th>
+                    <th>Program Name</th>
+                    <th>Course Name</th>
+                    <th>Status</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div id="courseModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="courseModalTitle">Add Course</h3>
+            <span class="close-btn" onclick="closeCourseModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="courseId" />
+            <div class="form-group">
+                <label>Program</label>
+                <select id="programDropdown">
+                    <option value="">Select Program</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Course Name</label>
+                <input type="text" id="courseName" placeholder="Enter course name" />
+            </div>
+            <div class="form-group">
+                <label>Status</label>
+                <select id="courseStatus">
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeCourseModal()">Cancel</button>
+            <button class="btn btn-save" onclick="saveCourse()">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+   $(document).ready(function () {        
+       $('#courseTable').DataTable({
+        ajax: {
+            url: ApiBaseUrl + 'Course/GetCourses',
+            dataSrc: ''
+        },
+        columns: [
+            {
+                data: null,
+                render: (data, type, row, meta) =>
+                    meta.row + meta.settings._iDisplayStart + 1
+            },
+            { data: 'programName' },
+            { data: 'course_Name' },
+            {
+                data: 'isActive',
+                render: d => d
+                    ? '<span class="status-active">Active</span>'
+                    : '<span class="status-inactive">Inactive</span>'
+            },
+            {
+                data: 'course_Id',
+                render: id => `
+                     <button class="btn btn-edit" onclick="editCourse(${id})">Edit</button>
+                       <button class="btn btn-delete" onclick="deleteCourse(${id})">Delete</button>
+                `
+            }
+        ],
+         pageLength: 10,
+             lengthMenu: [10, 25, 50],
+             language: {
+                 search: "🔍 Search:",
+                 lengthMenu: "Show _MENU_ entries",
+                 info: "Showing _START_ to _END_ of _TOTAL_ programs"
+             }
+    });
+     loadPrograms();
+    });
+    function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programDropdown').html(opt);
+        });
+    }
+      function saveCourse() {
+        let model = {
+            course_Id: parseInt($('#courseId').val()) || 0,
+            programId: parseInt($('#programDropdown').val()),
+            course_Name: $('#courseName').val(),
+            isActive: $('#courseStatus').val() === 'true'
+        };
+        let url = model.course_Id > 0
+            ? ApiBaseUrl + 'Course/Update'
+            : ApiBaseUrl + 'Course/Add';
+        let type = model.course_Id > 0 ? 'PUT' : 'POST';
+        $.ajax({
+            url: url,
+            type: type,
+            contentType: 'application/json',
+            data: JSON.stringify(model),
+            success: function (res) {
+                 if(res=="add")
+                 {
+                 alert('Saved successfully');
+                  $('#courseModal').hide();
+                 $('#courseTable').DataTable().ajax.reload();
+                 }
+                 else{
+                  alert('Updated successfully');
+                  $('#courseModal').hide();
+                  $('#courseTable').DataTable().ajax.reload();
+                 }
+             
+            }
+        });
+    }
+     function editCourse(id) {
+        let table = $('#courseTable').DataTable();
+        let data = table.rows().data().toArray().find(x => x.course_Id == id);
+        $('#courseId').val(data.course_Id);
+        $('#courseName').val(data.course_Name);
+        $('#programDropdown').val(data.programId);
+        $('#courseStatus').val(data.isActive.toString());
+        $('#courseModal').css('display', 'flex');
+    }
+    function openAddCourseModal() {
+        $('#courseModalTitle').text('Add Course');
+        $('#courseId').val('');
+        $('#courseName').val('');
+        $('#programDropdown').val('');
+        $('#courseStatus').val('true');
+        $('#courseModal').css('display', 'flex');
+    }
+
+    function closeCourseModal() {
+        $('#courseModal').hide();
+    }
+
+     function deleteCourse(id) {
+         if (!confirm("Are you sure you want to delete this Course?")) return;
+         $.ajax({
+              url: ApiBaseUrl + 'Course/Delete/' + id,
+             type: 'DELETE',
+             success: function (res) {
+                 alert(res.message || "Deleted successfully");
+                  $('#courseTable').DataTable().ajax.reload(null, false);
+             },
+             error: function (xhr) {
+                 if (xhr.status === 404) {
+                     alert("Record not found");
+                 }
+                 else {
+                     alert("Something went wrong");
+                 }
+                 console.error(xhr.responseText);
+             }
+         });
+     }
+
+       $('#statusFilter').on('change', function () {
+          var table = $('#courseTable').DataTable();
+         table.column(2).search(this.value).draw();
+     });
+</script>
+
