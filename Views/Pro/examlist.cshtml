@@ -14,83 +14,224 @@
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
             </select>
-            <button type="button" class="btn btn-primary">Add Exam</button>
+            <button class="btn btn-success mb-3" onclick="openExamModal()">+ Add Exam</button>
         </div>
     </div>
     <div class="table-responsive">
         <table id="examTable" class="display custom-table">
             <thead>
                 <tr>
-                    <th>Sr.No.</th>
-                    <th>Course Name</th>
-                    <th>Exam Name</th>                    
+                    <th>#</th>
+                    <th>Program </th>
+                    <th>Course </th>
+                    <th>Exam </th>
+                    <th>Status</th>
                     <th style="text-align:center;">Action</th>
                 </tr>
             </thead>
-            <tbody></tbody>
         </table>
     </div>
+</div>
 
+<div class="modal fade" id="examModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="modalTitle">Add / Edit Exam</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="examId">
+                <div class="form-group">
+                    <label>Program</label>
+                    <select id="programDropdown" class="form-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>Course</label>
+                    <select id="courseDropdown" class="form-select"></select>
+                </div>
+                <div class="form-group">
+                    <label>Exam Name</label>
+                    <textarea type="text" id="examName" class="form-control"></textarea>                   
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-save" onclick="saveExam()">Save</button>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-         $('#examTable').DataTable({
-             ajax: {
-                 url: ApiBaseUrl + 'Program/GetEaxmList',
-                 dataSrc: ''
-             },
-             columns: [
-                  {
-                     data: null,
-                     render: function (data, type, row, meta) {
-                     return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                  },
+      $(document).ready(function () {
+        $('#examTable').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Exam/list',
+                dataSrc: ''
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'programName' },
+                { data: 'courseName' },
+                { data: 'examName' },
+                {
+                    data: 'status',
+                    render: d =>
+                        d
+                            ? '<span class="badge bg-success">Active</span>'
+                            : '<span class="badge bg-danger">Inactive</span>'
+                },
+                {
+                    data: 'examId',
+                    render: d => `
+                        <button class="btn btn-edit" onclick="editExam(${d})">Edit</button>
+                        <button class="btn btn-delete" onclick="deleteExam(${d})">Delete</button>
+                    `
+                }
+            ]
+        });
+         loadPrograms();
+    });
+     function closeModal() {
+        $('#examModal').hide();
+    }
+    function openExamModal() {       
+     $("#examId").val(0);
+     $("#examName").val('');
+     $("#status").val('');
+     $("#programDropdown").val('');
+     $("#courseDropdown").val('');
+     $('#examModal').css('display', 'flex');
+    }
+    function loadPrograms() {
+        fetch(ApiBaseUrl + 'Course/GetPrograms')
+            .then(res => res.json())
+            .then(data => {
+                let ddl = document.getElementById("programDropdown");
+                ddl.innerHTML = '<option value="">Select Program</option>';
+                data.forEach(x => {
+                    ddl.innerHTML += `<option value="${x.programId}">${x.programName}</option>`;
+                });
+            });
+    }
+    document.getElementById("programDropdown").addEventListener("change", function () {
+        let programId = this.value;
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let ddl = document.getElementById("courseDropdown");
+                ddl.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(x => {
+                    ddl.innerHTML += `<option value="${x.course_Id}">${x.course_Name}</option>`;
+                });
+            });
+    });
+    
+   
+        function saveExam() {
+        if($("#programDropdown").val()=="")
+        {
+            alert("Please Select Program !");
+            return false;
+        }
+        if($("#courseDropdown").val()=="")
+        {
+            alert("Please Select Course !");
+            return false;
+        }
+        if($("#examName").val()=="")
+        {
+            alert("Please Create Exam !");
+            return false;
+        }
+        let model = {
+            examId: parseInt(document.getElementById("examId").value) || 0,
+            programId: parseInt(document.getElementById("programDropdown").value),
+            courseId: parseInt(document.getElementById("courseDropdown").value),
+            examName: document.getElementById("examName").value,
+            status: document.getElementById("status").value === "true"
+        };
+        if (!model.programId || !model.courseId) {
+            alert("Select Program & Course");
+            return;
+        }
+        fetch(ApiBaseUrl + 'Exam/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(model)
+        })
+        .then(res => res.text())
+        .then(msg => {
+            Swal.fire({
+            icon: 'success',
+            title: msg,
+            timer: 2000,
+            showConfirmButton: false
+            });
+            $('#examTable').DataTable().ajax.reload();
+            $("#examModal").hide();
+        });
+    }
+     function editExam(id) {     
+         
+       fetch(ApiBaseUrl + `Exam/get/${id}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("examId").value = data.examId;
+            document.getElementById("examName").value = data.examName;
+            document.getElementById("status").value = data.status.toString();
+            document.getElementById("programDropdown").value = data.programId;
+            fetch(ApiBaseUrl + `Subject/courses/${data.programId}`)
+                .then(res => res.json())
+                .then(courseData => {
 
-                 { data: 'course_name'},
-                 { data: 'exam_name' },                
-                 {
-                      data: 'exam_id',
-                     render: function (data) {
-                         return `
-                             <button class="btn btn-edit" onclick="editCourse(${data})">Edit</button>
-                              <button class="btn btn-delete" onclick="deleteCourse(${data})">Delete</button>
-                         `;
-                     }
-                 }
-             ],
-             pageLength: 10,
-             lengthMenu: [10, 25, 50],
-             language: {
-                 search: "🔍 Search:",
-                 lengthMenu: "Show _MENU_ entries",
-                 info: "Showing _START_ to _END_ of _TOTAL_ programs"
-             }
-         });
-
-     });
-
-     // function editProgram(id) {
-     //     alert("Edit ID: " + id);
-     // }
-
-     // function deleteProgram(id) {
-     //     if (confirm("Are you sure to delete?")) {
-     //         $.ajax({
-     //             url: '/api/Program/Delete/' + id,
-     //             type: 'DELETE',
-     //             success: function () {
-     //                 alert("Deleted");
-     //                 loadPrograms();
-     //             }
-     //         });
-
-     //     }
-     // }
-       $('#statusFilter').on('change', function () {
-           var table = $('#courseTable').DataTable();
-          table.column(2).search(this.value).draw();
-      });
+                    let ddl = document.getElementById("courseDropdown");
+                    ddl.innerHTML = '<option value="">Select Course</option>';
+                    courseData.forEach(x => {
+                        ddl.innerHTML += `<option value="${x.course_Id}">${x.course_Name}</option>`;
+                    });
+                    ddl.value = data.courseId;
+                });
+             $('#examModal').css('display', 'flex');
+        });
+    }
+        
+    
+    function deleteExam(id) {
+        if (!confirm("Delete this record?")) return;
+        fetch(ApiBaseUrl + `Exam/delete/${id}`, {
+            method: 'DELETE'
+        })
+        .then(res => res.text())
+        .then(msg => {
+            Swal.fire({
+            icon: 'success',
+            title: msg,
+            timer: 2000,
+            showConfirmButton: false
+            });
+            $('#examTable').DataTable().ajax.reload();
+        });
+    }
+     
+    $('#statusFilter').on('change', function () {
+        var table = $('#examTable').DataTable();
+        table.column(4).search(this.value).draw(); 
+    });
 </script>
 

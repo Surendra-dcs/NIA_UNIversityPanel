@@ -86,8 +86,6 @@
         .slide-right {
             animation: slideRight 0.65s ease both;
         }
-
-        /* OTP input special styling */
         .otp-input {
             letter-spacing: 0.45em;
             font-size: 1.35rem;
@@ -117,8 +115,6 @@
                 background: #fff;
                 box-shadow: 0 0 0 3px rgba(5,150,105,0.12);
             }
-
-        /* Primary button */
         .nia-btn {
             width: 100%;
             padding: 0.8rem 1.5rem;
@@ -150,8 +146,6 @@
                 opacity: 0.65;
                 cursor: not-allowed;
             }
-
-        /* Alert */
         .alert-box {
             display: none;
             padding: 0.75rem 1rem;
@@ -178,8 +172,6 @@
             color: #854d0e;
             border-left: 4px solid #fbbf24;
         }
-
-        /* Gradient border card */
         .gradient-border-card {
             position: relative;
             background: white;
@@ -198,8 +190,6 @@
                 mask-composite: exclude;
                 pointer-events: none;
             }
-
-        /* Spinner */
         @@keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -219,8 +209,6 @@
             .spinner.active {
                 display: inline-block;
             }
-
-        /* Step indicator */
         .step-dot {
             width: 28px;
             height: 28px;
@@ -251,8 +239,6 @@
             background: #059669;
             border-radius: 4px;
         }
-
-        /* only-number JS class helper */
         input.onlyNumber {
             -moz-appearance: textfield;
         }
@@ -264,8 +250,6 @@
     </style>
 </head>
 <body class="min-h-screen" style="background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 50%, #f8fafc 100%);">
-
-    <!-- ─── Header ─────────────────────────────────────────────────────────────── -->
     <header class="bg-white/95 backdrop-blur-md shadow-sm border-b border-emerald-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-5 sm:px-8 py-3.5">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
@@ -288,16 +272,11 @@
             </div>
         </div>
     </header>
-
-    <!-- ─── Main ───────────────────────────────────────────────────────────────── -->
     <main class="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         <div class="flex flex-col lg:flex-row items-stretch gap-6 lg:gap-8">
-
-            <!-- ── Left Panel ─────────────────────────────────────────────── -->
             <div class="slide-left lg:w-5/12 rounded-2xl shadow-2xl overflow-hidden"
                  style="background: linear-gradient(145deg, #065f46, #0f766e 60%, #047857);">
                 <div class="p-8 text-white h-full flex flex-col">
-                    <!-- Badge -->
                     <div class="inline-flex items-center gap-2 self-start bg-white/20 backdrop-blur-sm rounded-full px-3.5 py-1.5 mb-6">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -345,12 +324,9 @@
                 </div>
             </div>
 
-            <!-- ── Right Panel – Login Form ───────────────────────────────── -->
             <div class="slide-right flex-1">
                 <div class="gradient-border-card shadow-2xl">
                     <div class="p-8 sm:p-10">
-
-                        <!-- Icon & title -->
                         <div class="text-center mb-8 fade-up">
                             <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
                                  style="background:linear-gradient(135deg,#d1fae5,#ccfbf1);">
@@ -363,11 +339,7 @@
                             <p class="hindi text-sm text-slate-500 mt-1">विश्वविद्यालय लॉगिन / UNIVERSITY LOGIN</p>
                             <p class="text-xs text-slate-400 mt-1.5">LOGIN TO ACCESS YOUR UNIVERSITY DASHBOARD</p>
                         </div>
-
-                        <!-- Alert Box -->
                         <div id="alertBox" class="alert-box"></div>
-
-                        <!-- Server-side error (Razor) -->
                         @if (ViewBag.Error != null)
                         {
                             <div class="alert-box alert-danger" style="display:block;">
@@ -379,8 +351,6 @@
                                 </div>
                             </div>
                         }
-
-                        <!-- ── STEP 1: Mobile Number ── -->
                         @if (mobile == null)
                         {
                             <form method="post" asp-action="Login" asp-controller="Account" id="mobileForm">
@@ -415,11 +385,8 @@
                                 </button>
                             </form>
                         }
-
-                        <!-- ── STEP 2: OTP Verification ── -->
                         @if (mobile != null)
                         {
-                            <!-- Step indicator banner -->
                             <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3.5 mb-6">
                                 <div class="w-9 h-9 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-4.5 h-4.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -457,8 +424,6 @@
                                     </svg>
                                     <span id="verifyText">Verify &amp; Login</span>
                                 </button>
-
-                                <!-- Resend -->
                                 <div class="text-center mt-4">
                                     <p class="text-xs text-slate-500">
                                         Didn't receive OTP?
@@ -469,8 +434,6 @@
                                 </div>
                             </form>
                         }
-
-                        <!-- Help -->
                         <div class="mt-8 pt-5 border-t border-slate-100 text-center">
                             <p class="text-xs text-slate-400">
                                 Having trouble?
@@ -479,15 +442,11 @@
                                 <a href="#" target="_blank" class="text-emerald-600 hover:underline">DCS</a>
                             </p>
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
-
-    <!-- ─── Footer ─────────────────────────────────────────────────────────────── -->
     <footer class="bg-slate-900 text-slate-300 mt-12 border-t-4 border-emerald-500">
         <div class="max-w-7xl mx-auto px-6 py-7">
             <div class="flex flex-col md:flex-row justify-between items-center gap-5">
@@ -507,9 +466,7 @@
             </div>
         </div>
     </footer>
-
     <script>
-        /* ── Only-number inputs ─────────────────────────────────────────── */
         document.querySelectorAll('.onlyNumber').forEach(el => {
             el.addEventListener('input', function () {
                 this.value = this.value.replace(/\D/g, '');
@@ -518,8 +475,6 @@
                 if (!/[0-9]/.test(e.key)) e.preventDefault();
             });
         });
-
-        /* ── Mobile form submit loading state ──────────────────────────── */
         const mobileForm = document.getElementById('mobileForm');
         if (mobileForm) {
             mobileForm.addEventListener('submit', function (e) {
@@ -532,8 +487,6 @@
                 setBtnLoading('sendOtpBtn', 'sendSpinner', 'sendIcon', 'sendText', true, 'Sending...');
             });
         }
-
-        /* ── OTP form submit loading state ─────────────────────────────── */
         const otpForm = document.getElementById('otpForm');
         if (otpForm) {
             otpForm.addEventListener('submit', function (e) {
@@ -546,8 +499,6 @@
                 setBtnLoading('verifyBtn', 'verifySpinner', 'verifyIcon', 'verifyText', true, 'Verifying...');
             });
         }
-
-        /* ── Helpers ───────────────────────────────────────────────────── */
         function setBtnLoading(btnId, spinnerId, iconId, textId, state, loadText) {
             const btn  = document.getElementById(btnId);
             const spin = document.getElementById(spinnerId);

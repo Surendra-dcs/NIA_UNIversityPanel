@@ -114,6 +114,17 @@
         });
     }
       function saveCourse() {
+            if($('#programDropdown').val()=="")
+             {
+              alert("Please Select Program");
+              return false
+             }
+           if($('#courseName').val()=="")
+           {
+            alert("Please Enter Course");
+            return false
+           }
+            
         let model = {
             course_Id: parseInt($('#courseId').val()) || 0,
             programId: parseInt($('#programDropdown').val()),
@@ -132,12 +143,22 @@
             success: function (res) {
                  if(res=="add")
                  {
-                 alert('Saved successfully');
-                  $('#courseModal').hide();
+                 Swal.fire({
+                 icon: 'success',
+                 title: 'Saved successfully',
+                 timer: 2000,
+                 showConfirmButton: false
+                 });
+                 $('#courseModal').hide();
                  $('#courseTable').DataTable().ajax.reload();
                  }
                  else{
-                  alert('Updated successfully');
+                 Swal.fire({
+                 icon: 'success',
+                  title: 'Updated successfully',
+                 timer: 2000,
+                 showConfirmButton: false
+                 });
                   $('#courseModal').hide();
                   $('#courseTable').DataTable().ajax.reload();
                  }
@@ -190,7 +211,7 @@
 
        $('#statusFilter').on('change', function () {
           var table = $('#courseTable').DataTable();
-         table.column(2).search(this.value).draw();
+         table.column(3).search(this.value).draw();
      });
 </script>
 

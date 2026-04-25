@@ -111,7 +111,7 @@
 
     });
 
-        function openAddModal() {
+     function openAddModal() {
         $('#modalTitle').text('Add Program');
         $('#programId').val('');
         $('#programName').val('');
@@ -123,29 +123,27 @@
         $('#programModal').hide();
     }
 
-    // EDIT
     function editProgram(id) {
-
         let table = $('#programTable').DataTable();
         let data = table.rows().data().toArray().find(x => x.programId == id);
-
         $('#modalTitle').text('Edit Program');
         $('#programId').val(data.programId);
         $('#programName').val(data.programName);
         $('#isActive').val(data.isActive.toString());
-
         $('#programModal').css('display', 'flex');
     }
 
-    // SAVE (ADD + UPDATE)
     function saveProgram() {
-        debugger
-            let model = {
+        if($('#programName').val()=="")
+        {
+            alert("Please Enter Program !");
+            return false;
+        }
+    let model = {
         programId: parseInt($('#programId').val()) || 0,
         programName: $('#programName').val(),
         isActive: $('#isActive').val() === 'true'
-    };
-
+     };
     let url = model.programId > 0
         ? ApiBaseUrl + 'Program/Update'
         : ApiBaseUrl + 'Program/Add';
@@ -159,12 +157,22 @@
             success: function (res) {
                 if(res=="Added")
                 {
-                alert('Saved successfully');
+                Swal.fire({
+                icon: 'success',
+                title: 'Saved successfully',
+                timer: 2000,
+                showConfirmButton: false
+                });
                 $('#programModal').hide();
                 $('#programTable').DataTable().ajax.reload();
                 }
-                else{
-                alert('Updated successfully');
+                else{                
+                Swal.fire({
+                icon: 'success',
+                title: 'Updated successfully',
+                timer: 2000,
+                showConfirmButton: false
+                });
                 $('#programModal').hide();
                 $('#programTable').DataTable().ajax.reload();
                 }
