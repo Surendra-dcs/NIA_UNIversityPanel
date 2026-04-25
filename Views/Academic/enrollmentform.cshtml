@@ -1,8 +1,147 @@
-﻿
-@{
-    ViewData["Title"] = "enrollmentform";
+﻿@{
+    ViewData["Title"] = "Enrollment Form";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Student Enrollment Form</h3>
+        @* <div class="table-actions">
+            <select id="programFilter" class="filter-select">
+                <option value="">All Programs</option>
+            </select>
 
-<h1>enrollmentform</h1>
+            <select id="courseFilter" class="filter-select">
+                <option value="">All Courses</option>
+            </select>
+        </div> *@
+    </div>
+    <div class="table-responsive">
+        <table id="studentEnrollmenttbl" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Exnrollment Number</th>
+                    <th>College</th>
+                    <th>Program</th>
+                    <th>Course</th>
+                    <th>Student Name</th>
+                    @* <th>Father Name</th>
+                    <th>Mother Name</th> *@
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
 
+<div id="studentModal" class="modal">
+    <div class="modal-box">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h3>Student Details</h3>
+            <span class="close-btn" onclick="closeStudentModal()">&times;</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body" id="studentDetails"></div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+        let table;
+    let allData = [];
+
+    $(document).ready(function () {
+
+        table = $('#studentEnrollmenttbl').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList',
+                dataSrc: function (json) {
+                    allData = json;
+                    return json;
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'enrollmentNumber' },
+                { data: 'collegeName' },
+                { data: 'programName' },
+                { data: 'courseName' },
+                { data: 'studentName' },
+                { data: 'email' },
+                { data: 'mobile' },
+                {
+                    data: null,
+                        render: function (data) {
+
+                        let disabled = data.isVerify ? 'disabled' : '';
+                        let style = data.isVerify
+                            ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
+                            : 'background: #2d7dd2; color: white;';
+
+                        return `
+                            <button class="btn btn-info btn-sm" style="background: #e07a54; color: white;"
+                                onclick='viewStudent(${JSON.stringify(data)})'>
+                                View
+                            </button>
+
+                            <button class="btn btn-success btn-sm ms-1" style="background: #b99e11; color: white;"
+                                onclick='printEnrollment(${JSON.stringify(data)})'>
+                                Print
+                            </button>
+
+                            <button class="btn btn-success btn-sm ms-1"
+                                style="${style}"
+                                onclick='verifyForm(${data.id})'
+                                ${disabled}>
+                                Verify
+                            </button>
+                        `;
+                    }
+                }
+            ]
+        });
+
+    });
+
+
+    // ✅ MOVE OUTSIDE
+    function verifyForm(id) {
+
+        if (!confirm("Are you sure you want to verify this student?"))
+            return;
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentEnrollment/VerifyStudent',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                id: id
+            }),
+            success: function () {
+                alert("Student verified successfully");
+                table.ajax.reload();
+            },
+            error: function () {
+                alert("Verification failed");
+            }
+        });
+    }
+
+</script>

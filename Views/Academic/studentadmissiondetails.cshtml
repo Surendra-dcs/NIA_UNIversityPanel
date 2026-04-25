@@ -1,8 +1,272 @@
 ﻿
 @{
-    ViewData["Title"] = "studentadmissiondetails";
+    ViewData["Title"] = "Student Admission Details";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<style>
+    .student-container {
+        font-family: Arial, sans-serif;
+        padding: 15px;
+    }
 
-<h1>studentadmissiondetails</h1>
+    .student-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
+        .student-header h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .student-header p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+        }
+
+    .student-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .card p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .card b {
+            color: #222;
+        }
+
+    .modal-box {
+        background: #fff;
+        width: 850px;
+        border-radius: 14px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+        animation: fadeIn 0.25s ease;
+        overflow: hidden;
+    }
+</style>
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Student Admission Details</h3>
+        <div class="table-actions">
+            <select id="programFilter" class="filter-select">
+                <option value="">All Programs</option>
+            </select>
+
+            <select id="courseFilter" class="filter-select">
+                <option value="">All Courses</option>
+            </select>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="studentAdmissiontbl" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>College</th>
+                    <th>Program</th>
+                    <th>Course</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="studentModal" class="modal">
+    <div class="modal-box">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h3>Student Details</h3>
+            <span class="close-btn" onclick="closeStudentModal()">&times;</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body" id="studentDetails"></div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+
+    let table;
+    let allData = [];
+
+    $(document).ready(function () {
+
+        table = $('#studentAdmissiontbl').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'StudentAdmission/GetStudentAdmissionList',
+                dataSrc: function (json) {
+                    allData = json;
+                    populateFilters(json);
+                    return json;
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'collegeName' },
+                { data: 'programName' },
+                { data: 'courseName' },
+                { data: 'studentName' },
+                { data: 'email' },
+                { data: 'mobile' },
+                {
+                    data: null,
+                    render: function (data) {
+                        return `<button class="btn btn-info" onclick='viewStudent(${JSON.stringify(data)})'>View</button>`;
+                    }
+                }
+            ]
+        });
+
+        // FILTER EVENTS
+        $('#programFilter').on('change', function () {
+            let program = $(this).val();
+
+            let courses = [...new Set(allData
+                .filter(x => program === "" || x.program === program)
+                .map(x => x.course))];
+
+            $('#courseFilter').html('<option value="">All Courses</option>');
+            courses.forEach(c => {
+                $('#courseFilter').append(`<option value="${c}">${c}</option>`);
+            });
+
+            applyFilters();
+        });
+
+        $('#courseFilter').on('change', applyFilters);
+    });
+
+    function populateFilters(data) {
+        let programs = [...new Set(data.map(x => x.program))];
+
+        programs.forEach(p => {
+            $('#programFilter').append(`<option value="${p}">${p}</option>`);
+        });
+    }
+
+    function applyFilters() {
+        let program = $('#programFilter').val();
+        let course = $('#courseFilter').val();
+
+        let filtered = allData.filter(x =>
+            (program === "" || x.program === program) &&
+            (course === "" || x.course === course)
+        );
+
+        table.clear().rows.add(filtered).draw();
+    }
+
+
+    function openStudentModal() {
+        $('#studentModal').css('display', 'flex');
+    }
+
+    function closeStudentModal() {
+        $('#studentModal').hide();
+    }
+
+        function viewStudent(data) {
+
+        let html = `
+        <div class="student-container">
+
+            <div class="student-header">
+                <h2>${data.studentName}</h2>
+                <p>${data.programName} - ${data.courseName}</p>
+            </div>
+
+            <div class="student-grid">
+
+                <div class="card">
+                    <h3>Personal Details</h3>
+                    <p><b>Father:</b> ${data.fatherName}</p>
+                    <p><b>Mother:</b> ${data.motherName || '-'}</p>
+                    <p><b>Gender:</b> ${data.gender}</p>
+                    <p><b>DOB:</b> ${new Date(data.dateOfBirth).toLocaleDateString()}</p>
+                    <p><b>Category:</b> ${data.category}</p>
+                    <p><b>Religion:</b> ${data.religion}</p>
+                    <p><b>Nationality:</b> ${data.nationality}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Contact Details</h3>
+                    <p><b>Mobile:</b> ${data.mobile}</p>
+                    <p><b>Email:</b> ${data.email}</p>
+                    <p><b>Address:</b> ${data.addressLine1}</p>
+                    <p><b>City:</b> ${data.city}</p>
+                    <p><b>District:</b> ${data.district}</p>
+                    <p><b>State:</b> ${data.state}</p>
+                    <p><b>PIN:</b> ${data.pinCode}</p>
+                    <p><b>Country:</b> ${data.country}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Academic Details</h3>
+                    <p><b>College:</b> ${data.collegeName}</p>
+                    <p><b>Program:</b> ${data.programName}</p>
+                    <p><b>Course:</b> ${data.courseName}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Identification</h3>
+                    <p><b>Aadhaar:</b> ${data.aadhaarId}</p>
+                    <p><b>ABC ID:</b> ${data.abcId}</p>
+                </div>
+
+            </div>
+        </div>
+        `;
+
+        document.getElementById('studentDetails').innerHTML = html;
+        openStudentModal();
+    }
+
+    $(window).on('click', function (e) {
+        if ($(e.target).is('#studentModal')) {
+            closeStudentModal();
+        }
+    });
+</script>

@@ -1,8 +1,391 @@
-﻿
-@{
-    ViewData["Title"] = "stcorrection";
+﻿@{
+    ViewData["Title"] = "Student Personal Correction";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
 
-<h1>stcorrection</h1>
+<style>
+    .flex-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
 
+    .flex-card {
+        flex: 1 1 calc(33.33% - 20px);
+    }
+
+    /* Card */
+    .table-card {
+        height: 100%;
+        padding: 18px;
+        border-radius: 10px;
+        background: #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+        /* Headings */
+        .table-card h5 {
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+    /* Form Group */
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+    }
+
+        .form-group label {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #555;
+        }
+
+        .form-group input {
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+    /* Buttons */
+    .btn-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .btn {
+        padding: 7px 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-info {
+        background: #6c757d;
+        color: #fff;
+    }
+
+    .btn-save {
+        background: #e07b52;
+        color: #fff;
+    }
+
+    /* File section */
+    .file-group {
+        margin-bottom: 15px;
+    }
+
+        .file-group input {
+            margin-top: 5px;
+        }
+
+    /* Preview image */
+    .img-preview {
+        width: 100%;
+        height: 120px;
+        object-fit: contain;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-top: 8px;
+    }
+
+    /* Divider */
+    .divider {
+        border-top: 1px solid #eee;
+        margin: 15px 0;
+    }
+
+    .search-box {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+    }
+
+        .search-box input {
+            flex: 1;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .search-box button {
+            white-space: nowrap;
+        }
+</style>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Student Correction</h3>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="form-group search-row">
+        <label>Enter Mobile Number</label>
+
+        <div class="search-box">
+            <input type="text" id="searchMobile" class="onlyNumber" maxlength="10" placeholder="Enter mobile number" />
+            <button class="btn btn-save" onclick="searchStudent()">Search</button>
+        </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="studentSection" class="flex-container" style="display:none; margin-top:20px;">
+
+        <!-- 1. PERSONAL DETAILS -->
+        <div class="flex-card personal-section" style="border: 2px dashed #1a3a5c91;">
+            <div class="table-card">
+                <h5>Personal Details</h5>
+
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" id="studentName" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Father Name</label>
+                    <input type="text" id="fatherName" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Mother Name</label>
+                    <input type="text" id="motherName" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="dob" disabled />
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea id="address" disabled></textarea>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-info" onclick="enableEdit()">Edit</button>
+                    <button class="btn btn-save" id="saveBtn" style="display:none;" onclick="saveStudent()">Save</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 2. PHOTO + SIGNATURE -->
+        <div class="flex-card" style="border: 2px dashed #e85a3a7d;">
+            <div class="table-card">
+                <h5>Photo & Signature</h5>
+
+                <!-- PHOTO -->
+                <div class="file-group">
+                    <label>Photo</label>
+                    <input type="file" id="photoFile" onchange="previewImage(event,'photoPreview')" />
+                    <img id="photoPreview" class="img-preview" />
+                    <button class="btn btn-save" onclick="uploadPhoto()">Upload Photo</button>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- SIGNATURE -->
+                <div class="file-group">
+                    <label>Signature</label>
+                    <input type="file" id="signFile" onchange="previewImage(event,'signPreview')" />
+                    <img id="signPreview" class="img-preview" />
+                    <button class="btn btn-save" onclick="uploadSignature()">Upload Signature</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 3. MOBILE -->
+        <div class="flex-card" style="border: 2px dashed #88888887;">
+            <div class="table-card">
+                <h5>Change Mobile</h5>
+
+                <div class="form-group">
+                    <label>New Mobile</label>
+                    <input type="text" id="newMobile" maxlength="10" />
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-save" onclick="updateMobile()">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    let currentStudentId = 0;
+    let userId = 0;
+
+    function searchStudent() {
+
+        let mobile = $('#searchMobile').val();
+
+        if (!mobile) {
+            alert("Enter mobile number");
+            return;
+        }
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentCorrection/GetStudentByMobile?mobile=' + mobile,
+            type: 'GET',
+            success: function (data) {
+
+                currentStudentId = data.id;
+                userId = data.userId;
+
+                $('#studentSection').show();
+
+                $('#studentName').val(data.studentName);
+                $('#fatherName').val(data.fatherName);
+                $('#motherName').val(data.motherName);
+
+                $('#dob').val(data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '');
+                $('#address').val(data.address);
+            },
+            error: function () {
+                alert("Student not found");
+            }
+        });
+    }
+
+    function enableEdit() {
+
+        $('.personal-section input, .personal-section textarea').prop('disabled', false);
+
+        $('#saveBtn').show();
+    }
+
+    function saveStudent() {
+
+        let model = {
+            id: currentStudentId,
+            userId: userId,
+            studentName: $('#studentName').val(),
+            fatherName: $('#fatherName').val(),
+            motherName: $('#motherName').val(),
+            dateOfBirth: $('#dob').val(),
+            address: $('#address').val()
+        };
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentCorrection/UpdateStudent',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(model),
+            success: function () {
+                alert("Student updated successfully");
+
+                // ONLY disable personal section
+                $('.personal-section input, .personal-section textarea').prop('disabled', true);
+
+                $('#saveBtn').hide();
+            },
+            error: function () {
+                alert("Update failed");
+            }
+        });
+    }
+
+    // IMAGE PREVIEW
+    function previewImage(event, id) {
+        let reader = new FileReader();
+        reader.onload = function () {
+            $('#' + id).attr('src', reader.result);
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    }
+
+    // PHOTO UPLOAD
+    function uploadPhoto() {
+
+        let file = $('#photoFile')[0].files[0];
+        if (!file) {
+            alert("Select photo");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("studentId", currentStudentId);
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentCorrection/UploadPhoto',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                alert("Photo uploaded");
+            },
+            error: function () {
+                alert("Upload failed");
+            }
+        });
+    }
+
+    // SIGNATURE UPLOAD
+    function uploadSignature() {
+
+        let file = $('#signFile')[0].files[0];
+        if (!file) {
+            alert("Select signature");
+            return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("studentId", currentStudentId);
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentCorrection/UploadSignature',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                alert("Signature uploaded");
+            },
+            error: function () {
+                alert("Upload failed");
+            }
+        });
+    }
+
+    // MOBILE UPDATE
+    function updateMobile() {
+
+        let newMobile = $('#newMobile').val();
+
+        if (newMobile.length !== 10) {
+            alert("Enter valid mobile");
+            return;
+        }
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentCorrection/UpdateMobile',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                id: currentStudentId,
+                userId: userId,
+                mobile: newMobile
+            }),
+            success: function () {
+                alert("Mobile Number updated");
+                $('#mobile').val(newMobile);
+                window.location.reload();
+            },
+            error: function () {
+                alert("Update failed");
+            }
+        });
+    }
+</script>

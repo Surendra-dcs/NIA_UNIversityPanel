@@ -1,8 +1,133 @@
-﻿
-@{
-    ViewData["Title"] = "stphotoandsignature";
+﻿@{
+    ViewData["Title"] = "Student Personal Correction";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Student Personal Correction</h3>
+    </div>
 
-<h1>stphotoandsignature</h1>
+    <!-- SEARCH SECTION -->
+    <div class="form-group" style="max-width:400px;">
+        <label>Enter Mobile Number</label>
+        <input type="text" id="searchMobile" class="onlyNumber" maxlength="10" placeholder="Enter mobile number" />
+        <button class="btn btn-save mt-2" onclick="searchStudent()">Search</button>
+    </div>
 
+    <!-- RESULT SECTION -->
+    <div id="studentSection" style="display:none; margin-top:20px;">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>Form Number</label>
+                <input type="text" id="formNumber" disabled />
+            </div>
+
+            <div class="form-group">
+                <label>Student Name</label>
+                <input type="text" id="studentName" disabled />
+            </div>
+
+            <div class="form-group">
+                <label>Father Name</label>
+                <input type="text" id="fatherName" disabled />
+            </div>
+
+            <div class="form-group">
+                <label>Mother Name</label>
+                <input type="text" id="motherName" disabled />
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="text" id="email" disabled />
+            </div>
+
+            <div class="form-group">
+                <label>Mobile</label>
+                <input type="text" id="mobile" disabled />
+            </div>
+
+        </div>
+
+        <button class="btn btn-info mt-3" onclick="enableEdit()">Edit</button>
+        <button class="btn btn-save mt-3" id="saveBtn" style="display:none;" onclick="saveStudent()">Save</button>
+
+    </div>
+</div>
+
+<script>
+
+
+        let currentStudentId = 0;
+
+    function searchStudent() {
+
+        let mobile = $('#searchMobile').val();
+
+        if (!mobile) {
+            alert("Enter mobile number");
+            return;
+        }
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentAdmission/GetStudentByMobile?mobile=' + mobile,
+            type: 'GET',
+            success: function (data) {
+
+                currentStudentId = data.id;
+
+                $('#studentSection').show();
+
+                $('#formNumber').val(data.formNumber);
+                $('#studentName').val(data.studentName);
+                $('#fatherName').val(data.fatherName);
+                $('#motherName').val(data.motherName);
+                $('#email').val(data.email);
+                $('#mobile').val(data.mobile);
+            },
+            error: function () {
+                alert("Student not found");
+            }
+        });
+    }
+
+    function enableEdit() {
+
+        $('#studentSection input').prop('disabled', false);
+        $('#formNumber').prop('disabled', true); // keep readonly
+
+        $('#saveBtn').show();
+    }
+
+        function saveStudent() {
+
+        let model = {
+            id: currentStudentId,
+            studentName: $('#studentName').val(),
+            fatherName: $('#fatherName').val(),
+            motherName: $('#motherName').val(),
+            email: $('#email').val(),
+            mobile: $('#mobile').val()
+        };
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentAdmission/UpdateStudent',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(model),
+            success: function (res) {
+                alert("Student updated successfully");
+
+                // disable again after save
+                $('#studentSection input').prop('disabled', true);
+                $('#saveBtn').hide();
+            },
+            error: function () {
+                alert("Update failed");
+            }
+        });
+    }
+</script>
