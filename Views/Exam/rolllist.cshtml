@@ -4,5 +4,92 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 
-<h1>rolllist</h1>
+
+
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Roll List</h3>
+        <div class="table-actions">
+           
+            <button class="btn btn-success mb-3" onclick="openExamModal()">Bulk Print Admit Card</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="examTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Roll Number </th>
+                    <th>Student Name </th>
+                    <th>Student Email </th>
+                    <th>Course </th>
+                    <th>Semester </th>
+                    <th>Exam </th>
+                  
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+      $(document).ready(function () {
+        $('#examTable').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Exam/rolllist',
+                dataSrc: ''
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'rollNumber' },
+                { data: 'userName' },
+                { data: 'email' },
+                { data: 'courseName' },
+                { data: 'semesterName' },
+                { data: 'examName' },
+               
+                {
+                 
+                    render: d => `
+                        <button class="btn btn-edit" onclick="">Print Admit Card</button>
+                       
+                    `
+                }
+            ]
+        });
+         loadPrograms();
+    });
+     function closeModal() {
+        $('#examModal').hide();
+    }
+    function openExamModal() {
+     $("#examId").val(0);
+     $("#examName").val('');
+     $("#status").val('');
+     $("#programDropdown").val('');
+     $("#courseDropdown").val('');
+     $('#examModal').css('display', 'flex');
+    }
+    
+
+
+        
+     
+
+
+
+
+    $('#statusFilter').on('change', function () {
+        var table = $('#examTable').DataTable();
+        table.column(4).search(this.value).draw();
+    });
+</script>
 

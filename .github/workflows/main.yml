@@ -1,0 +1,85 @@
+name: Deploy NIA University (.NET)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Setup .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # 3. Restore dependencies
+      - name: Restore
+        run: dotnet restore
+
+      # 4. Build project
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # 5. Publish build
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+
+      # 5.1 Inject ApiSettings BaseUrl into appsettings
+      - name: Inject Api BaseUrl
+        run: |
+          echo "Updating appsettings.json..."
+
+          sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
+
+          if [ -f ./publish/appsettings.json ]; then
+            sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
+          fi
+
+      # 6. Upload to VPS
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          source: "publish/*"
+          target: "/var/www/NIA_university_publish_temp"
+          strip_components: 1
+
+      # 7. Deploy on VPS
+      - name: Deploy & Restart
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "🧹 Clean old publish"
+            mkdir -p /var/www/NIA_university/NIA_UNIversityPanel/publish
+            rm -rf /var/www/NIA_university/NIA_UNIversityPanel/publish/*
+
+            echo "🚀 Copy new build"
+            cp -r /var/www/NIA_university_publish_temp/. /var/www/NIA_university/NIA_UNIversityPanel/publish/
+
+            echo "🧹 Cleaning temp folder"
+            rm -rf /var/www/NIA_university_publish_temp
+
+            echo "🔐 Fix permissions"
+            chown -R www-data:www-data /var/www/NIA_university
+
+            echo "🚀 Restart service"
+            sudo systemctl restart nia-app
+
+            echo "✅ Checking service status"
+            sudo systemctl status nia-app --no-pager

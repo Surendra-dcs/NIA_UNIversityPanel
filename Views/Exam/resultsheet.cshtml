@@ -4,5 +4,81 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 
-<h1>resultsheet</h1>
 
+
+
+
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Result Sheet</h3>
+        <div class="table-actions">
+
+            <button class="btn btn-success mb-3" onclick="openExamModal()">Bulk Print Result Sheet</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="examTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Roll Number </th>
+                    <th>Exam Name </th>
+                    <th>Student Name </th>
+                    <th>Student Email </th>
+                    <th>Attempt </th>
+                    <th>Result </th>
+                    <th>Fall in Paper </th>
+
+                 
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+      $(document).ready(function () {
+        $('#examTable').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Exam/resultlist',
+                dataSrc: ''
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'rollNumber' },
+                { data: 'examName' },
+                { data: 'userName' },
+                { data: 'email' },
+                { data: 'attempt' },
+                { data: 'resultStatus' },
+                 { data: 'fallinpaper' }
+            ]
+        });
+         loadPrograms();
+    });
+     function closeModal() {
+        $('#examModal').hide();
+    }
+    function openExamModal() {
+     $("#examId").val(0);
+     $("#examName").val('');
+     $("#status").val('');
+     $("#programDropdown").val('');
+     $("#courseDropdown").val('');
+     $('#examModal').css('display', 'flex');
+    }
+
+
+
+    $('#statusFilter').on('change', function () {
+        var table = $('#examTable').DataTable();
+        table.column(4).search(this.value).draw();
+    });
+</script>
