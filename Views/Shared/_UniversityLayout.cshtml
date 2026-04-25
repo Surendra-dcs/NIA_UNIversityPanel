@@ -11,11 +11,29 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 	<script src="~/js/admin.js"></script>	
     @inject IConfiguration Configuration
     <script>
         var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
     </script>
+    <style>
+        .topbar {
+            height: var(--topbar-height);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            gap: 14px;
+            position: sticky;
+            height: auto;
+            top: 0;
+            z-index: 200;
+            flex-shrink: 0;
+            border-bottom: 1.5px solid #dceaf7;
+        }
+    </style>
 </head>
 <body>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -132,7 +150,7 @@
                 </h1>
                 <p class="hindi text-[11px] text-slate-500 leading-tight">मानद विश्वविद्यालय (डी. नोवो) | आयुष मंत्रालय, भारत सरकार</p>
                 <p class="text-[10px] font-semibold text-emerald-700 tracking-wide uppercase mt-0.5">National Institute of Ayurveda (Deemed to be University)</p>
-            </div>
+            </div><br />
             <div class="topbar-right">
                 <div class="admin-info">
                     <i class="fas fa-circle-user"></i>
