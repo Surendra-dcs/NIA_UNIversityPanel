@@ -36,7 +36,7 @@ jobs:
       # 5.1 Inject ApiSettings BaseUrl into appsettings
       - name: Inject Api BaseUrl
         run: |
-          echo "Updating appsettings.json..."
+          echo "Updating appsettings.json....."
 
           sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
 
