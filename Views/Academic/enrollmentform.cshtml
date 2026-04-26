@@ -89,17 +89,17 @@
                 {
                     data: null,
                         render: function (data) {
-
+                            // <button class="btn btn-info btn-sm" style="background: #e07a54; color: white;"
+                            //     onclick='viewStudent(${JSON.stringify(data)})'>
+                            //     View
+                            // </button>
                         let disabled = data.isVerify ? 'disabled' : '';
                         let style = data.isVerify
                             ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
                             : 'background: #2d7dd2; color: white;';
 
                         return `
-                            <button class="btn btn-info btn-sm" style="background: #e07a54; color: white;"
-                                onclick='viewStudent(${JSON.stringify(data)})'>
-                                View
-                            </button>
+                            
 
                             <button class="btn btn-success btn-sm ms-1" style="background: #b99e11; color: white;"
                                 onclick='printEnrollment(${JSON.stringify(data)})'>

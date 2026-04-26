@@ -161,26 +161,26 @@
         });
 
         // FILTER EVENTS
-        $('#programFilter').on('change', function () {
-            let program = $(this).val();
+            $('#programFilter').on('change', function () {
+                let program = $(this).val();
 
-            let courses = [...new Set(allData
-                .filter(x => program === "" || x.program === program)
-                .map(x => x.course))];
+                let courses = [...new Set(allData
+                    .filter(x => program === "" || x.programName === program)
+                    .map(x => x.courseName))];
 
-            $('#courseFilter').html('<option value="">All Courses</option>');
-            courses.forEach(c => {
-                $('#courseFilter').append(`<option value="${c}">${c}</option>`);
+                $('#courseFilter').html('<option value="">All Courses</option>');
+                courses.forEach(c => {
+                    $('#courseFilter').append(`<option value="${c}">${c}</option>`);
+                });
+
+                applyFilters();
             });
-
-            applyFilters();
-        });
 
         $('#courseFilter').on('change', applyFilters);
     });
 
     function populateFilters(data) {
-        let programs = [...new Set(data.map(x => x.program))];
+        let programs = [...new Set(data.map(x => x.programName))];
 
         programs.forEach(p => {
             $('#programFilter').append(`<option value="${p}">${p}</option>`);
@@ -192,8 +192,8 @@
         let course = $('#courseFilter').val();
 
         let filtered = allData.filter(x =>
-            (program === "" || x.program === program) &&
-            (course === "" || x.course === course)
+            (program === "" || x.programName === program) &&
+            (course === "" || x.courseName === course)
         );
 
         table.clear().rows.add(filtered).draw();
@@ -208,7 +208,7 @@
         $('#studentModal').hide();
     }
 
-        function viewStudent(data) {
+    function viewStudent(data) {
 
         let html = `
         <div class="student-container">

@@ -1,8 +1,541 @@
-﻿
-@{
-    ViewData["Title"] = "examinerlist";
+﻿@{
+    ViewData["Title"] = "Examiner List";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<style>
+    .examiner-container {
+        font-family: Arial, sans-serif;
+        padding: 15px;
+    }
 
-<h1>examinerlist</h1>
+    .examiner-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
+        .examiner-header h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .examiner-header p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+        }
+
+    /* 👇 3 column layout */
+    .examiner-grid {
+        display: grid;
+        grid-template-columns: repeat(2 , 1fr);
+        gap: 15px;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .card p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .card b {
+            color: #222;
+        }
+
+    /* Overlay background */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none; /* hidden by default */
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    /* Modal box (FULL WIDTH STYLE) */
+    .modal-box {
+        background: #fff;
+        width: 95%;
+        max-width: 1200px; /* control max width */
+        height: 90vh; /* almost full screen */
+        border-radius: 14px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: fadeIn 0.25s ease;
+    }
+
+    .modal-box-assign {
+        background: #fff;
+        width: 95%;
+        max-width: 600px; /* control max width */
+        height: 75vh; /* almost full screen */
+        border-radius: 14px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: fadeIn 0.25s ease;
+    }
+
+    /* Header */
+    .modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        font-size: 18px;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Body (scrollable) */
+    .modal-body {
+        padding: 15px;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    /* Close button */
+    .modal-close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    /* Animation */
+    @@keyframes fadeIn {
+        from
+
+    {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    }
+
+    /* Mobile fix */
+    @@media (max-width: 600px) {
+        .modal-box
+
+    {
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    }
+
+    #examinerTbl thead th {
+        text-transform: none !important;
+        font-weight: 600;
+    }
+
+    #examinerTbl {
+        border-collapse: collapse;
+    }
+
+        #examinerTbl th,
+        #examinerTbl td {
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+    .btn-sm {
+        margin-right: 5px;
+    }
+</style>
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Examiner</h3>
+        <div class="table-actions">
+            <a href="/Exam/ExaminerCreate" class="btn btn-success btn-sm ms-1" style="background: #2d7dd2; color: white; text-decoration:none;">Create Examiner</a>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="examinerTbl" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Mobile No</th>
+                    <th>PAN No</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="examinerModal" class="modal">
+    <div class="modal-box">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h3>Examiner Details</h3>
+            <span class="close-btn" onclick="closeExaminerModal()">&times;</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body" id="examinerDetails"></div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeExaminerModal()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<div id="assignModal" class="modal">
+    <div class="modal-box-assign">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <h3>Assign Paper to Examiner</h3>
+            <span class="close-btn" onclick="closeassignModal()">&times;</span>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body" id="assignDetails">
+
+            <div class="form-group">
+                <label>College</label>
+                <select id="collegeDropdown" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Course</label>
+                <select id="courseDropdown" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Subject</label>
+                <select id="subjectDropdown" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Exam</label>
+                <select id="examDropdown" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+                <label>Paper Type</label>
+                <select id="paperType" class="form-control">
+                    <option value="">Select</option>
+                    <option value="Internal">Internal Paper</option>
+                    <option value="External">External Paper</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="submitAssignment()">Submit</button>
+            <button class="btn btn-cancel" onclick="closeassignModal()">Close</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        loadData();
+    });
+
+    let table;
+    let allData = [];
+
+    function loadData() {
+
+        table = $('#examinerTbl').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Examiner/GetAll',
+                dataSrc: function (json) {
+                    allData = json;
+                    return json;
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    className: "text-center",
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'examinerName', className: "text-center" },
+                { data: 'email', className: "text-center" },
+                { data: 'mobileNo', className: "text-center" },
+                { data: 'panNo', className: "text-center" },
+                {
+                        data: null,
+                        className: "text-center",
+                        render: function (data) {
+
+                        return `
+                            <div style="display:flex;">
+                            <button class="btn btn-info btn-sm" style="background: #2d7dd2; color: white;"
+                                onclick='viewExaminer(${JSON.stringify(data)})'>
+                                View
+                            </button>
+
+                            <button class="btn btn-info btn-sm" style="background: #16a643; color: white;"
+                                onclick='assignPaper(${data.examinerID})'>
+                                Assign Paper
+                            </button>
+
+                            <button class="btn btn-info btn-sm" style="background: #e07a54; color: white;"
+                                onclick='editExaminer(${data.examinerID})'>
+                                Edit
+                            </button>
+
+                            <button class="btn btn-success btn-sm ms-1" style="background: #b99e11; color: white;"
+                                onclick='deleteExaminer(${data.examinerID})'>
+                                Delete
+                            </button>
+                            </div>
+                        `;
+                    }
+                }
+            ],
+            columnDefs: [
+                { width: "5%", targets: 0 },
+                { width: "20%", targets: 1 },
+                { width: "25%", targets: 2 },
+                { width: "15%", targets: 3 },
+                { width: "15%", targets: 4 },
+                { width: "20%", targets: 5 }
+            ]
+        });
+    }
+
+    function deleteExaminer(id) {
+            if (!confirm("Are you sure?")) return;
+
+            $.ajax({
+                url: ApiBaseUrl + "Examiner/Delete/" + id,
+                type: "DELETE",
+                success: function () {
+                    table.ajax.reload();
+                }
+            });
+    }
+
+    function editExaminer(id) {
+        window.location.href = '/Exam/ExaminerCreate?id=' + id;
+    }
+
+    function openExaminerModal() {
+        $('#examinerModal').css('display', 'flex');
+    }
+
+    function closeExaminerModal() {
+        $('#examinerModal').hide();
+    }
+
+        function viewExaminer(data) {
+
+        let html = `
+        <div class="examiner-container">
+
+            <div class="examiner-header">
+                <h2>${data.examinerName || '-'}</h2>
+                <p>${data.qualification || '-'} - ${data.specialization || '-'}</p>
+            </div>
+
+            <div class="examiner-grid">
+
+                <div class="card">
+                    <h3>Basic Details</h3>
+                    <p><b>Email:</b> ${data.email || '-'}</p>
+                    <p><b>Mobile:</b> ${data.mobileNo || '-'}</p>
+                    <p><b>PAN:</b> ${data.panNo || '-'}</p>
+                    <p><b>Qualification:</b> ${data.qualification || '-'}</p>
+                    <p><b>Specialization:</b> ${data.specialization || '-'}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Teaching Experience</h3>
+                    <p><b>UG Experience:</b> ${data.teachingExpUG || 0} Years</p>
+                    <p><b>PG Experience:</b> ${data.teachingExpPG || 0} Years</p>
+                </div>
+
+                <div class="card">
+                    <h3>College Details</h3>
+                    <p><b>College:</b> ${data.collegeName || '-'}</p>
+                    <p><b>Address:</b> ${data.collegeAddress || '-'}</p>
+                    <p><b>City:</b> ${data.collegeCity || '-'}</p>
+                    <p><b>District:</b> ${data.collegeDistrict || '-'}</p>
+                    <p><b>State:</b> ${data.collegeState || '-'}</p>
+                    <p><b>PIN:</b> ${data.collegePinCode || '-'}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Residential Details</h3>
+                    <p><b>Address:</b> ${data.residentialAddress || '-'}</p>
+                    <p><b>City:</b> ${data.residentialCity || '-'}</p>
+                    <p><b>District:</b> ${data.residentialDistrict || '-'}</p>
+                    <p><b>State:</b> ${data.residentialState || '-'}</p>
+                    <p><b>PIN:</b> ${data.residentialPinCode || '-'}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Bank Details</h3>
+                    <p><b>Bank:</b> ${data.bankName || '-'}</p>
+                    <p><b>Account No:</b> ${data.bankAccountNo || '-'}</p>
+                    <p><b>IFSC:</b> ${data.ifscCode || '-'}</p>
+                </div>
+
+            </div>
+        </div>
+        `;
+
+        document.getElementById('examinerDetails').innerHTML = html;
+        openExaminerModal();
+    }
+
+    $(window).on('click', function (e) {
+        if ($(e.target).is('#examinerModal')) {
+            closeExaminerModal();
+        }
+    });
+
+    let selectedExaminerId = 0; // set this when opening modal
+
+    function assignPaper(examinerId) {
+        selectedExaminerId = examinerId;
+
+        $('#assignModal').css('display', 'flex');
+
+        loadColleges();
+        loadCourses();
+    }
+
+    function loadColleges() {
+        $.get(ApiBaseUrl + 'Examiner/GetColleges', function (data) {
+
+            let ddl = $('#collegeDropdown');
+            ddl.empty().append('<option value="">Select College</option>');
+
+            data.forEach(x => {
+                ddl.append(`<option value="${x.Id}">${x.Name}</option>`);
+            });
+        });
+    }
+
+    function loadCourses() {
+        $.get(ApiBaseUrl + 'Examiner/GetCourses', function (data) {
+
+            let ddl = $('#courseDropdown');
+            ddl.empty().append('<option value="">Select Course</option>');
+
+            data.forEach(x => {
+                ddl.append(`<option value="${x.course_Id}">${x.course_name}</option>`);
+            });
+        });
+    }
+
+    $('#courseDropdown').on('change', function () {
+
+        let courseId = $(this).val();
+
+        if (!courseId) return;
+
+        loadSubjects(courseId);
+        loadExams(courseId);
+    });
+
+    function loadSubjects(courseId) {
+        $.get(ApiBaseUrl + 'Examiner/GetSubjects?courseId=' + courseId, function (data) {
+
+            let ddl = $('#subjectDropdown');
+            ddl.empty().append('<option value="">Select Subject</option>');
+
+            data.forEach(x => {
+                ddl.append(`<option value="${x.subject_id}">${x.subject_name}</option>`);
+            });
+        });
+    }
+
+    function loadExams(courseId) {
+        $.get(ApiBaseUrl + 'Examiner/GetExams?courseId=' + courseId, function (data) {
+
+            let ddl = $('#examDropdown');
+            ddl.empty().append('<option value="">Select Exam</option>');
+
+            data.forEach(x => {
+                ddl.append(`<option value="${x.exam_id}">${x.exam_name}</option>`);
+            });
+        });
+    }
+
+    function closeassignModal() {
+        $('#assignModal').hide();
+    }
+
+    function submitAssignment() {
+
+        let model = {
+            examinerId: selectedExaminerId,
+            collegeId: $('#collegeDropdown').val(),
+            courseId: $('#courseDropdown').val(),
+            subjectId: $('#subjectDropdown').val(),
+            examId: $('#examDropdown').val(),
+            paperType: $('#paperType').val()
+        };
+
+        // basic validation
+        if (!model.examinerId || !model.collegeId || !model.courseId ||
+            !model.subjectId || !model.examId || !model.paperType) {
+            alert("Please fill all fields");
+            return;
+        }
+
+        $.ajax({
+            url: ApiBaseUrl + 'Examiner/AssignPaper',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(model),
+            success: function () {
+                alert("Assignment saved successfully");
+                closeassignModal();
+            },
+            error: function (err) {
+                alert("Save failed");
+                console.log(err);
+            }
+        });
+    }
+</script>

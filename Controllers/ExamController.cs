@@ -40,6 +40,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult ExaminerCreate()
+        {
+            return View();
+        }
         public IActionResult ansbooklist()
         {
             return View();
