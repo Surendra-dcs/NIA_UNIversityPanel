@@ -4,36 +4,24 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 
-
-
-
 <link href="~/css/programandcourse.css" rel="stylesheet" />
+
 <style>
     .Filters {
         display: flex;
         justify-content: space-evenly;
-        padding: 10px 0px 0;
+        padding: 10px 0 0;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
-    select#examFilter {
-        padding: 5px;
-        background: #dfdfdf;
-        border-radius: 3px;
-    }
-
+    select#examFilter,
     input#rollFilter {
-        padding: 5px;
+        padding: 8px;
         background: #dfdfdf;
         border-radius: 3px;
+        width: 100%;
     }
-</style>
-
-<style>
-
-
-
-
-
 
     .page {
         width: 297mm;
@@ -42,19 +30,16 @@
         background: #fff;
         padding: 5mm 6mm;
         box-shadow: 0 0 8px rgba(0,0,0,0.3);
-        position: relative;
     }
 
-    /* ── TOP BAR ── */
     .top-bar {
         display: flex;
-        justify-content: space-between;
-        font-size: 9.5px;
-        margin-bottom: 3px;
-        color: #333;
+        justify-content: center;
+        font-size: 12px;
+        margin-bottom: 15px;
+        font-weight: bold;
     }
 
-    /* ── HEADER ── */
     .header {
         display: flex;
         align-items: center;
@@ -66,7 +51,6 @@
         width: 60px;
         height: 60px;
         object-fit: contain;
-        flex-shrink: 0;
         margin-left: 30px;
     }
 
@@ -78,535 +62,323 @@
         .header-center .h1 {
             font-size: 17px;
             font-weight: bold;
-            color: #000;
-            letter-spacing: 0.3px;
         }
 
-        .header-center .h2 {
-            font-size: 11px;
-            margin-top: 1px;
-        }
-
-        .header-center .h3 {
-            font-size: 11px;
-        }
-
+        .header-center .h2,
+        .header-center .h3,
         .header-center .h4 {
             font-size: 11px;
         }
 
-        .header-center .exam-title {
+        .header-center .exam-title,
+        .header-center .tab-title {
             font-size: 12px;
             font-weight: bold;
             margin-top: 4px;
         }
 
-        .header-center .tab-title {
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
     .page-box {
         border: 1.5px solid #000;
-        padding: 2px 10px;
+        padding: 2px 20px;
         font-size: 12px;
         font-weight: bold;
-        align-self: flex-start;
-        white-space: nowrap;
-        padding: 2px 30px;
     }
 
     .date-issue {
         font-size: 11px;
         font-weight: bold;
-        text-align: right;
-        margin-top: 2px;
-        margin-right: 10px;
-        white-space: nowrap;
+        margin-top: 20px;
     }
 
     .header-right {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
-        gap: 40px;
-        position: relative;
+        gap: 20px;
     }
 
-    /* ── MAIN TABLE ── */
     .main-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 10px;
         margin-top: 4px;
+        border: 1.5px solid #000;
     }
 
-        .main-table th, .main-table td {
+        .main-table th,
+        .main-table td {
             border: 1px solid #000;
             padding: 2px 3px;
+            /* text-align: center; */
             vertical-align: middle;
-            text-align: center;
         }
 
-
-    /* Header row 1 - top labels */
-    .th-sno {
-        width: 22px;
-    }
-
-    .th-info {
-        width: 110px;
-    }
-
-    .th-attempt {
-        width: 22px;
-    }
-
-    .th-subject {
-    }
-
-    .th-ucode {
-        width: 58px;
-    }
-
-    .th-marks-scheme {
-        width: 80px;
-    }
-
-    .th-obtained {
-        width: 130px;
-    }
-
-    .th-grace {
-        width: 30px;
-    }
-
-    .th-reqd {
-        width: 42px;
-    }
-
-    .th-dist {
-        width: 30px;
-    }
-
-    .th-grand {
-        width: 38px;
-    }
-
-    .th-result {
-        width: 36px;
-    }
-
-    /* Rotated text */
     .rotated {
         writing-mode: vertical-rl;
         transform: rotate(180deg);
         white-space: nowrap;
-        font-size: 9.5px;
+        font-size: 9px;
         font-weight: bold;
-        padding: 4px 1px;
-        line-height: 1.2;
     }
 
-    /* Candidate info cell - left aligned */
     .info-cell {
-        text-align: left;
-        vertical-align: middle;
-        font-size: 10px;
+        text-align:center;
         line-height: 1.6;
-        padding: 3px 5px;
+        padding: 4px;
     }
 
-        .info-cell .roll {
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .info-cell .enroll {
-            font-size: 10px;
-        }
-
-        .info-cell .name {
-            font-weight: bold;
-            font-size: 10px;
-        }
-
-        .info-cell .father {
-            font-size: 10px;
-        }
-
-    /* Subject name cell */
     .subj-cell {
-        padding: 2px 5px;
-        font-size: 10px;
-        white-space: nowrap;
         text-align: left !important;
-    }
-
-    /* Data cells */
-    .num {
-        font-size: 10px;
-    }
-
-    .dash {
-        font-size: 12px;
-    }
-
-    /* Notes section */
-    .notes-row td {
-        border: 1px solid #000;
-        vertical-align: top;
-        padding: 4px 6px;
-        font-size: 10px;
+        padding-left: 5px;
     }
 
     .notes-content {
-        width: 55%;
-    }
-
-    .notes-sign {
-        width: 45%;
+        text-align: left;
     }
 
     .note-title {
         font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .note-item {
         margin-bottom: 2px;
         font-size: 10px;
     }
 
-    .note-item {
+    .note-item1 {
         margin: 1px 0;
         font-size: 10px;
         line-height: 1.4;
     }
-
     .sign-row {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        padding-top: 6px;
-        font-size: 10px;
         font-weight: bold;
+        padding-top: 41px;
     }
 
-    .sign-col {
-        text-align: center;
-    }
-
-
-    /* Thick border for outer table */
-    .main-table {
-        border: 1.5px solid #000;
-    }
-
-    /* Sub-header rows */
-    .subhdr th {
-        font-size: 9.5px;
-        background: #fff;
-        font-weight: bold;
-        padding: 2px 2px;
+    .sign-col {        
+       
+        vertical-align: bottom;
+        padding: 5px 10px;
     }
 </style>
+
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Re Reval TR</h3>
         <div class="table-actions">
-
-            <button class="btn btn-success mb-3" onclick="openExamModal()">Bulk Print Re Reval TR</button>
+            <button class="btn btn-success mb-3" onclick="window.print()">Bulk Print Re Reval TR</button>
         </div>
     </div>
-    <div class="table-responsive">
 
-        <div class="card shadow-sm p-3 rounded-4">
-
-
-
-            <!-- Filters -->
-            <div class="row g-3 align-items-end Filters">
-
-                <!-- Exam Name -->
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label fw-semibold">Exam Name</label>
-                    <select id="examFilter" class="form-select">
-                        <option value="">-- Select Exam --</option>
-                        <option value="1">BAMS IIIrd Prof Attempt (Batch 2020) EXAM (December 2025)</option>
-                        <option value="2">BAMS IVth Prof MAIN &amp; Attempt (Batch 2020) EXAM (December 2025)</option>
-                        <option value="3">BAMS I Prof Main Batch-2024 &amp; Attempt (Batch-2023) EXAM (March 2026)</option>
-                        <option value="4">BAMS I Prof BATCH-2021 &amp; 2022 ATTEMPT EXAM (December 2025)</option>
-                        <option value="5">BAMS II Prof BATCH-2022 MAIN &amp; BATCH-2021 ATTEMPT EXAM (December 2025)</option>
-                        <option value="6">COMMON PHD PAPER - JANUARY 2026</option>
-                        <option value="7">M.Sc. Ayurved Manuscriptology Part-II BATCH-2023 MAIN EXAM (March 2026)</option>
-                        <option value="8">M.Sc. Ayurveda Diet and Nutrition Part-I BATCH-2024 MAIN EXAM (March 2026)</option>
-                        <option value="9">M.Sc. Ayur-Yoga Preventive Cardiology Part-I BATCH-2024 MAIN EXAM (March 2026)</option>
-                        <option value="10">M.Sc. Marmalogy and Sports Medicine Part-I BATCH-2024 MAIN EXAM (March 2026)</option>
-                        <option value="11">M.Sc. Marmalogy and Sports Medicine Part-I BATCH-2024 MAIN EXAM (December 2025)</option>
-                        <option value="12">M.Sc. Saundarya Ayurveda Part-I BATCH-2024 MAIN EXAM (December 2025)</option>
-                        <option value="13">M.Sc. Vrikshayurveda Part-I BATCH-2024 MAIN EXAM (March 2026)</option>
-                        <option value="14">M.D. (Ay.) Agada Tantra Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="15">MD(Ay.) Samhita Siddhanta &amp; Sanskrit SEMESTER-II Odd BATCH-2024 Summative Assessment (March 2026)</option>
-                        <option value="16">M.D. (Ay.) Dravyaguna Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="17">M.D. (Ay.) Kaumarabhritya Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="18">MD(Ay.) Kaumarabhritya SEMESTER-II Odd BATCH-2024 Summative Assessment (March 2026)</option>
-                        <option value="19">M.D. (Ay.) Kayachikitsa Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="20">M.D. (Ay.) Kriya Sharira Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="21">M.D. (Ay.) Panchakarma Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="22">M.D. (Ay.) Rachana Sharira Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="23">M.D. (Ay.) Rasashastra &amp; Bhaishajyakalpana Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="24">M.D. (Ay.) Roga Nidan &amp; Vikriti Vigyan Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="25">M.D. (Ay.) Ayurved Samhita &amp; Siddhanta &amp; Sanskrit Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="26">M.D. (Ay.) Swasthavritta Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="27">MD(Ay.) Swasthavritta SEMESTER-II Odd BATCH-2024 Summative Assessment (March 2026)</option>
-                        <option value="28">M.S. (Ay.) Prasuti Tantra evam Stri Roga Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="29">MS(Ay.) Prasuti Tantra evam Stri Roga SEMESTER-II Odd BATCH-2024 Summative Assessment (March 2026)</option>
-                        <option value="30">M.S. (Ay.) Shalakya Tantra Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="31">M.S. (Ay.) Shalya Tantra Part-II (Final) BATCH-2022 MAIN EXAM (March-2026)</option>
-                        <option value="32">PANCHKARMA TECHNICIAN ATTEMPT BATCH-2023 &amp;&amp; MAIN BATCH 2025 EXAM (March 2026)</option>
-
-                    </select>
-                </div>
-
-                <!-- Roll Number -->
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label fw-semibold">Roll Number</label>
-                    <input type="text" id="rollFilter" class="form-control" placeholder="Enter Roll Number">
-                </div>
-
-                <!-- Search Button -->
-                <div class="col-lg-2 col-md-6">
-                    <button id="searchBtn" class="btn btn-primary w-100">
-                        🔍 Search
-                    </button>
-                </div>
-
-                <!-- Optional Reset -->
-
-
+    <div class="card shadow-sm p-3 rounded-4">
+        <div class="row g-3 align-items-end Filters">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label fw-semibold">Exam Name</label>
+                <select id="examFilter" class="form-select">
+                    <option value="">-- Select Exam --</option>
+                </select>
             </div>
 
-        </div>
-
-
-
-    </div>
-</div>
-
-
-<div style="">
-    <div class="page">
-        <div class="top-bar" style="display:flex; justify-content: center; margin-bottom: 20px;">
-
-            <span>NATIONAL INSTITUTE OF AYURVEDA</span>
-        </div>
-        <div style="border:1px solid black">
-
-            <!-- TOP BAR -->
-            <!-- HEADER -->
-            <div class="header">
-                <img class="logo-img" src="/logo/nia_logo_tR.png" alt="NIA Logo">
-                <div class="header-center">
-                    <div class="h1">NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</div>
-                    <div class="h2">Deemed to be University</div>
-                    <div class="h3">(Ministry of AYUSH, Govt. of India)</div>
-                    <div class="h4">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
-                    <div class="exam-title">M.Sc. Marmalogy and Sports Medicine Part-I BATCH-2024 MAIN EXAM (March 2026)</div>
-                    <div class="tab-title">TABULATION REGISTER/LEDGER</div>
-                </div>
-                <div class="header-right">
-                    <div class="page-box">Page:1</div>
-                    <div class="date-issue">Date of Issue : @DateTime.Now.ToString("dd-MM-yyyy")</div>
-                </div>
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label fw-semibold">Roll Number</label>
+                <input type="text" id="rollFilter" class="form-control onlyNumber" placeholder="Enter Roll Number">
             </div>
 
-            <!-- MAIN TABLE -->
-            <table class="main-table">
-                <thead>
-                    <!-- Row 1: top-level column headers -->
-                    <tr>
-                        <th rowspan="3" class="th-sno">S.<br>No.</th>
-                        <th rowspan="3" class="th-info">Roll NO<br>Enrollment No.<br>Candidate Name<br>Father`s Name</th>
-                        <th rowspan="3" class="th-attempt"><div class="rotated">Attempt</div></th>
-                        <th rowspan="3" class="th-subject">Name of Subjects<br>in which appearing</th>
-                        <th rowspan="3" class="th-ucode">Unique Code</th>
-                        <th colspan="3">Marks Scheme</th>
-                        <th colspan="4">OBTAINED MARKS</th>
-                        <th rowspan="3" class="th-grace">Grace</th>
-                        <th rowspan="3" class="th-reqd"><div class="rotated">Required to appear at the <br> Attempt Examinations</div></th>
-                        <th rowspan="3" class="th-dist"><div class="rotated">Distinction</div></th>
-                        <th rowspan="3" class="th-grand">Grand<br>Total</th>
-                        <th rowspan="3" class="th-result">Result</th>
-                    </tr>
-                    <!-- Row 2 -->
-                    <tr>
-                        <th colspan="2">Theory / Practical</th>
-                        <th rowspan="2">Total</th>
-                        <th rowspan="2">Theory</th>
-                        <th rowspan="2">Practical</th>
-                        <th rowspan="2" colspan="2">Total</th>
-                    </tr>
-                    <!-- Row 3: MAX / MIN -->
-                    <tr class="subhdr">
-                        <th>MAX</th>
-                        <th>MIN</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Candidate row spanning 5 subjects -->
-                    <!-- Subject 1 -->
-                    <tr>
-                        <td rowspan="5" style="vertical-align:middle; font-weight:bold;">1</td>
-                        <td rowspan="5" class="info-cell">
-                            <div class="roll">2404004</div>
-                            <div class="enroll">NIA24040005</div>
-                            <div class="name">SRISHTI BALODA</div>
-                            <div class="father">PRATAP SINGH BALODA</div>
-                        </td>
-                        <td rowspan="5" style="vertical-align:middle; font-weight:bold;">1st</td>
-                        <td class="subj-cell">MSc-I-Basic Fundamentals of Ayurveda</td>
-                        <td>605576</td>
-                        <td>100</td>
-                        <td>50</td>
-                        <td>100</td>
-                        <td>75</td>
-                        <td class="dash">-</td>
-                        <td colspan="2">75</td>
-                        <td></td><!-- Grace -->
-                        <td></td><!-- Required -->
-                        <td>D</td>
-                        <td rowspan="5" style="vertical-align:middle; font-size:12px; font-weight:bold;">376</td>
-                        <td rowspan="5" style="vertical-align:middle; font-size:11px; font-weight:bold;">PASS</td>
-                    </tr>
-                    <!-- Subject 2 -->
-                    <tr>
-                        <td class="subj-cell">MSc-II-Basic Fundamental of Anatomy, Lifestyle and Personal Hygiene</td>
-                        <td>605577</td>
-                        <td>100</td>
-                        <td>50</td>
-                        <td>100</td>
-                        <td>71</td>
-                        <td class="dash">-</td>
-                        <td colspan="2">71</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <!-- Subject 3 -->
-                    <tr>
-                        <td class="subj-cell">MSc-III-Basic Fundamental of Physiology &amp; Marma Vigyana</td>
-                        <td>605578</td>
-                        <td>100</td>
-                        <td>50</td>
-                        <td>100</td>
-                        <td>76</td>
-                        <td class="dash">-</td>
-                        <td colspan="2">76</td>
-                        <td></td>
-                        <td></td>
-                        <td>D</td>
-                    </tr>
-                    <!-- Subject 4 -->
-                    <tr>
-                        <td class="subj-cell">MSc-IV-Basic Fundamental of Sports Medicine</td>
-                        <td>605579</td>
-                        <td>100</td>
-                        <td>50</td>
-                        <td>100</td>
-                        <td>74</td>
-                        <td class="dash">-</td>
-                        <td colspan="2">74</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <!-- Subject 5 - Practical -->
-                    <tr>
-                        <td class="subj-cell">PR-Practical</td>
-                        <td class="dash">-</td>
-                        <td>100</td>
-                        <td>50</td>
-                        <td>100</td>
-                        <td class="dash">-</td>
-                        <td>80</td>
-                        <td colspan="2">80</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-
-                    <!-- NOTES ROW -->
-                    <tr>
-                        <td colspan="4" class="notes-content" style="vertical-align:top; padding:5px 7px; font-size:10px; text-align:left; border:1px solid #000;">
-                            <div class="note-title">Note.</div>
-                            <div class="note-item">1. For candidate to pass, he/she shall require to obtain a minimum of 50% marks in each of Theory and Practical examination.</div>
-                            <div class="note-item">2. The candidate securing 75% marks or above in a subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</div>
-                            <div class="note-item">3. A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</div>
-                        </td>
-                        <td colspan="3" style="vertical-align:bottom; padding:5px 10px; border:1px solid #000;">
-                            <div class="sign-row">
-                                <div class="sign-col">Tabulator</div>
-                                <div class="sign-col">DCOE</div>
-                        </td>
+            <div class="col-lg-2 col-md-6">
+                <button id="searchBtn" class="btn btn-primary w-100" style="margin-top:16%;">🔍 Search</button>
+            </div>
         </div>
     </div>
-    <td colspan="11" style="vertical-align:bottom; padding:5px 10px; border:1px solid #000;">
-        <div class="sign-row">
-            <div class="sign-col">Controller of Examinations</div>
-            <div class="sign-col">Registrar</div>
-            <div class="sign-col">Vice Chancellor.</div>
+</div>
+
+<div class="page">
+    <div class="top-bar">
+        <span>NATIONAL INSTITUTE OF AYURVEDA</span>
+    </div>
+
+    <div style="border:1px solid black;">
+        <div class="header">
+            <img class="logo-img" src="/logo/nia_logo_tR.png" alt="NIA Logo">
+
+            <div class="header-center">
+                <div class="h1">NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</div>
+                <div class="h2">Deemed to be University</div>
+                <div class="h3">(Ministry of AYUSH, Govt. of India)</div>
+                <div class="h4">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
+                <div class="exam-title">Exam Name</div>
+                <div class="tab-title">TABULATION REGISTER/LEDGER</div>
+            </div>
+
+            <div class="header-right">
+                <div class="page-box">Page:1</div>
+                <div class="date-issue">Date of Issue : @DateTime.Now.ToString("dd-MM-yyyy")</div>
+            </div>
         </div>
-    </td>
-    </tr>
-    </tbody>
-    </table>
 
-
-
+        <table class="main-table" id="tbl_result">
+            <thead>
+                <tr>
+                    <th rowspan="3">S.<br>No.</th>
+                    <th rowspan="3">Roll NO<br>Enrollment No.<br>Candidate Name<br>Father's Name</th>
+                    <th rowspan="3"><div class="rotated">Attempt</div></th>
+                    <th rowspan="3">Name of Subjects<br>in which appearing</th>
+                    <th rowspan="3">Unique Code</th>
+                    <th colspan="3">Marks Scheme</th>
+                    <th colspan="4">OBTAINED MARKS</th>
+                    <th rowspan="3">Grace</th>
+                    <th rowspan="3"><div class="rotated">Required to appear</div></th>
+                    <th rowspan="3"><div class="rotated">Distinction</div></th>
+                    <th rowspan="3">Grand<br>Total</th>
+                    <th rowspan="3">Result</th>
+                </tr>
+                <tr>
+                    <th colspan="2">Theory / Practical</th>
+                    <th rowspan="2">Total</th>
+                    <th rowspan="2">Theory</th>
+                    <th rowspan="2">Practical</th>
+                    <th rowspan="2" colspan="2">Total</th>
+                </tr>
+                <tr>
+                    <th>MAX</th>
+                    <th>MIN</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </div>
-
-</div>
-
 
 <script>
-      $(document).ready(function () {
-        $('#examTable').DataTable({
-            ajax: {
-                url: ApiBaseUrl + 'Exam/resultlist',
-                dataSrc: ''
-            },
-            columns: [
-                {
-                    data: null,
-                    render: (data, type, row, meta) =>
-                        meta.row + meta.settings._iDisplayStart + 1
-                },
-                { data: 'rollNumber' },
-                { data: 'examName' },
-                { data: 'userName' },
-                { data: 'email' },
-                { data: 'attempt' },
-                { data: 'resultStatus' },
-                 { data: 'fallinpaper' }
-            ]
+    $(document).ready(function () {
+
+        loadPrograms();
+        loadResultSheet();
+
+        $('#searchBtn').click(function () {
+            loadResultSheet();
+            var examIddd = $('#examFilter option:selected').text();
+            $(".exam-title").text(examIddd);
         });
-         loadPrograms();
-    });
-     function closeModal() {
-        $('#examModal').hide();
+
+        function loadResultSheet() {
+             var examId = $('#examFilter').val();
+    var rollNo = $('#rollFilter').val().trim();
+
+    let requestData = {};
+    if (examId && examId !== "") {
+        requestData.examId = parseInt(examId);
     }
-    function openExamModal() {
-     $("#examId").val(0);
-     $("#examName").val('');
-     $("#status").val('');
-     $("#programDropdown").val('');
-     $("#courseDropdown").val('');
-     $('#examModal').css('display', 'flex');
+    if (rollNo && rollNo !== "") {
+        requestData.rollNo = rollNo;
     }
 
+            $.ajax({
+                url: ApiBaseUrl + 'Exam/resultsheet',
+                type: 'GET',
+              data: requestData,
+                success: function (data) {
+                    let subjectRows = '';
+                    if (data.length > 0) {
+                        $('.exam-title').text(data[0].exam_name);
+                        let grandTotal = data[0].grandTotal;
+                        let result = data[0].result;
+                        $.each(data, function (index, item) {
+                            subjectRows += `
+                                <tr style="text-align:center;">
+                                    ${index === 0 ? `<td rowspan="${data.length}">1</td>` : ''}
+                                    ${index === 0 ? `
+                                    <td rowspan="${data.length}" class="info-cell">
+                                        <div><b>${item.rollNumber}</b></div>
+                                        <div>${item.enrollmentNo ?? ''}</div>
+                                        <div><b>${item.studentName}</b></div>
+                                        <div>${item.fatherName}</div>
+                                    </td>` : ''}
 
+                                    ${index === 0 ? `<td rowspan="${data.length}">1st</td>` : ''}
+                                    <td class="subj-cell">${item.subject_name}</td>
+                                    <td>${item.scriptId}</td>
+                                    <td>${item.maxValue}</td>
+                                    <td>${item.minValue}</td>
+                                    <td>${item.maxValue}</td>
+                                    <td>${item.theory}</td>
+                                    <td>${item.practical}</td>
+                                    <td colspan="2">${item.theory}</td>
+                                    <td>${item.grace ?? ''}</td>
+                                    <td>${item.requiredtoappear ?? ''}</td>
+                                    <td>${item.distinction ?? ''}</td>
+                                    ${index === 0 ? `<td rowspan="${data.length}"><b>${grandTotal}</b></td>` : ''}
+                                    ${index === 0 ? `<td rowspan="${data.length}"><b>${result}</b></td>` : ''}
+                                </tr>`;
+                        });
 
-    $('#statusFilter').on('change', function () {
-        var table = $('#examTable').DataTable();
-        table.column(4).search(this.value).draw();
+                        subjectRows += `
+                            <tr>
+                                <td colspan="4" class="note-item1">
+                                    <div class="note-title">Note.</div>
+                                    <div class="note-item">1. For candidate to pass, minimum 50% marks are required in Theory and Practical.</div>
+                                    <div class="note-item">2. 75% or above marks indicate Distinction (D).</div>
+                                    <div class="note-item">3. Failing Theory means fail in both Theory and Practical.</div>
+                                </td>
+                                <td colspan="3">
+                                    <div class="sign-row">
+                                        <div class="sign-col">Tabulator</div>
+                                        <div class="sign-col">DCOE</div>
+                                    </div>
+                                </td>
+                                <td colspan="11">
+                                    <div class="sign-row">
+                                        <div class="sign-col">Controller of Examinations</div>
+                                        <div class="sign-col">Registrar</div>
+                                        <div class="sign-col">Vice Chancellor</div>
+                                    </div>
+                                </td>
+                            </tr>`;
+                    }
+                    else {
+                        subjectRows = `
+                            <tr>
+                                <td colspan="17" style="padding:20px; font-weight:bold;">
+                                    No Record Found
+                                </td>
+                            </tr>`;
+                    }
+
+                    $('#tbl_result tbody').html(subjectRows);
+                },
+                    error: function (xhr, status, error) {
+
+        console.log("XHR:", xhr);
+        console.log("Status:", status);
+        console.log("Error:", error);
+        console.log("Response Text:", xhr.responseText);
+
+        let errorMessage = "Error loading result sheet.";
+
+        if (xhr.responseText) {
+            errorMessage += "\n\nServer Response:\n" + xhr.responseText;
+        }
+
+        alert(errorMessage);
+    }
+            });
+        }
     });
+
+
+    function loadPrograms() {
+        fetch(ApiBaseUrl + 'Course/GetExamDetails')
+            .then(res => res.json())
+            .then(data => {
+                let ddl = document.getElementById("examFilter");
+                ddl.innerHTML = '<option value="">Select Exam</option>';
+                data.forEach(x => {
+                    ddl.innerHTML += `<option value="${x.examId}">${x.examName}</option>`;
+                });
+            });
+    }
+
 </script>
+
