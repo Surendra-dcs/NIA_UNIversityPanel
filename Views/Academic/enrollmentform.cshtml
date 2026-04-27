@@ -3,31 +3,21 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
+
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Student Enrollment Form</h3>
-        @* <div class="table-actions">
-            <select id="programFilter" class="filter-select">
-                <option value="">All Programs</option>
-            </select>
-
-            <select id="courseFilter" class="filter-select">
-                <option value="">All Courses</option>
-            </select>
-        </div> *@
     </div>
     <div class="table-responsive">
         <table id="studentEnrollmenttbl" class="display custom-table">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Exnrollment Number</th>
+                    <th>Enrollment Number</th>
                     <th>College</th>
                     <th>Program</th>
                     <th>Course</th>
                     <th>Student Name</th>
-                    @* <th>Father Name</th>
-                    <th>Mother Name</th> *@
                     <th>Email</th>
                     <th>Mobile</th>
                     <th>Action</th>
@@ -38,29 +28,26 @@
     </div>
 </div>
 
+<!-- Student Details Modal -->
 <div id="studentModal" class="modal">
     <div class="modal-box">
-
-        <!-- HEADER -->
         <div class="modal-header">
             <h3>Student Details</h3>
             <span class="close-btn" onclick="closeStudentModal()">&times;</span>
         </div>
-
-        <!-- BODY -->
         <div class="modal-body" id="studentDetails"></div>
-
-        <!-- FOOTER -->
         <div class="modal-footer">
             <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
         </div>
-
     </div>
 </div>
 
+<!-- Include the shared admit card JS -->
+<script src="~/js/enrollmentAdmitCard.js"></script>
+
 <script>
 
-        let table;
+    let table;
     let allData = [];
 
     $(document).ready(function () {
@@ -88,28 +75,24 @@
                 { data: 'mobile' },
                 {
                     data: null,
-                        render: function (data) {
-                            // <button class="btn btn-info btn-sm" style="background: #e07a54; color: white;"
-                            //     onclick='viewStudent(${JSON.stringify(data)})'>
-                            //     View
-                            // </button>
-                        let disabled = data.isVerify ? 'disabled' : '';
-                        let style = data.isVerify
+                    render: function (data) {
+
+                        let verifyDisabled = data.isVerify ? 'disabled' : '';
+                        let verifyStyle = data.isVerify
                             ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
                             : 'background: #2d7dd2; color: white;';
 
                         return `
-                            
-
-                            <button class="btn btn-success btn-sm ms-1" style="background: #b99e11; color: white;"
+                            <button class="btn btn-success btn-sm ms-1"
+                                style="background: #b99e11; color: white;"
                                 onclick='printEnrollment(${JSON.stringify(data)})'>
                                 Print
                             </button>
 
                             <button class="btn btn-success btn-sm ms-1"
-                                style="${style}"
+                                style="${verifyStyle}"
                                 onclick='verifyForm(${data.id})'
-                                ${disabled}>
+                                ${verifyDisabled}>
                                 Verify
                             </button>
                         `;
@@ -120,10 +103,7 @@
 
     });
 
-
-    // ✅ MOVE OUTSIDE
     function verifyForm(id) {
-
         if (!confirm("Are you sure you want to verify this student?"))
             return;
 
@@ -131,9 +111,7 @@
             url: ApiBaseUrl + 'StudentEnrollment/VerifyStudent',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                id: id
-            }),
+            data: JSON.stringify({ id: id }),
             success: function () {
                 alert("Student verified successfully");
                 table.ajax.reload();
@@ -142,6 +120,10 @@
                 alert("Verification failed");
             }
         });
+    }
+
+    function closeStudentModal() {
+        $('#studentModal').hide();
     }
 
 </script>
