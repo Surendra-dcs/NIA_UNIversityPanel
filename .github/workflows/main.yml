@@ -40,9 +40,7 @@ jobs:
 
           sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
 
-          if [ -f ./publish/appsettings.json ]; then
-            sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
-          fi
+          
 
       # 6. Upload to VPS
       - name: Upload to VPS
