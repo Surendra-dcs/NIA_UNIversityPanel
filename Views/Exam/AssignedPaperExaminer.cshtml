@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Assigned Paper to Examiner";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Assigned Paper to Examiner</h3>
+    </div>
+    <div class="table-responsive">
+        <table id="assignedPaperExaminerTbl" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Examiner</th>
+                    <th>College</th>
+                    <th>Course</th>
+                    <th>Exam</th>
+                    <th>Subject</th>
+                    <th>Paper Type</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    let table;
+    let allData = [];
+
+    $(document).ready(function () {
+
+        table = $('#assignedPaperExaminerTbl').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Examiner/GetAllAssignedExaminer',
+                dataSrc: function (json) {
+                    allData = json;
+                    return json;
+                }
+            },
+            columns: [
+                {
+                    data: null,
+                    render: (data, type, row, meta) =>
+                        meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'examinerName' },
+                { data: 'collegeName' },
+                { data: 'courseName' },
+                { data: 'examName' },
+                { data: 'subjectName' },
+                { data: 'paperType' }
+            ]
+        });
+
+    });
+
+</script>

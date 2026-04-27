@@ -45,6 +45,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult AssignedPaperExaminer()
+        {
+            return View();
+        }
         public IActionResult ansbooklist()
         {
             return View();
