@@ -11,38 +11,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # 3. Restore dependencies
       - name: Restore
         run: dotnet restore
 
-      # 4. Build project
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      # 5. Publish build
       - name: Publish
         run: dotnet publish -c Release -o ./publish
 
-      # 5.1 Inject ApiSettings BaseUrl into appsettings
+      # ✅ Fix BaseUrl injection (clean)
       - name: Inject Api BaseUrl
         run: |
-          echo "Updating appsettings.json....."
+          sed -i "s|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g" ./publish/appsettings.json
 
-          sed -i 's|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.API_BASE_URL }}\"|g' ./publish/appsettings.json
-
-          
-
-      # 6. Upload to VPS
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -54,7 +44,6 @@ jobs:
           target: "/var/www/NIA_university_publish_temp"
           strip_components: 1
 
-      # 7. Deploy on VPS
       - name: Deploy & Restart
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -63,21 +52,19 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            echo "🧹 Clean old publish"
-            mkdir -p /var/www/NIA_university/NIA_UNIversityPanel/publish
+            echo "🧹 Cleaning old build"
             rm -rf /var/www/NIA_university/NIA_UNIversityPanel/publish/*
 
             echo "🚀 Copy new build"
             cp -r /var/www/NIA_university_publish_temp/. /var/www/NIA_university/NIA_UNIversityPanel/publish/
 
-            echo "🧹 Cleaning temp folder"
+            echo "🧹 Remove temp"
             rm -rf /var/www/NIA_university_publish_temp
 
-            echo "🔐 Fix permissions"
+            echo "🔐 Set permissions"
             chown -R www-data:www-data /var/www/NIA_university
 
-            echo "🚀 Restart service"
-            sudo systemctl restart nia-app
-
-            echo "✅ Checking service status"
-            sudo systemctl status nia-app --no-pager
+            echo "🔄 Restart service"
+            systemctl daemon-reexec
+            systemctl restart nia-app
+            systemctl status nia-app --no-pager
