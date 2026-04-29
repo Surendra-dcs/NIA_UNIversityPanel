@@ -1,11 +1,20 @@
-﻿// ── enrollmentAdmitCard.js ───────────────────────────────────────
-// Place at: wwwroot/js/enrollmentAdmitCard.js
-// Used by:
-//   1. Academic/enrollmentform  → printEnrollment(rowData)
-//   2. Exam/rolllist            → printRollAdmitCard(rowData)
+﻿// ── AdmitCard.js ─────────────────────────────────────────────────
+// Place at: wwwroot/js/AdmitCard.js
+// Used by: Exam/rolllist → printRollAdmitCard(rowData)
 // ─────────────────────────────────────────────────────────────────
 
-// ── CSS shared by both admit card types ───────────────────────────
+// ── Helper: resolve image URL from a relative server path ────────
+// ApiBaseUrl is a global JS variable already defined in your layout.
+function _resolveImgUrl(path) {
+    if (!path || path.trim() === '') return '';
+    if (path.startsWith('http://') || path.startsWith('https://')) return path;
+    var base = (typeof ApiBaseUrl !== 'undefined')
+        ? ApiBaseUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
+        : '';
+    return base + (path.startsWith('/') ? path : '/' + path);
+}
+
+// ── CSS ───────────────────────────────────────────────────────────
 function _admitCardCss() {
     return '' +
         '@import url(\'https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap\');' +
@@ -13,8 +22,6 @@ function _admitCardCss() {
         'body { background:#f0f0f0; font-family:Arial,sans-serif; font-size:11px; }' +
         '.page { width:210mm; margin:10mm auto; background:#fff; }' +
         '.container { border:2px solid #000; }' +
-
-        /* Header */
         '.header { display:flex; align-items:center; border-bottom:3px solid #000; padding:0 8px; gap:8px; }' +
         '.header-logo { width:60px; height:60px; flex-shrink:0; display:flex; align-items:center; justify-content:center; padding:6px; }' +
         '.header-logo img { width:60px; height:auto; }' +
@@ -26,16 +33,12 @@ function _admitCardCss() {
         '.header-center .perm-title { font-size:11px; font-weight:bold; margin-top:4px; display:inline-block; padding:1px 6px; }' +
         '.header-right { width:150px; flex-shrink:0; font-size:12px; margin-right:10px; }' +
         '.header-right table { width:100%; border-collapse:collapse; }' +
-        '.header-right td { padding:2px 2px; }' +
+        '.header-right td { padding:2px; }' +
         '.header-right .label { font-weight:bold; white-space:nowrap; }' +
         '.header-right .roll-value { font-size:14px; font-weight:bold; }' +
-
-        /* Exam title */
         '.exam-title-box { border-bottom:2px solid #000; text-align:center; padding:4px 6px; }' +
         '.exam-title-box .main-title { font-size:12px; font-weight:bold; letter-spacing:0.3px; }' +
         '.exam-title-box .sub-title { font-size:11px; font-style:italic; margin-top:1px; }' +
-
-        /* Info + photo row */
         '.info-photo-row { display:flex; border-bottom:1px solid #000; }' +
         '.info-table { flex:1; }' +
         '.info-table table { width:100%; border-collapse:collapse; }' +
@@ -43,41 +46,27 @@ function _admitCardCss() {
         '.info-table .lbl { font-weight:bold; font-size:11px; width:140px; white-space:nowrap; border-right:1px solid #ddd; }' +
         '.info-table .val { font-size:11px; }' +
         '.info-table .name { font-size:14px; font-weight:bold; }' +
-
-        /* Photo/sig column */
         '.photo-sig-box { width:160px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px; gap:6px; border-left:2px solid #000; }' +
         '.photo-box { width:120px; height:140px; border:1px solid #999; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#f5f5f5; font-size:10px; color:#888; text-align:center; }' +
-        '.sig-box { width:120px; height:40px; border:1px solid #aaa; display:flex; align-items:center; justify-content:center; font-size:9px; color:#888; }' +
-
-        /* Notes */
+        '.sig-box { width:120px; height:40px; border:1px solid #aaa; display:flex; align-items:center; justify-content:center; font-size:9px; color:#888; overflow:hidden; }' +
         '.notes-row { border-top:1px solid #000; border-bottom:2px solid #000; padding:3px 8px; }' +
         '.notes-row p { font-size:10.5px; margin:1px 0; }' +
-
-        /* Exam programme */
         '.exam-prog-box { border-bottom:2px solid #000; }' +
         '.exam-prog-title { font-size:11px; font-weight:bold; padding:3px 8px; border-bottom:1.5px solid #000; background:#f9f9f9; }' +
         '.exam-prog-table { width:100%; border-collapse:collapse; font-size:11px; }' +
         '.exam-prog-table th { border:1px solid #000; padding:4px 6px; font-weight:bold; text-align:center; background:#f0f0f0; }' +
         '.exam-prog-table td { border:1px solid #000; padding:4px 6px; text-align:center; vertical-align:middle; }' +
         '.exam-prog-table td.subject-col { text-align:left; }' +
-
-        /* Confirm */
         '.confirm-row { border-bottom:2px solid #000; padding:4px 8px; font-size:12px; font-weight:bold; }' +
-
-        /* Signature row */
         '.sig-row { border-bottom:2px solid #000; display:flex; justify-content:space-between; align-items:flex-end; padding:8px 20px; }' +
         '.sig-col { text-align:center; font-size:12px; }' +
         '.sig-line { border-bottom:1px solid #000; min-width:140px; margin-bottom:3px; height:22px; }' +
         '.sig-col-right { text-align:right; font-size:12px; }' +
         '.sig-col-right .prof-name { font-weight:bold; font-size:14px; }' +
-
-        /* Important notes */
         '.important-notes { border-bottom:2px solid #000; padding:5px 8px; }' +
         '.important-notes .note-heading { font-size:13px; font-weight:bold; color:#000; margin-bottom:5px; }' +
         '.important-notes ol { padding-left:18px; margin:0; }' +
         '.important-notes ol li { font-size:9px; margin-bottom:2.5px; line-height:1.4; }' +
-
-        /* Action bar */
         '.action-bar { background:#f8f8f8; border:1px solid #ddd; border-radius:6px; padding:10px 16px; margin:0 auto 16px; max-width:820px; display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }' +
         '.btn-action { padding:8px 20px; border:2px solid #7B1C1C; border-radius:4px; font-size:13px; font-weight:600; cursor:pointer; font-family:Arial,sans-serif; display:inline-flex; align-items:center; gap:6px; }' +
         '.btn-dl { background:#7B1C1C; color:#fff; }' +
@@ -93,32 +82,7 @@ function _admitCardCss() {
         '}';
 }
 
-// ── Shared: build the header block ───────────────────────────────
-function _buildHeader(rollNo, enrollNo, semester, gender) {
-    return '' +
-        '<div class="header">' +
-        '<div class="header-logo">' +
-        '<img src="/images/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" />' +
-        '</div>' +
-        '<div class="header-center">' +
-        '<div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA</div>' +
-        '<div class="inst-sub">Deemed to be University</div>' +
-        '<div class="inst-ministry">(Ministry of AYUSH, Govt. of India)</div>' +
-        '<div class="inst-address">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>' +
-        '<div class="perm-title"><b>(PROVISIONALLY ALLOWED)</b> PERMISSION LETTER CUM ADMISSION CARD</div>' +
-        '</div>' +
-        '<div class="header-right">' +
-        '<table>' +
-        '<tr><td class="label">ROLL NO.:</td><td class="roll-value">' + (rollNo || '&mdash;') + '</td></tr>' +
-        '<tr><td class="label">ENROL NO.:</td><td style="font-weight:bold;font-size:10px;">' + (enrollNo || '&mdash;') + '</td></tr>' +
-        '<tr><td class="label">SEMESTER:</td><td style="font-weight:bold;font-size:10px;">' + (semester || '&mdash;') + '</td></tr>' +
-        '<tr><td class="label">GENDER:</td><td style="font-weight:bold;font-size:10px;">' + (gender || '&mdash;') + '</td></tr>' +
-        '</table>' +
-        '</div>' +
-        '</div>';
-}
-
-// ── Shared: build important notes ────────────────────────────────
+// ── Important notes ───────────────────────────────────────────────
 function _buildImportantNotes() {
     return '' +
         '<div class="important-notes">' +
@@ -142,10 +106,122 @@ function _buildImportantNotes() {
         '</div>';
 }
 
-// ── Shared: open window with full HTML ───────────────────────────
-function _openAdmitCardWindow(titleLabel, bodyHtml) {
-    var css = _admitCardCss();
+// ═══════════════════════════════════════════════════════════════════
+// ROLL LIST — printRollAdmitCard(data)
+//   data comes from DataTable row (Rolllist model).
+//   Now includes candidateImagePath, signatureImagePath, gender,
+//   and enrollmentNumber fetched via LEFT JOIN in GetRolllist().
+// ═══════════════════════════════════════════════════════════════════
+function printRollAdmitCard(data) {
 
+    var rollNo = data.rollNumber || '—';
+    var enrollNo = data.enrollmentNumber || '—';
+    var studentName = data.userName || '—';
+    var email = data.email || '—';
+    var courseName = data.courseName || '—';
+    var semesterName = data.semesterName || '—';
+    var examName = data.examName || '—';
+    var gender = data.gender ? data.gender.toUpperCase() : '—';
+
+    // ── Resolve photo and signature URLs (same logic as printEnrollment) ──
+    var photoSrc = _resolveImgUrl(data.candidateImagePath || '');
+    var sigSrc = _resolveImgUrl(data.signatureImagePath || '');
+
+    var photoHtml = photoSrc
+        ? '<img src="' + photoSrc + '" alt="Photo" ' +
+        'style="width:100%;height:100%;object-fit:cover;" ' +
+        'onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=\\\"font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;\\\">Photo<br>Not Available</span>\';" />'
+        : '<span style="font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;">Photo<br>Not Available</span>';
+
+    var sigHtml = sigSrc
+        ? '<img src="' + sigSrc + '" alt="Signature" ' +
+        'style="max-width:100%;max-height:100%;object-fit:contain;" ' +
+        'onerror="this.style.display=\'none\';" />'
+        : '<span style="font-size:9px;color:#888;">Signature</span>';
+
+    // ── Header ─────────────────────────────────────────────────────
+    var header =
+        '<div class="header">' +
+        '<div class="header-logo">' +
+        '<img src="/images/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" />' +
+        '</div>' +
+        '<div class="header-center">' +
+        '<div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA</div>' +
+        '<div class="inst-sub">Deemed to be University</div>' +
+        '<div class="inst-ministry">(Ministry of AYUSH, Govt. of India)</div>' +
+        '<div class="inst-address">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>' +
+        '<div class="perm-title"><b>(PROVISIONALLY ALLOWED)</b> PERMISSION LETTER CUM ADMISSION CARD</div>' +
+        '</div>' +
+        '<div class="header-right"><table>' +
+        '<tr><td class="label">ROLL NO.:</td><td class="roll-value">' + rollNo + '</td></tr>' +
+        '<tr><td class="label">ENROL NO.:</td><td style="font-weight:bold;font-size:10px;">' + enrollNo + '</td></tr>' +
+        '<tr><td class="label">SEMESTER:</td><td style="font-weight:bold;font-size:10px;">' + semesterName + '</td></tr>' +
+        '<tr><td class="label">GENDER:</td><td style="font-weight:bold;font-size:10px;">' + gender + '</td></tr>' +
+        '</table></div>' +
+        '</div>';
+
+    // ── Body ────────────────────────────────────────────────────────
+    var body = header +
+        '<div class="exam-title-box">' +
+        '<div class="main-title">' + examName + '</div>' +
+        '<div class="sub-title">' + courseName + ' &nbsp;|&nbsp; Semester: ' + semesterName + '</div>' +
+        '</div>' +
+
+        '<div class="info-photo-row">' +
+        '<div class="info-table"><table>' +
+        '<tr><td class="lbl">NAME</td><td class="val name">' + studentName + '</td></tr>' +
+        '<tr><td class="lbl">ROLL NUMBER</td><td class="val">' + rollNo + '</td></tr>' +
+        '<tr><td class="lbl">ENROLMENT NO.</td><td class="val">' + enrollNo + '</td></tr>' +
+        '<tr><td class="lbl">COURSE</td><td class="val">' + courseName + '</td></tr>' +
+        '<tr><td class="lbl">SEMESTER</td><td class="val">' + semesterName + '</td></tr>' +
+        '<tr><td class="lbl">EXAM</td><td class="val">' + examName + '</td></tr>' +
+        '<tr><td class="lbl">GENDER</td><td class="val">' + gender + '</td></tr>' +
+        '<tr><td class="lbl">EMAIL</td><td class="val">' + email + '</td></tr>' +
+        '</table></div>' +
+
+        '<div class="photo-sig-box">' +
+        '<div class="photo-box">' + photoHtml + '</div>' +
+        '<div class="sig-box">' + sigHtml + '</div>' +
+        '</div>' +
+        '</div>' +
+
+        '<div class="notes-row">' +
+        '<p><b>NOTE:-</b> MOBILE PHONE &amp; OTHER ELECTRONIC DEVICES NOT ALLOWED IN THE EXAMINATION HALL</p>' +
+        '<p><b>REMARK:-</b> CANDIDATE WILL BE ADMITTED TO THE EXAMINATION HALL ONLY ON PRODUCTION OF ADMIT CARD.</p>' +
+        '</div>' +
+
+        '<div class="exam-prog-box">' +
+        '<div class="exam-prog-title">Examination Programme for Subject(s) offered</div>' +
+        '<table class="exam-prog-table">' +
+        '<thead><tr>' +
+        '<th style="width:30px;">S.No</th>' +
+        '<th>Subject</th>' +
+        '<th style="width:80px;">Exam Date</th>' +
+        '<th style="width:65px;">Exam Day</th>' +
+        '<th style="width:110px;">Exam Time</th>' +
+        '<th style="width:80px;">Exam Center</th>' +
+        '</tr></thead>' +
+        '<tbody><tr>' +
+        '<td>1</td>' +
+        '<td class="subject-col">' + examName + '</td>' +
+        '<td>&mdash;</td>' +
+        '<td>&mdash;</td>' +
+        '<td>10:00 AM TO 01:00 PM</td>' +
+        '<td>NIA, JAIPUR</td>' +
+        '</tr></tbody>' +
+        '</table></div>' +
+
+        '<div class="confirm-row">All details in the admission card is correct</div>' +
+
+        '<div class="sig-row">' +
+        '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
+        '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
+        '<div class="sig-col-right"><div class="prof-name">Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
+        '</div>' +
+
+        _buildImportantNotes();
+
+    // ── Action bar ─────────────────────────────────────────────────
     var actionBar =
         '<div class="action-bar no-print">' +
         '<button class="btn-action btn-dl" onclick="window.print()">&#128190; Download / Print Admit Card</button>' +
@@ -156,15 +232,12 @@ function _openAdmitCardWindow(titleLabel, bodyHtml) {
     var html =
         '<!DOCTYPE html><html lang="en"><head>' +
         '<meta charset="UTF-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<title>Admit Card &mdash; ' + titleLabel + '</title>' +
+        '<title>Admit Card \u2014 Roll: ' + rollNo + '</title>' +
         '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">' +
-        '<style>' + css + '</style>' +
+        '<style>' + _admitCardCss() + '</style>' +
         '</head><body>' +
         actionBar +
-        '<div class="page"><div class="container">' +
-        bodyHtml +
-        '</div></div>' +
+        '<div class="page"><div class="container">' + body + '</div></div>' +
         actionBar +
         '</body></html>';
 
@@ -175,173 +248,4 @@ function _openAdmitCardWindow(titleLabel, bodyHtml) {
     } else {
         alert('Pop-up blocked. Please allow pop-ups to download the admit card.');
     }
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// 1. ENROLLMENT FORM — printEnrollment(data)
-//    data comes directly from DataTable row (StudentEnrollmentModel)
-// ═══════════════════════════════════════════════════════════════════
-function printEnrollment(data) {
-
-    var studentName = data.studentName || '—';
-    var fatherName = data.fatherName || '—';
-    var motherName = data.motherName || '—';
-    var enrollNo = data.enrollmentNumber || '—';
-    var collegeName = data.collegeName || '—';
-    var programName = data.programName || '—';
-    var courseName = data.courseName || '—';
-    var email = data.email || '—';
-    var mobile = data.mobile || '—';
-
-    // Enrollment admit card has no roll number yet — show enrollment number as reference
-    var header = _buildHeader('—', enrollNo, '—', '—');
-
-    var examTitleBox =
-        '<div class="exam-title-box">' +
-        '<div class="main-title">ENROLLMENT ADMISSION CARD</div>' +
-        '<div class="sub-title">' + courseName + ' &nbsp;|&nbsp; ' + programName + '</div>' +
-        '</div>';
-
-    var infoRows =
-        '<tr><td class="lbl">NAME</td><td class="val name">' + studentName + '</td></tr>' +
-        '<tr><td class="lbl">FATHER\'S NAME</td><td class="val">' + fatherName + '</td></tr>' +
-        '<tr><td class="lbl">MOTHER\'S NAME</td><td class="val">' + motherName + '</td></tr>' +
-        '<tr><td class="lbl">ENROLLMENT NO.</td><td class="val">' + enrollNo + '</td></tr>' +
-        '<tr><td class="lbl">COLLEGE</td><td class="val">' + collegeName + '</td></tr>' +
-        '<tr><td class="lbl">PROGRAM</td><td class="val">' + programName + '</td></tr>' +
-        '<tr><td class="lbl">COURSE</td><td class="val">' + courseName + '</td></tr>' +
-        '<tr><td class="lbl">MOBILE</td><td class="val">' + mobile + '</td></tr>' +
-        '<tr><td class="lbl">EMAIL</td><td class="val">' + email + '</td></tr>';
-
-    var infoPhotoRow =
-        '<div class="info-photo-row">' +
-        '<div class="info-table"><table>' + infoRows + '</table></div>' +
-        '<div class="photo-sig-box">' +
-        '<div class="photo-box"><span style="font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;">Photo<br>Not Available</span></div>' +
-        '<div class="sig-box"><span>Signature</span></div>' +
-        '</div>' +
-        '</div>';
-
-    var notes =
-        '<div class="notes-row">' +
-        '<p><b>NOTE:-</b> MOBILE PHONE &amp; OTHER ELECTRONIC DEVICES NOT ALLOWED IN THE EXAMINATION HALL</p>' +
-        '<p><b>REMARK:-</b> CANDIDATE WILL BE ADMITTED TO THE EXAMINATION HALL ONLY ON PRODUCTION OF ADMIT CARD.</p>' +
-        '</div>';
-
-    // Enrollment form — no subjects assigned yet; show placeholder row
-    var subRows =
-        '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:10px;font-style:italic;">Subjects will be assigned after exam schedule is released</td></tr>';
-
-    var examProg =
-        '<div class="exam-prog-box">' +
-        '<div class="exam-prog-title">Examination Programme for Subject(s) offered</div>' +
-        '<table class="exam-prog-table">' +
-        '<thead><tr>' +
-        '<th style="width:30px;">S.No</th>' +
-        '<th>Subject</th>' +
-        '<th style="width:80px;">Exam Date</th>' +
-        '<th style="width:65px;">Exam Day</th>' +
-        '<th style="width:110px;">Exam Time</th>' +
-        '<th style="width:80px;">Exam Center</th>' +
-        '</tr></thead>' +
-        '<tbody>' + subRows + '</tbody>' +
-        '</table></div>';
-
-    var confirmRow = '<div class="confirm-row">All details in the admission card is correct</div>';
-
-    var sigRow =
-        '<div class="sig-row">' +
-        '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
-        '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
-        '<div class="sig-col-right"><div class="prof-name">Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
-        '</div>';
-
-    var body = header + examTitleBox + infoPhotoRow + notes + examProg + confirmRow + sigRow + _buildImportantNotes();
-
-    _openAdmitCardWindow('Enrollment: ' + enrollNo, body);
-}
-
-
-// ═══════════════════════════════════════════════════════════════════
-// 2. ROLL LIST — printRollAdmitCard(data)
-//    data comes directly from DataTable row (Rolllist model)
-// ═══════════════════════════════════════════════════════════════════
-function printRollAdmitCard(data) {
-
-    var rollNo = data.rollNumber || '—';
-    var studentName = data.userName || '—';
-    var email = data.email || '—';
-    var courseName = data.courseName || '—';
-    var semesterName = data.semesterName || '—';
-    var examName = data.examName || '—';
-
-    var header = _buildHeader(rollNo, '—', semesterName, '—');
-
-    var examTitleBox =
-        '<div class="exam-title-box">' +
-        '<div class="main-title">' + examName + '</div>' +
-        '<div class="sub-title">' + courseName + ' &nbsp;|&nbsp; Semester: ' + semesterName + '</div>' +
-        '</div>';
-
-    var infoRows =
-        '<tr><td class="lbl">NAME</td><td class="val name">' + studentName + '</td></tr>' +
-        '<tr><td class="lbl">ROLL NUMBER</td><td class="val">' + rollNo + '</td></tr>' +
-        '<tr><td class="lbl">COURSE</td><td class="val">' + courseName + '</td></tr>' +
-        '<tr><td class="lbl">SEMESTER</td><td class="val">' + semesterName + '</td></tr>' +
-        '<tr><td class="lbl">EXAM</td><td class="val">' + examName + '</td></tr>' +
-        '<tr><td class="lbl">EMAIL</td><td class="val">' + email + '</td></tr>';
-
-    var infoPhotoRow =
-        '<div class="info-photo-row">' +
-        '<div class="info-table"><table>' + infoRows + '</table></div>' +
-        '<div class="photo-sig-box">' +
-        '<div class="photo-box"><span style="font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;">Photo<br>Not Available</span></div>' +
-        '<div class="sig-box"><span>Signature</span></div>' +
-        '</div>' +
-        '</div>';
-
-    var notes =
-        '<div class="notes-row">' +
-        '<p><b>NOTE:-</b> MOBILE PHONE &amp; OTHER ELECTRONIC DEVICES NOT ALLOWED IN THE EXAMINATION HALL</p>' +
-        '<p><b>REMARK:-</b> CANDIDATE WILL BE ADMITTED TO THE EXAMINATION HALL ONLY ON PRODUCTION OF ADMIT CARD.</p>' +
-        '</div>';
-
-    // Roll list — single subject row using examName as the paper
-    var subRows =
-        '<tr>' +
-        '<td style="text-align:center;">1</td>' +
-        '<td class="subject-col">' + examName + '</td>' +
-        '<td style="text-align:center;">&mdash;</td>' +
-        '<td style="text-align:center;">&mdash;</td>' +
-        '<td style="text-align:center;">10:00 AM TO 01:00 PM</td>' +
-        '<td style="text-align:center;">NIA, JAIPUR</td>' +
-        '</tr>';
-
-    var examProg =
-        '<div class="exam-prog-box">' +
-        '<div class="exam-prog-title">Examination Programme for Subject(s) offered</div>' +
-        '<table class="exam-prog-table">' +
-        '<thead><tr>' +
-        '<th style="width:30px;">S.No</th>' +
-        '<th>Subject</th>' +
-        '<th style="width:80px;">Exam Date</th>' +
-        '<th style="width:65px;">Exam Day</th>' +
-        '<th style="width:110px;">Exam Time</th>' +
-        '<th style="width:80px;">Exam Center</th>' +
-        '</tr></thead>' +
-        '<tbody>' + subRows + '</tbody>' +
-        '</table></div>';
-
-    var confirmRow = '<div class="confirm-row">All details in the admission card is correct</div>';
-
-    var sigRow =
-        '<div class="sig-row">' +
-        '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
-        '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
-        '<div class="sig-col-right"><div class="prof-name">Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
-        '</div>';
-
-    var body = header + examTitleBox + infoPhotoRow + notes + examProg + confirmRow + sigRow + _buildImportantNotes();
-
-    _openAdmitCardWindow('Roll: ' + rollNo, body);
 }
