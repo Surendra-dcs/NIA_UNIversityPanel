@@ -15,7 +15,6 @@
         flex: 1 1 calc(33.33% - 20px);
     }
 
-    /* Card */
     .table-card {
         height: 100%;
         padding: 18px;
@@ -24,14 +23,12 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-        /* Headings */
         .table-card h5 {
             margin-bottom: 15px;
             font-size: 16px;
             font-weight: 600;
         }
 
-    /* Form Group */
     .form-group {
         display: flex;
         flex-direction: column;
@@ -51,7 +48,6 @@
             font-size: 14px;
         }
 
-    /* Buttons */
     .btn-row {
         display: flex;
         gap: 10px;
@@ -75,26 +71,81 @@
         color: #fff;
     }
 
-    /* File section */
     .file-group {
         margin-bottom: 15px;
     }
 
-        .file-group input {
-            margin-top: 5px;
+        .file-group label {
+            font-size: 13px;
+            color: #555;
+            display: block;
+            margin-bottom: 4px;
         }
 
-    /* Preview image */
-    .img-preview {
+        .file-group input[type="file"] {
+            margin-top: 5px;
+            display: block;
+        }
+
+    /* ── Image preview boxes (same dimensions as photo/sig in AdmitCard) ── */
+    .img-preview-wrap {
         width: 100%;
-        height: 120px;
-        object-fit: contain;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin: 8px 0;
     }
 
-    /* Divider */
+    .photo-preview-box {
+        width: 120px;
+        height: 150px;
+        border: 1px solid #999;
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f5f5;
+        font-size: 11px;
+        color: #aaa;
+        text-align: center;
+    }
+
+        .photo-preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+    .sig-preview-box {
+        width: 180px;
+        height: 55px;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+        font-size: 11px;
+        color: #aaa;
+        text-align: center;
+    }
+
+        .sig-preview-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+    .preview-label {
+        font-size: 10px;
+        color: #888;
+        margin-top: 3px;
+    }
+
     .divider {
         border-top: 1px solid #eee;
         margin: 15px 0;
@@ -126,7 +177,6 @@
     <!-- SEARCH -->
     <div class="form-group search-row">
         <label>Enter Mobile Number</label>
-
         <div class="search-box">
             <input type="text" id="searchMobile" class="onlyNumber" maxlength="10" placeholder="Enter mobile number" />
             <button class="btn btn-save" onclick="searchStudent()">Search</button>
@@ -177,14 +227,23 @@
         <!-- 2. PHOTO + SIGNATURE -->
         <div class="flex-card" style="border: 2px dashed #e85a3a7d;">
             <div class="table-card">
-                <h5>Photo & Signature</h5>
+                <h5>Photo &amp; Signature</h5>
 
                 <!-- PHOTO -->
                 <div class="file-group">
                     <label>Photo</label>
-                    <input type="file" id="photoFile" onchange="previewImage(event,'photoPreview')" />
-                    <img id="photoPreview" class="img-preview" />
-                    <button class="btn btn-save" onclick="uploadPhoto()">Upload Photo</button>
+
+                    <!-- S3 / current image preview -->
+                    <div class="img-preview-wrap">
+                        <div class="photo-preview-box" id="photoPreviewBox">
+                            <span>No Photo</span>
+                        </div>
+                        <span class="preview-label" id="photoPreviewLabel">Current photo from records</span>
+                    </div>
+
+                    <input type="file" id="photoFile" accept="image/*"
+                           onchange="previewLocalFile(event, 'photoPreviewBox', 'photo')" />
+                    <button class="btn btn-save" style="margin-top:6px;" onclick="uploadPhoto()">Upload Photo</button>
                 </div>
 
                 <div class="divider"></div>
@@ -192,9 +251,18 @@
                 <!-- SIGNATURE -->
                 <div class="file-group">
                     <label>Signature</label>
-                    <input type="file" id="signFile" onchange="previewImage(event,'signPreview')" />
-                    <img id="signPreview" class="img-preview" />
-                    <button class="btn btn-save" onclick="uploadSignature()">Upload Signature</button>
+
+                    <!-- S3 / current image preview -->
+                    <div class="img-preview-wrap">
+                        <div class="sig-preview-box" id="sigPreviewBox">
+                            <span>No Signature</span>
+                        </div>
+                        <span class="preview-label" id="sigPreviewLabel">Current signature from records</span>
+                    </div>
+
+                    <input type="file" id="signFile" accept="image/*"
+                           onchange="previewLocalFile(event, 'sigPreviewBox', 'sig')" />
+                    <button class="btn btn-save" style="margin-top:6px;" onclick="uploadSignature()">Upload Signature</button>
                 </div>
             </div>
         </div>
@@ -224,14 +292,54 @@
     let currentStudentId = 0;
     let userId = 0;
 
-    function searchStudent() {
+    // ── Same helper used in AdmitCard.js and enrollmentAdmitCard.js ─────────
+    // ApiBaseUrl is already defined in the layout (e.g. "https://host/api/")
+    function _resolveImgUrl(path) {
+        if (!path || path.trim() === '') return '';
+        if (path.startsWith('http://') || path.startsWith('https://')) return path;
+        var base = (typeof ApiBaseUrl !== 'undefined')
+            ? ApiBaseUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
+            : '';
+        return base + (path.startsWith('/') ? path : '/' + path);
+    }
 
-        let mobile = $('#searchMobile').val();
+    // ── Render a resolved S3 image into a preview box ───────────────────────
+    function setPreviewFromPath(boxId, labelId, path, type) {
+        var url = _resolveImgUrl(path);
+        var $box = $('#' + boxId);
+        var $lbl = $('#' + labelId);
 
-        if (!mobile) {
-            alert("Enter mobile number");
-            return;
+        if (url) {
+            var img = '<img src="' + url + '" alt="' + type + '" '
+                + 'onerror="this.parentElement.innerHTML=\'<span>Image not available</span>\'" />';
+            $box.html(img);
+            $lbl.text('Current ' + type + ' from records');
+        } else {
+            $box.html('<span>No ' + type + '</span>');
+            $lbl.text('No ' + type + ' on record');
         }
+    }
+
+    // ── When user picks a local file, preview it immediately ────────────────
+    function previewLocalFile(event, boxId, type) {
+        var file = event.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function () {
+            var labelId = (type === 'photo') ? 'photoPreviewLabel' : 'sigPreviewLabel';
+            var $box = $('#' + boxId);
+            var img = '<img src="' + reader.result + '" alt="' + type + '" />';
+            $box.html(img);
+            $('#' + labelId).text('New ' + type + ' selected — click Upload to save');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ── Search ───────────────────────────────────────────────────────────────
+    function searchStudent() {
+        var mobile = $('#searchMobile').val();
+        if (!mobile) { alert("Enter mobile number"); return; }
 
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/GetStudentByMobile?mobile=' + mobile,
@@ -239,16 +347,22 @@
             success: function (data) {
 
                 currentStudentId = data.id;
-                userId = data.userId;
+                userId           = data.userId;
 
-                $('#studentSection').show();
-
+                // Personal fields
                 $('#studentName').val(data.studentName);
                 $('#fatherName').val(data.fatherName);
                 $('#motherName').val(data.motherName);
-
                 $('#dob').val(data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '');
                 $('#address').val(data.address);
+
+                // ── Load S3 images exactly like AdmitCard / EnrollmentForm ──
+                setPreviewFromPath('photoPreviewBox', 'photoPreviewLabel',
+                                   data.candidateImagePath, 'photo');
+                setPreviewFromPath('sigPreviewBox',   'sigPreviewLabel',
+                                   data.signatureImagePath, 'signature');
+
+                $('#studentSection').show();
             },
             error: function () {
                 alert("Student not found");
@@ -256,23 +370,21 @@
         });
     }
 
+    // ── Personal detail edit / save ──────────────────────────────────────────
     function enableEdit() {
-
         $('.personal-section input, .personal-section textarea').prop('disabled', false);
-
         $('#saveBtn').show();
     }
 
     function saveStudent() {
-
-        let model = {
-            id: currentStudentId,
-            userId: userId,
+        var model = {
+            id:          currentStudentId,
+            userId:      userId,
             studentName: $('#studentName').val(),
-            fatherName: $('#fatherName').val(),
-            motherName: $('#motherName').val(),
+            fatherName:  $('#fatherName').val(),
+            motherName:  $('#motherName').val(),
             dateOfBirth: $('#dob').val(),
-            address: $('#address').val()
+            address:     $('#address').val()
         };
 
         $.ajax({
@@ -282,37 +394,19 @@
             data: JSON.stringify(model),
             success: function () {
                 alert("Student updated successfully");
-
-                // ONLY disable personal section
                 $('.personal-section input, .personal-section textarea').prop('disabled', true);
-
                 $('#saveBtn').hide();
             },
-            error: function () {
-                alert("Update failed");
-            }
+            error: function () { alert("Update failed"); }
         });
     }
 
-    // IMAGE PREVIEW
-    function previewImage(event, id) {
-        let reader = new FileReader();
-        reader.onload = function () {
-            $('#' + id).attr('src', reader.result);
-        }
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
-    // PHOTO UPLOAD
+    // ── Photo upload ─────────────────────────────────────────────────────────
     function uploadPhoto() {
+        var file = $('#photoFile')[0].files[0];
+        if (!file) { alert("Select photo"); return; }
 
-        let file = $('#photoFile')[0].files[0];
-        if (!file) {
-            alert("Select photo");
-            return;
-        }
-
-        let formData = new FormData();
+        var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
 
@@ -322,25 +416,25 @@
             data: formData,
             processData: false,
             contentType: false,
-            success: function () {
-                alert("Photo uploaded");
+            success: function (res) {
+                alert("Photo uploaded successfully");
+                // If API returns the new path, refresh preview from S3
+                if (res && res.filePath) {
+                    setPreviewFromPath('photoPreviewBox', 'photoPreviewLabel', res.filePath, 'photo');
+                }
+                $('#photoFile').val('');
+                $('#photoPreviewLabel').text('Current photo from records');
             },
-            error: function () {
-                alert("Upload failed");
-            }
+            error: function () { alert("Upload failed"); }
         });
     }
 
-    // SIGNATURE UPLOAD
+    // ── Signature upload ─────────────────────────────────────────────────────
     function uploadSignature() {
+        var file = $('#signFile')[0].files[0];
+        if (!file) { alert("Select signature"); return; }
 
-        let file = $('#signFile')[0].files[0];
-        if (!file) {
-            alert("Select signature");
-            return;
-        }
-
-        let formData = new FormData();
+        var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
 
@@ -350,42 +444,34 @@
             data: formData,
             processData: false,
             contentType: false,
-            success: function () {
-                alert("Signature uploaded");
+            success: function (res) {
+                alert("Signature uploaded successfully");
+                // If API returns the new path, refresh preview from S3
+                if (res && res.filePath) {
+                    setPreviewFromPath('sigPreviewBox', 'sigPreviewLabel', res.filePath, 'signature');
+                }
+                $('#signFile').val('');
+                $('#sigPreviewLabel').text('Current signature from records');
             },
-            error: function () {
-                alert("Upload failed");
-            }
+            error: function () { alert("Upload failed"); }
         });
     }
 
-    // MOBILE UPDATE
+    // ── Mobile update ────────────────────────────────────────────────────────
     function updateMobile() {
-
-        let newMobile = $('#newMobile').val();
-
-        if (newMobile.length !== 10) {
-            alert("Enter valid mobile");
-            return;
-        }
+        var newMobile = $('#newMobile').val();
+        if (newMobile.length !== 10) { alert("Enter valid 10-digit mobile"); return; }
 
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UpdateMobile',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                id: currentStudentId,
-                userId: userId,
-                mobile: newMobile
-            }),
+            data: JSON.stringify({ id: currentStudentId, userId: userId, mobile: newMobile }),
             success: function () {
-                alert("Mobile Number updated");
-                $('#mobile').val(newMobile);
+                alert("Mobile number updated");
                 window.location.reload();
             },
-            error: function () {
-                alert("Update failed");
-            }
+            error: function () { alert("Update failed"); }
         });
     }
 </script>
