@@ -1,0 +1,70 @@
+name: Deploy NIA University (.NET)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+
+      # ✅ Fix BaseUrl injection (clean)
+      - name: Inject Api BaseUrl
+        run: |
+          sed -i "s|\"BaseUrl\": \".*\"|\"BaseUrl\": \"${{ secrets.UAT_API_BASE_URL }}\"|g" ./publish/appsettings.json
+
+      - name: Upload to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          source: "publish/*"
+          target: "/var/www/UAT_NIA_university_publish_temp"
+          strip_components: 1
+
+      - name: Deploy & Restart
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            echo "🧹 Cleaning old build"
+            rm -rf /var/www/uat_NIA_University/NIA_UNIversityPanel/publish/*
+
+            echo "🚀 Copy new build"
+            cp -r /var/www/UAT_NIA_university_publish_temp/. /var/www/uat_NIA_University/NIA_UNIversityPanel/publish/
+
+            echo "🧹 Remove temp"
+            rm -rf /var/www/UAT_NIA_university_publish_temp
+
+            echo "🔐 Set permissions"
+            chown -R www-data:www-data /var/www/uat_NIA_University/NIA_UNIversityPanel
+
+            echo "🔄 Restart service"
+            systemctl daemon-reexec
+            systemctl restart uat_nia-app
+            systemctl status uat_nia-app --no-pager
