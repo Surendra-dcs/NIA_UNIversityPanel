@@ -1,4 +1,4 @@
-name: Deploy NIA University (.NET)
+name: UAT Deploy NIA University (.NET)
 
 on:
   push:
