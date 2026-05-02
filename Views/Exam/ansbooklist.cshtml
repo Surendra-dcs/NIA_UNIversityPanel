@@ -1,8 +1,252 @@
-﻿
-@{
-    ViewData["Title"] = "ansbooklist";
+﻿@{
+    ViewData["Title"] = "Answer Book List";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
 
-<h1>ansbooklist</h1>
+<style>
+    .filter-card {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        border: 1px solid #e9ecef;
+    }
 
+    .filter-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+        .filter-row .form-control,
+        .filter-row .form-select {
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+            .filter-row .form-control:focus,
+            .filter-row .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+            }
+
+        .filter-row .input-group {
+            max-width: 300px;
+        }
+
+        .filter-row .input-group-text {
+            background: #fff;
+            border-right: none;
+            border-radius: 0.375rem 0 0 0.375rem;
+            color: #6c757d;
+        }
+
+        .filter-row .input-group .form-control {
+            border-left: none;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+
+        .filter-row .form-select {
+            max-width: 160px;
+            cursor: pointer;
+        }
+
+    .btn-clear {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+        transition: all 0.15s ease-in-out;
+        white-space: nowrap;
+    }
+
+        .btn-clear:hover {
+            background: #e9ecef;
+            color: #495057;
+            border-color: #ced4da;
+        }
+
+    .badge-status {
+        font-size: 0.8rem;
+        font-weight: 500;
+        padding: 0.35rem 0.65rem;
+    }
+
+    @@media (max-width: 576px) {
+        .filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .filter-row .input-group,
+            .filter-row .form-select {
+                max-width: 100%;
+            }
+    }
+</style>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Answer Book List</h3>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="filter-row">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control"
+                       placeholder="Search by student name or roll number...">
+            </div>
+
+            <select id="statusFilter" class="form-select">
+                <option value="">📋 All Statuses</option>
+                <option value="Pending">🕐 Pending</option>
+                <option value="Evaluated">✅ Evaluated</option>
+                <option value="Not Submitted">❌ Not Submitted</option>
+            </select>
+
+            <button class="btn-clear" id="clearFilters">
+                <i class="bi bi-x-circle"></i> Clear Filters
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="ansBookTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Roll Number</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Book Code</th>
+                    <th style="text-align:center;">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>26050100001</td>
+                    <td>Aarav Sharma</td>
+                    <td>MD(Ay.) Dravyaguna</td>
+                    <td>Semester 1</td>
+                    <td>Dravyaguna Vigyan</td>
+                    <td>15/04/2026</td>
+                    <td>AB-2026-001</td>
+                    <td class="text-center"><span class="badge bg-success text-white badge-status">Evaluated</span></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>26050100002</td>
+                    <td>Priya Patel</td>
+                    <td>MD(Ay.) Dravyaguna</td>
+                    <td>Semester 1</td>
+                    <td>Nighantu & Yoga Vigyanan</td>
+                    <td>15/04/2026</td>
+                    <td>AB-2026-002</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark badge-status">Pending</span></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>26050100003</td>
+                    <td>Rohan Gupta</td>
+                    <td>MD(Ay.) Kayachikitsa</td>
+                    <td>Semester 2</td>
+                    <td>Kayachikitsa</td>
+                    <td>16/04/2026</td>
+                    <td>AB-2026-003</td>
+                    <td class="text-center"><span class="badge bg-success text-white badge-status">Evaluated</span></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>26050100004</td>
+                    <td>Sneha Verma</td>
+                    <td>MD(Ay.) Panchakarma</td>
+                    <td>Semester 1</td>
+                    <td>Panchakarma</td>
+                    <td>16/04/2026</td>
+                    <td>AB-2026-004</td>
+                    <td class="text-center"><span class="badge bg-danger text-white badge-status">Not Submitted</span></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>26050100005</td>
+                    <td>Vikram Singh</td>
+                    <td>MD(Ay.) Dravyaguna</td>
+                    <td>Semester 1</td>
+                    <td>Dravyaguna Vigyan</td>
+                    <td>15/04/2026</td>
+                    <td>AB-2026-005</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark badge-status">Pending</span></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>26050100006</td>
+                    <td>Ananya Joshi</td>
+                    <td>MD(Ay.) Kayachikitsa</td>
+                    <td>Semester 2</td>
+                    <td>Kayachikitsa</td>
+                    <td>16/04/2026</td>
+                    <td>AB-2026-006</td>
+                    <td class="text-center"><span class="badge bg-success text-white badge-status">Evaluated</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#ansBookTable').DataTable({
+            dom: 'rtip',
+            order: [[0, 'asc']],
+            language: {
+                emptyTable: "No answer books found.",
+                zeroRecords: "No records match your filter."
+            }
+        });
+
+        // Custom search filter
+        $.fn.dataTable.ext.search.push(function (settings, data) {
+            if (settings.nTable.id !== 'ansBookTable') return true;
+
+            var searchVal = $('#searchInput').val().trim().toLowerCase();
+            var statusVal = $('#statusFilter').val().trim().toLowerCase();
+
+            var rollNumber  = (data[1] ?? '').toLowerCase();
+            var studentName = (data[2] ?? '').toLowerCase();
+            var status      = (data[8] ?? '').toLowerCase();
+
+            var matchSearch = !searchVal ||
+                              rollNumber.includes(searchVal) ||
+                              studentName.includes(searchVal);
+
+            var plainStatus = status.replace(/<[^>]+>/g, '').trim().toLowerCase();
+            var matchStatus = !statusVal || plainStatus.includes(statusVal);
+
+            return matchSearch && matchStatus;
+        });
+
+        $('#searchInput').on('input', function () { table.draw(); });
+        $('#statusFilter').on('change', function () { table.draw(); });
+
+        $('#clearFilters').on('click', function () {
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            table.draw();
+        });
+    });
+</script>
