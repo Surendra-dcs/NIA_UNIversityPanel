@@ -53,18 +53,18 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "🧹 Cleaning old build"
-            rm -rf /var/www/uat_NIA_University/NIA_UNIversityPanel/publish/*
+            rm -rf /var/www/UAT_NIA_University/NIA_UNIversityPanel/publish/*
 
             echo "🚀 Copy new build"
-            cp -r /var/www/UAT_NIA_university_publish_temp/. /var/www/uat_NIA_University/NIA_UNIversityPanel/publish/
+            cp -r /var/www/UAT_NIA_university_publish_temp/. /var/www/UAT_NIA_University/NIA_UNIversityPanel/publish/
 
             echo "🧹 Remove temp"
             rm -rf /var/www/UAT_NIA_university_publish_temp
 
             echo "🔐 Set permissions"
-            chown -R www-data:www-data /var/www/uat_NIA_University/NIA_UNIversityPanel
+            chown -R www-data:www-data /var/www/UAT_NIA_University/NIA_UNIversityPanel
 
             echo "🔄 Restart service"
             systemctl daemon-reexec
-            systemctl restart uat_nia-app
-            systemctl status uat_nia-app --no-pager
+            systemctl restart uat_nia-app.service
+            systemctl status uat_nia-app.service --no-pager
