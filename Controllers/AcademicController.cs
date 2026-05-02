@@ -40,9 +40,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-        public IActionResult changemobilenumber()
+        public IActionResult changemobilerequest()
         {
             return View();
         }
+
     }
 }
