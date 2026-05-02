@@ -59,6 +59,7 @@
         border-radius: 6px;
         border: none;
         cursor: pointer;
+        font-size: 14px;
     }
 
     .btn-info {
@@ -69,6 +70,21 @@
     .btn-save {
         background: #e07b52;
         color: #fff;
+    }
+
+    .btn-approve {
+        background: #198754;
+        color: #fff;
+    }
+
+    .btn-reject {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .btn:disabled {
+        opacity: .6;
+        cursor: not-allowed;
     }
 
     .file-group {
@@ -87,7 +103,6 @@
             display: block;
         }
 
-    /* ── Image preview boxes (same dimensions as photo/sig in AdmitCard) ── */
     .img-preview-wrap {
         width: 100%;
         display: flex;
@@ -167,6 +182,117 @@
         .search-box button {
             white-space: nowrap;
         }
+
+    /* ── Mobile Change Requests table ── */
+    #mcrSection {
+        margin-top: 30px;
+    }
+
+    .mcr-table-wrap {
+        overflow-x: auto;
+    }
+
+    .mcr-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+        .mcr-table th {
+            background: #094D50;
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .mcr-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #e8f0f0;
+            vertical-align: middle;
+        }
+
+        .mcr-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .mcr-table tr:nth-child(even) td {
+            background: #f7fafa;
+        }
+
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .badge-pending {
+        background: #f59e0b;
+    }
+
+    .badge-approved {
+        background: #198754;
+    }
+
+    .badge-rejected {
+        background: #dc3545;
+    }
+
+    .mcr-action-btn {
+        padding: 5px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        margin-right: 4px;
+    }
+
+        .mcr-action-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+    .mcr-empty {
+        text-align: center;
+        color: #888;
+        padding: 24px;
+        font-size: 13px;
+    }
+
+    .note-input {
+        width: 100%;
+        padding: 5px 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+        .filter-row label {
+            font-size: 13px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .filter-row select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+        }
 </style>
 
 <div class="table-card">
@@ -190,32 +316,26 @@
         <div class="flex-card personal-section" style="border: 2px dashed #1a3a5c91;">
             <div class="table-card">
                 <h5>Personal Details</h5>
-
                 <div class="form-group">
                     <label>Student Name</label>
                     <input type="text" id="studentName" disabled />
                 </div>
-
                 <div class="form-group">
                     <label>Father Name</label>
                     <input type="text" id="fatherName" disabled />
                 </div>
-
                 <div class="form-group">
                     <label>Mother Name</label>
                     <input type="text" id="motherName" disabled />
                 </div>
-
                 <div class="form-group">
                     <label>Date of Birth</label>
                     <input type="date" id="dob" disabled />
                 </div>
-
                 <div class="form-group">
                     <label>Address</label>
                     <textarea id="address" disabled></textarea>
                 </div>
-
                 <div class="btn-row">
                     <button class="btn btn-info" onclick="enableEdit()">Edit</button>
                     <button class="btn btn-save" id="saveBtn" style="display:none;" onclick="saveStudent()">Save</button>
@@ -223,43 +343,27 @@
             </div>
         </div>
 
-
         <!-- 2. PHOTO + SIGNATURE -->
         <div class="flex-card" style="border: 2px dashed #e85a3a7d;">
             <div class="table-card">
                 <h5>Photo &amp; Signature</h5>
-
-                <!-- PHOTO -->
                 <div class="file-group">
                     <label>Photo</label>
-
-                    <!-- S3 / current image preview -->
                     <div class="img-preview-wrap">
-                        <div class="photo-preview-box" id="photoPreviewBox">
-                            <span>No Photo</span>
-                        </div>
+                        <div class="photo-preview-box" id="photoPreviewBox"><span>No Photo</span></div>
                         <span class="preview-label" id="photoPreviewLabel">Current photo from records</span>
                     </div>
-
                     <input type="file" id="photoFile" accept="image/*"
                            onchange="previewLocalFile(event, 'photoPreviewBox', 'photo')" />
                     <button class="btn btn-save" style="margin-top:6px;" onclick="uploadPhoto()">Upload Photo</button>
                 </div>
-
                 <div class="divider"></div>
-
-                <!-- SIGNATURE -->
                 <div class="file-group">
                     <label>Signature</label>
-
-                    <!-- S3 / current image preview -->
                     <div class="img-preview-wrap">
-                        <div class="sig-preview-box" id="sigPreviewBox">
-                            <span>No Signature</span>
-                        </div>
+                        <div class="sig-preview-box" id="sigPreviewBox"><span>No Signature</span></div>
                         <span class="preview-label" id="sigPreviewLabel">Current signature from records</span>
                     </div>
-
                     <input type="file" id="signFile" accept="image/*"
                            onchange="previewLocalFile(event, 'sigPreviewBox', 'sig')" />
                     <button class="btn btn-save" style="margin-top:6px;" onclick="uploadSignature()">Upload Signature</button>
@@ -267,33 +371,76 @@
             </div>
         </div>
 
-
-        <!-- 3. MOBILE -->
+        <!-- 3. MOBILE (direct admin override — unchanged) -->
         <div class="flex-card" style="border: 2px dashed #88888887;">
             <div class="table-card">
-                <h5>Change Mobile</h5>
-
+                <h5>Change Mobile (Admin Override)</h5>
+                <p style="font-size:12px;color:#888;margin-bottom:10px;">
+                    Direct override — no approval flow. Use this only for urgent corrections.
+                </p>
                 <div class="form-group">
                     <label>New Mobile</label>
                     <input type="text" id="newMobile" maxlength="10" />
                 </div>
-
                 <div class="btn-row">
                     <button class="btn btn-save" onclick="updateMobile()">Update</button>
                 </div>
             </div>
         </div>
 
+    </div><!-- end flex-container -->
+</div><!-- end student correction card -->
+<!-- ══════════════════════════════════════════════════════════════════
+     MOBILE CHANGE REQUESTS (student-raised — requires admin approval)
+══════════════════════════════════════════════════════════════════ -->
+<div class="table-card" id="mcrSection" style="margin-top:24px;">
+    <div class="table-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <h3 class="table-title" style="margin:0;">📱 Mobile Change Requests</h3>
+        <button class="btn btn-info" style="font-size:13px;" onclick="loadMobileRequests()">↻ Refresh</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-row">
+        <label>Filter by status:</label>
+        <select id="mcrStatusFilter" onchange="loadMobileRequests()">
+            <option value="">All</option>
+            <option value="Pending" selected>Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+
+    <div class="mcr-table-wrap">
+        <table class="mcr-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Current Mobile</th>
+                    <th>Requested Mobile</th>
+                    <th>Status</th>
+                    <th>Submitted On</th>
+                    <th>Admin Note</th>
+                    <th style="min-width:220px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="mcrTableBody">
+                <tr><td colspan="8" class="mcr-empty">Loading…</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
 
 <script>
+    var ApiBaseUrl = typeof ApiBaseUrl !== 'undefined' ? ApiBaseUrl : '';
+    // Try to pick it up from the layout global if present
+    if (!ApiBaseUrl && typeof window.ApiBaseUrl !== 'undefined') ApiBaseUrl = window.ApiBaseUrl;
+
     let currentStudentId = 0;
     let userId = 0;
 
-    // ── Same helper used in AdmitCard.js and enrollmentAdmitCard.js ─────────
-    // ApiBaseUrl is already defined in the layout (e.g. "https://host/api/")
+    /* ── Image helpers ── */
     function _resolveImgUrl(path) {
         if (!path || path.trim() === '') return '';
         if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -303,12 +450,10 @@
         return base + (path.startsWith('/') ? path : '/' + path);
     }
 
-    // ── Render a resolved S3 image into a preview box ───────────────────────
     function setPreviewFromPath(boxId, labelId, path, type) {
-        var url = _resolveImgUrl(path);
+        var url  = _resolveImgUrl(path);
         var $box = $('#' + boxId);
         var $lbl = $('#' + labelId);
-
         if (url) {
             var img = '<img src="' + url + '" alt="' + type + '" '
                 + 'onerror="this.parentElement.innerHTML=\'<span>Image not available</span>\'" />';
@@ -320,23 +465,19 @@
         }
     }
 
-    // ── When user picks a local file, preview it immediately ────────────────
     function previewLocalFile(event, boxId, type) {
         var file = event.target.files[0];
         if (!file) return;
-
         var reader = new FileReader();
         reader.onload = function () {
             var labelId = (type === 'photo') ? 'photoPreviewLabel' : 'sigPreviewLabel';
-            var $box = $('#' + boxId);
-            var img = '<img src="' + reader.result + '" alt="' + type + '" />';
-            $box.html(img);
+            $('#' + boxId).html('<img src="' + reader.result + '" alt="' + type + '" />');
             $('#' + labelId).text('New ' + type + ' selected — click Upload to save');
         };
         reader.readAsDataURL(file);
     }
 
-    // ── Search ───────────────────────────────────────────────────────────────
+    /* ── Search ── */
     function searchStudent() {
         var mobile = $('#searchMobile').val();
         if (!mobile) { alert("Enter mobile number"); return; }
@@ -345,32 +486,22 @@
             url: ApiBaseUrl + 'StudentCorrection/GetStudentByMobile?mobile=' + mobile,
             type: 'GET',
             success: function (data) {
-
                 currentStudentId = data.id;
                 userId           = data.userId;
-
-                // Personal fields
                 $('#studentName').val(data.studentName);
                 $('#fatherName').val(data.fatherName);
                 $('#motherName').val(data.motherName);
                 $('#dob').val(data.dateOfBirth ? data.dateOfBirth.split('T')[0] : '');
                 $('#address').val(data.address);
-
-                // ── Load S3 images exactly like AdmitCard / EnrollmentForm ──
-                setPreviewFromPath('photoPreviewBox', 'photoPreviewLabel',
-                                   data.candidateImagePath, 'photo');
-                setPreviewFromPath('sigPreviewBox',   'sigPreviewLabel',
-                                   data.signatureImagePath, 'signature');
-
+                setPreviewFromPath('photoPreviewBox', 'photoPreviewLabel', data.candidateImagePath, 'photo');
+                setPreviewFromPath('sigPreviewBox',   'sigPreviewLabel',   data.signatureImagePath, 'signature');
                 $('#studentSection').show();
             },
-            error: function () {
-                alert("Student not found");
-            }
+            error: function () { alert("Student not found"); }
         });
     }
 
-    // ── Personal detail edit / save ──────────────────────────────────────────
+    /* ── Personal detail edit / save ── */
     function enableEdit() {
         $('.personal-section input, .personal-section textarea').prop('disabled', false);
         $('#saveBtn').show();
@@ -386,12 +517,9 @@
             dateOfBirth: $('#dob').val(),
             address:     $('#address').val()
         };
-
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UpdateStudent',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(model),
+            type: 'POST', contentType: 'application/json', data: JSON.stringify(model),
             success: function () {
                 alert("Student updated successfully");
                 $('.personal-section input, .personal-section textarea').prop('disabled', true);
@@ -401,27 +529,19 @@
         });
     }
 
-    // ── Photo upload ─────────────────────────────────────────────────────────
+    /* ── Photo / Signature upload ── */
     function uploadPhoto() {
         var file = $('#photoFile')[0].files[0];
         if (!file) { alert("Select photo"); return; }
-
         var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
-
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UploadPhoto',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
+            type: 'POST', data: formData, processData: false, contentType: false,
             success: function (res) {
                 alert("Photo uploaded successfully");
-                // If API returns the new path, refresh preview from S3
-                if (res && res.filePath) {
-                    setPreviewFromPath('photoPreviewBox', 'photoPreviewLabel', res.filePath, 'photo');
-                }
+                if (res && res.filePath) setPreviewFromPath('photoPreviewBox','photoPreviewLabel',res.filePath,'photo');
                 $('#photoFile').val('');
                 $('#photoPreviewLabel').text('Current photo from records');
             },
@@ -429,27 +549,18 @@
         });
     }
 
-    // ── Signature upload ─────────────────────────────────────────────────────
     function uploadSignature() {
         var file = $('#signFile')[0].files[0];
         if (!file) { alert("Select signature"); return; }
-
         var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
-
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UploadSignature',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
+            type: 'POST', data: formData, processData: false, contentType: false,
             success: function (res) {
                 alert("Signature uploaded successfully");
-                // If API returns the new path, refresh preview from S3
-                if (res && res.filePath) {
-                    setPreviewFromPath('sigPreviewBox', 'sigPreviewLabel', res.filePath, 'signature');
-                }
+                if (res && res.filePath) setPreviewFromPath('sigPreviewBox','sigPreviewLabel',res.filePath,'signature');
                 $('#signFile').val('');
                 $('#sigPreviewLabel').text('Current signature from records');
             },
@@ -457,21 +568,125 @@
         });
     }
 
-    // ── Mobile update ────────────────────────────────────────────────────────
+    /* ── Direct mobile override ── */
     function updateMobile() {
         var newMobile = $('#newMobile').val();
         if (newMobile.length !== 10) { alert("Enter valid 10-digit mobile"); return; }
-
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UpdateMobile',
-            type: 'POST',
-            contentType: 'application/json',
+            type: 'POST', contentType: 'application/json',
             data: JSON.stringify({ id: currentStudentId, userId: userId, mobile: newMobile }),
-            success: function () {
-                alert("Mobile number updated");
-                window.location.reload();
-            },
+            success: function () { alert("Mobile number updated"); window.location.reload(); },
             error: function () { alert("Update failed"); }
         });
     }
+
+
+    /* ════════════════════════════════════════════════════════════════
+       MOBILE CHANGE REQUESTS — admin approve / reject
+    ════════════════════════════════════════════════════════════════ */
+
+    function loadMobileRequests() {
+        var status = $('#mcrStatusFilter').val();
+        var url    = ApiBaseUrl + 'MobileChangeRequest/all';
+        if (status) url += '?status=' + encodeURIComponent(status);
+
+        var $body = $('#mcrTableBody');
+        $body.html('<tr><td colspan="8" class="mcr-empty">Loading…</td></tr>');
+
+        $.ajax({
+            url: url, type: 'GET',
+            success: function (list) {
+                if (!list || list.length === 0) {
+                    $body.html('<tr><td colspan="8" class="mcr-empty">No requests found.</td></tr>');
+                    return;
+                }
+                var html = '';
+                list.forEach(function (r, idx) {
+                    var badgeClass = 'badge-' + r.status.toLowerCase();
+                    var isPending  = (r.status === 'Pending');
+
+                    html += '<tr>' +
+                        '<td>' + (idx + 1) + '</td>' +
+                        '<td><strong>' + (r.studentName || '—') + '</strong></td>' +
+                        '<td>' + r.oldMobile + '</td>' +
+                        '<td><strong>' + r.newMobile + '</strong></td>' +
+                        '<td><span class="badge ' + badgeClass + '">' + r.status + '</span></td>' +
+                        '<td style="white-space:nowrap;">' + r.createdAt + '</td>' +
+                        '<td style="color:#666;font-size:12px;">' + (r.adminNote || '—') + '</td>' +
+                        '<td>';
+
+                    if (isPending) {
+                        html +=
+                            '<div style="margin-bottom:4px;">' +
+                            '  <input class="note-input" id="note-' + r.id + '" type="text" placeholder="Optional note for student…" />' +
+                            '</div>' +
+                            '<button class="mcr-action-btn btn-approve" onclick="mcrApprove(' + r.id + ')">✅ Approve</button>' +
+                            '<button class="mcr-action-btn btn-reject"  onclick="mcrReject('  + r.id + ')">❌ Reject</button>';
+                    } else {
+                        html += '<span style="color:#888;font-size:12px;">—</span>';
+                    }
+
+                    html += '</td></tr>';
+                });
+                $body.html(html);
+            },
+            error: function () {
+                $body.html('<tr><td colspan="8" class="mcr-empty" style="color:#dc3545;">Failed to load requests.</td></tr>');
+            }
+        });
+    }
+
+    function mcrApprove(id) {
+        var note = ($('#note-' + id).val() || '').trim();
+        if (!confirm('Approve this mobile change request?' + (note ? '\nNote: ' + note : ''))) return;
+
+        var $btn = $('button[onclick="mcrApprove(' + id + ')"]');
+        $btn.prop('disabled', true).text('Processing…');
+
+        $.ajax({
+            url: ApiBaseUrl + 'MobileChangeRequest/' + id + '/approve',
+            type: 'POST', contentType: 'application/json',
+            data: JSON.stringify({ note: note }),
+            success: function (res) {
+                alert('✅ ' + (res.message || 'Approved successfully!') +
+                      '\nStudent: ' + res.studentName +
+                      '\nNew mobile: ' + res.newMobile);
+                loadMobileRequests();
+            },
+            error: function (xhr) {
+                var msg = 'Approval failed.';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+                alert('⚠️ ' + msg);
+                $btn.prop('disabled', false).text('✅ Approve');
+            }
+        });
+    }
+
+    function mcrReject(id) {
+        var note = ($('#note-' + id).val() || '').trim();
+        if (!confirm('Reject this mobile change request?' + (note ? '\nNote: ' + note : ''))) return;
+
+        var $btn = $('button[onclick="mcrReject(' + id + ')"]');
+        $btn.prop('disabled', true).text('Processing…');
+
+        $.ajax({
+            url: ApiBaseUrl + 'MobileChangeRequest/' + id + '/reject',
+            type: 'POST', contentType: 'application/json',
+            data: JSON.stringify({ note: note }),
+            success: function (res) {
+                alert('Request rejected.');
+                loadMobileRequests();
+            },
+            error: function (xhr) {
+                var msg = 'Rejection failed.';
+                try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+                alert('⚠️ ' + msg);
+                $btn.prop('disabled', false).text('❌ Reject');
+            }
+        });
+    }
+
+    // Auto-load on page ready
+    $(function () { loadMobileRequests(); });
 </script>

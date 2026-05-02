@@ -1,0 +1,594 @@
+﻿@{
+    ViewData["Title"] = "Mobile Change Requests";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-primary, #1e293b);
+        margin: 0;
+    }
+
+    .page-subtitle {
+        font-size: 0.82rem;
+        color: var(--text-muted, #64748b);
+        margin-top: 2px;
+    }
+
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .filter-btn {
+        padding: 6px 16px;
+        border-radius: 20px;
+        border: 1.5px solid #e2e8f0;
+        background: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.18s;
+        color: #475569;
+    }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: #fff;
+        }
+
+        .filter-btn.active-pending {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: #fff;
+        }
+
+        .filter-btn.active-approved {
+            background: #10b981;
+            border-color: #10b981;
+            color: #fff;
+        }
+
+        .filter-btn.active-rejected {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: #fff;
+        }
+
+    .search-input {
+        padding: 7px 14px;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        outline: none;
+        width: 220px;
+        transition: border-color 0.18s;
+    }
+
+        .search-input:focus {
+            border-color: #4f46e5;
+        }
+
+    .section-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .badge-count {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 2px 10px;
+        border-radius: 20px;
+    }
+
+    .table-wrap {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.83rem;
+    }
+
+        .data-table th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 11px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+            color: #1e293b;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover td {
+            background: #fafbff;
+        }
+
+    .row-num {
+        color: #94a3b8;
+        font-size: 0.78rem;
+    }
+
+    .student-cell {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+
+    .student-date {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 1px;
+    }
+
+    .mobile-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .mobile-old {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+
+    .mobile-new {
+        background: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .mobile-arrow {
+        color: #94a3b8;
+        font-size: 0.7rem;
+    }
+
+    .status-pill {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+    }
+
+    .status-pending {
+        background: #fef3c7;
+        color: #d97706;
+    }
+
+    .status-approved {
+        background: #d1fae5;
+        color: #059669;
+    }
+
+    .status-rejected {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .action-btns {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+    }
+
+    .btn-approve {
+        padding: 5px 14px;
+        background: #10b981;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.18s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-approve:disabled {
+            background: #a7f3d0;
+            cursor: not-allowed;
+        }
+
+    .btn-reject {
+        padding: 5px 12px;
+        background: #fff;
+        color: #ef4444;
+        border: 1.5px solid #fca5a5;
+        border-radius: 7px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.18s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+        .btn-reject:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .btn-reject:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+    .spinner-sm {
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        display: none;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 52px 20px;
+        color: #94a3b8;
+    }
+
+        .empty-state svg {
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 0.88rem;
+            margin: 0;
+        }
+
+    /* Toast */
+    .toast-wrap {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .toast {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 0.83rem;
+        font-weight: 500;
+        color: #fff;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        animation: slideIn 0.25s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .toast-success {
+        background: #10b981;
+    }
+
+    .toast-error {
+        background: #ef4444;
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(40px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+</style>
+
+<div id="toastWrap" class="toast-wrap"></div>
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Mobile Change Requests</h1>
+        <div class="page-subtitle">Review and approve student mobile number change requests</div>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <button class="filter-btn active" id="filterAll" onclick="applyFilter('All')">All</button>
+    <button class="filter-btn" id="filterPending" onclick="applyFilter('Pending')">Pending</button>
+    <button class="filter-btn" id="filterApproved" onclick="applyFilter('Approved')">Approved</button>
+    <button class="filter-btn" id="filterRejected" onclick="applyFilter('Rejected')">Rejected</button>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search student or mobile…" oninput="renderTable()" />
+</div>
+
+<div class="section-card">
+    <div class="section-header">
+        <span class="section-title">Request List</span>
+        <span class="badge-count" id="countBadge">0 requests</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table" id="requestTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Roll Number</th>
+                    <th>Old Mobile</th>
+                    <th>Requested Mobile</th>
+                    <th>Status</th>
+                    <th>Requested On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="requestTbody">
+                <tr><td colspan="8" class="text-center" style="padding:40px;color:#94a3b8;">Loading requests…</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // ── Config ────────────────────────────────────────────────────────────────
+    // ApiBaseUrl is injected by _UniversityLayout.cshtml (window.ApiBaseUrl)
+    const API = (typeof ApiBaseUrl !== 'undefined' ? ApiBaseUrl : window.ApiBaseUrl || '').replace(/\/?$/, '/');
+
+    let allRequests = [];   // raw data from API
+    let rollMap = {};       // userId → rollNumber
+    let activeFilter = 'All';
+
+    // ── Boot ─────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', async function () {
+        await Promise.all([loadRequests(), loadRollMap()]);
+        renderTable();
+    });
+
+    async function loadRequests() {
+        try {
+            const res = await fetch(API + 'MobileChangeRequest/all');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            allRequests = await res.json();
+        } catch (e) {
+            allRequests = [];
+            showToast('Failed to load requests: ' + e.message, 'error');
+        }
+    }
+
+    async function loadRollMap() {
+        try {
+            // Fetch the roll list (same endpoint used by dashboard) to map userId → rollNumber
+            const res = await fetch(API + 'Exam/rolllist');
+            if (!res.ok) return;
+            const rolls = await res.json();
+            rolls.forEach(r => {
+                if (r.userId && r.rollNumber) {
+                    rollMap[r.userId] = r.rollNumber;
+                }
+            });
+        } catch (e) {
+            // non-critical — roll numbers may just show as —
+        }
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────────────
+    function applyFilter(filter) {
+        activeFilter = filter;
+
+        // Reset all filter button styles
+        document.querySelectorAll('.filter-btn').forEach(b => {
+            b.className = 'filter-btn';
+        });
+
+        const map = { All: 'active', Pending: 'active active-pending', Approved: 'active active-approved', Rejected: 'active active-rejected' };
+        const idMap = { All: 'filterAll', Pending: 'filterPending', Approved: 'filterApproved', Rejected: 'filterRejected' };
+        document.getElementById(idMap[filter]).className = 'filter-btn ' + map[filter];
+
+        renderTable();
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────
+    function renderTable() {
+        const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        const tbody = document.getElementById('requestTbody');
+
+        let filtered = allRequests.filter(r => {
+            const matchFilter = activeFilter === 'All' || r.status === activeFilter;
+            const matchSearch = !search ||
+                (r.studentName || '').toLowerCase().includes(search) ||
+                (r.oldMobile || '').includes(search) ||
+                (r.newMobile || '').includes(search) ||
+                (rollMap[r.userId] || '').includes(search);
+            return matchFilter && matchSearch;
+        });
+
+        document.getElementById('countBadge').textContent = filtered.length + ' request' + (filtered.length !== 1 ? 's' : '');
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="8">
+                    <div class="empty-state">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
+                        </svg>
+                        <p>No ${activeFilter === 'All' ? '' : activeFilter.toLowerCase() + ' '}requests found.</p>
+                    </div>
+                </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map((r, i) => {
+            const rollNo = rollMap[r.userId] || '<span style="color:#94a3b8">—</span>';
+            const isPending = r.status === 'Pending';
+
+            const statusClass = r.status === 'Pending' ? 'status-pending'
+                : r.status === 'Approved' ? 'status-approved'
+                : 'status-rejected';
+
+            const actionHtml = isPending
+                ? `<div class="action-btns">
+                    <button class="btn-approve" onclick="handleAction(${r.id}, 'approve', this)">
+                        <span class="spinner-sm" id="spin-a-${r.id}"></span>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Approve
+                    </button>
+                    <button class="btn-reject" onclick="handleAction(${r.id}, 'reject', this)">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Reject
+                    </button>
+                   </div>`
+                : `<span style="font-size:0.75rem;color:#94a3b8;">No action needed</span>`;
+
+            return `
+                <tr id="row-${r.id}">
+                    <td class="row-num">${i + 1}</td>
+                    <td>
+                        <div class="student-cell">
+                            <span class="student-name">${escHtml(r.studentName || '—')}</span>
+                            <span class="student-date">Req. ${escHtml(r.createdAt || '')}</span>
+                        </div>
+                    </td>
+                    <td>${rollNo}</td>
+                    <td><span class="mobile-chip mobile-old">📵 ${escHtml(r.oldMobile || '—')}</span></td>
+                    <td><span class="mobile-chip mobile-new">📱 ${escHtml(r.newMobile || '—')}</span></td>
+                    <td><span class="status-pill ${statusClass}">${escHtml(r.status || '')}</span></td>
+                    <td style="white-space:nowrap">${escHtml(r.createdAt || '—')}</td>
+                    <td>${actionHtml}</td>
+                </tr>`;
+        }).join('');
+    }
+
+    // ── Approve / Reject ──────────────────────────────────────────────────────
+    async function handleAction(id, action, btn) {
+        const row = document.getElementById('row-' + id);
+        const btns = row.querySelectorAll('button');
+        btns.forEach(b => b.disabled = true);
+
+        // Show spinner on approve button only
+        if (action === 'approve') {
+            const spin = document.getElementById('spin-a-' + id);
+            if (spin) spin.style.display = 'block';
+        }
+
+        try {
+            const res = await fetch(API + 'MobileChangeRequest/' + id + '/' + action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Request failed');
+            }
+
+            // Update local state
+            const req = allRequests.find(r => r.id === id);
+            if (req) {
+                req.status = action === 'approve' ? 'Approved' : 'Rejected';
+            }
+
+            showToast(
+                action === 'approve'
+                    ? '✅ Mobile number updated successfully for ' + (data.studentName || 'student')
+                    : '❌ Request rejected.',
+                action === 'approve' ? 'success' : 'error'
+            );
+
+            renderTable();
+
+        } catch (e) {
+            btns.forEach(b => b.disabled = false);
+            const spin = document.getElementById('spin-a-' + id);
+            if (spin) spin.style.display = 'none';
+            showToast('Error: ' + e.message, 'error');
+        }
+    }
+
+    // ── Utilities ─────────────────────────────────────────────────────────────
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function showToast(msg, type) {
+        const wrap = document.getElementById('toastWrap');
+        const el = document.createElement('div');
+        el.className = 'toast toast-' + type;
+        el.textContent = msg;
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 4000);
+    }
+</script>
