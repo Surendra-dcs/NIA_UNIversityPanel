@@ -1,8 +1,232 @@
-﻿
-@{
-    ViewData["Title"] = "revallist";
+﻿@{
+    ViewData["Title"] = "Re-Evaluation List";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
 
-<h1>revallist</h1>
+<style>
+    .filter-card {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.25rem;
+        margin-bottom: 1.25rem;
+        border: 1px solid #e9ecef;
+    }
 
+    .filter-row {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+        .filter-row .form-control,
+        .filter-row .form-select {
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+            .filter-row .form-control:focus,
+            .filter-row .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+            }
+
+        .filter-row .input-group {
+            max-width: 320px;
+        }
+
+        .filter-row .input-group-text {
+            background: #fff;
+            border-right: none;
+            border-radius: 0.375rem 0 0 0.375rem;
+            color: #6c757d;
+        }
+
+        .filter-row .input-group .form-control {
+            border-left: none;
+            border-radius: 0 0.375rem 0.375rem 0;
+        }
+
+        .filter-row .form-select {
+            max-width: 160px;
+            cursor: pointer;
+        }
+
+    .btn-clear {
+        background: #fff;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.875rem;
+        font-size: 0.875rem;
+        transition: all 0.15s ease-in-out;
+        white-space: nowrap;
+    }
+
+        .btn-clear:hover {
+            background: #e9ecef;
+            color: #495057;
+            border-color: #ced4da;
+        }
+
+    .pending-count {
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    @@media (max-width: 576px) {
+        .filter-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .filter-row .input-group,
+            .filter-row .form-select {
+                max-width: 100%;
+            }
+    }
+</style>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Re-Evaluation List</h3>
+        <div class="table-actions">
+            <span id="pendingBadge" class="badge bg-warning text-dark px-3 py-2 pending-count"></span>
+        </div>
+    </div>
+
+    <!-- Improved Filter Section -->
+    <div class="filter-card">
+        <div class="filter-row">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control"
+                       placeholder="Search by student name or roll number...">
+            </div>
+
+            <select id="statusFilter" class="form-select">
+                <option value="">📋 All Statuses</option>
+                <option value="Pending">🕐 Pending</option>
+                <option value="Approved">✅ Approved</option>
+                <option value="Rejected">❌ Rejected</option>
+            </select>
+
+            <button class="btn-clear" id="clearFilters">
+                <i class="bi bi-x-circle"></i> Clear Filters
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="revalTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Roll Number</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Subject</th>
+                    <th>Reason</th>
+                    <th>Applied On</th>
+                    <th style="text-align:center;">Status</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        var table = $('#revalTable').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'Exam/revallist',
+                dataSrc: function (data) {
+                    var pending = data.filter(r => (r.status ?? '').toLowerCase() === 'pending').length;
+                    $('#pendingBadge').text(pending > 0 ? pending + ' Pending' : '');
+                    return data;
+                }
+            },
+            // 🔴 KEY FIX: Remove default search box completely
+            dom: 'rtip',
+            columns: [
+                {
+                    data: null,
+                    render: (d, t, r, meta) => meta.row + meta.settings._iDisplayStart + 1
+                },
+                { data: 'rollNumber' },
+                { data: 'studentName' },
+                { data: 'courseName' },
+                { data: 'semesterName' },
+                { data: 'subjectName' },
+                {
+                    data: 'reason',
+                    render: function (data) {
+                        if (data && data.length > 60)
+                            return `<span title="${data}">${data.substring(0, 60)}…</span>`;
+                        return data ?? '';
+                    }
+                },
+                { data: 'createdAt' },
+                {
+                    data: 'status',
+                    render: function (data) {
+                        var s = (data ?? '').toLowerCase();
+                        var cls = s === 'pending'  ? 'bg-warning text-dark'  :
+                                  s === 'approved' ? 'bg-success text-white'  :
+                                  s === 'rejected' ? 'bg-danger text-white'   :
+                                                     'bg-secondary text-white';
+                        return `<span class="badge ${cls} px-2 py-1">${data ?? ''}</span>`;
+                    },
+                    className: 'text-center'
+                }
+            ],
+            order: [[7, 'desc']],
+            language: {
+                emptyTable: "No re-evaluation requests found.",
+                zeroRecords: "No records match your filter."
+            }
+        });
+
+        // --- Custom search: student name (col 2) OR roll number (col 1) ---
+        $.fn.dataTable.ext.search.push(function (settings, data) {
+            if (settings.nTable.id !== 'revalTable') return true;
+
+            var searchVal   = $('#searchInput').val().trim().toLowerCase();
+            var statusVal   = $('#statusFilter').val().trim().toLowerCase();
+
+            var rollNumber  = (data[1] ?? '').toLowerCase();
+            var studentName = (data[2] ?? '').toLowerCase();
+            var status      = (data[8] ?? '').toLowerCase();
+
+            var matchSearch = !searchVal ||
+                              rollNumber.includes(searchVal) ||
+                              studentName.includes(searchVal);
+
+            var plainStatus = status.replace(/<[^>]+>/g, '').trim().toLowerCase();
+            var matchStatus = !statusVal || plainStatus.includes(statusVal);
+
+            return matchSearch && matchStatus;
+        });
+
+        // Trigger redraw on input
+        $('#searchInput').on('input', function () { table.draw(); });
+        $('#statusFilter').on('change', function () { table.draw(); });
+
+        // Clear button
+        $('#clearFilters').on('click', function () {
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            table.draw();
+        });
+    });
+</script>

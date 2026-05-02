@@ -1,8 +1,63 @@
-﻿
-@{
-    ViewData["Title"] = "resultreport";
+﻿@{
+    ViewData["Title"] = "Result Report";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+<link href="~/css/programandcourse.css" rel="stylesheet" />
 
-<h1>resultreport</h1>
+<style>
+    .empty-state-card {
+        background: #fff;
+        border-radius: 0.75rem;
+        padding: 3rem 2rem;
+        text-align: center;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
 
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        background: #f0f4ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: #6c757d;
+    }
+
+    .empty-state-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state-message {
+        font-size: 0.95rem;
+        color: #6c757d;
+        margin-bottom: 1.5rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+</style>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Result Report</h3>
+    </div>
+
+    <div class="empty-state-card">
+        <div class="empty-state-icon">
+            📊
+        </div>
+        <h4 class="empty-state-title">No Results Available</h4>
+        <p class="empty-state-message">
+            Results have not been published yet. Once the examination results are
+            declared, you will be able to view and download the result report here.
+        </p>
+    </div>
+</div>

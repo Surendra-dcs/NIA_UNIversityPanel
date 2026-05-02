@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
@@ -16,10 +15,10 @@
         </div>
         <div class="stat-body">
             <div class="stat-label">Total Students</div>
-            <div class="stat-number" data-target="@Model.TotalStudents">0</div>
+            <div class="stat-number" id="totalStudents">—</div>
             <div class="stat-badge badge-up">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
-                +12% this month
+                Enrolled in exams
             </div>
         </div>
         <div class="stat-sparkline">
@@ -38,10 +37,10 @@
         </div>
         <div class="stat-body">
             <div class="stat-label">Total Courses</div>
-            <div class="stat-number" data-target="@Model.TotalCourses">0</div>
+            <div class="stat-number" id="totalCourses">—</div>
             <div class="stat-badge badge-up">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
-                +5 new courses
+                Active courses
             </div>
         </div>
         <div class="stat-sparkline">
@@ -58,11 +57,11 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-label">Total Programs</div>
-            <div class="stat-number" data-target="@Model.TotalPrograms">0</div>
+            <div class="stat-label">Total Subjects</div>
+            <div class="stat-number" id="totalSubjects">—</div>
             <div class="stat-badge badge-neutral">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                Same as last month
+                Across all courses
             </div>
         </div>
         <div class="stat-sparkline">
@@ -75,16 +74,16 @@
     <div class="stat-card card-admissions">
         <div class="stat-icon-wrap">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <line x1="5" y1="12" x2="19" y2="12" />
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-label">New Admissions</div>
-            <div class="stat-number" data-target="@Model.TotalNewAdmissions">0</div>
+            <div class="stat-label">Enrolled Students</div>
+            <div class="stat-number" id="totalActiveStudents">—</div>
             <div class="stat-badge badge-up">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
-                +28% this week
+                Verified enrollments
             </div>
         </div>
         <div class="stat-sparkline">
@@ -94,46 +93,123 @@
         </div>
     </div>
 </div>
+
 <div class="section-card">
     <div class="section-header">
-        <h2 class="section-title">Recent Admissions</h2>       
+        <h2 class="section-title">Recent Admissions (Roll List)</h2>
     </div>
     <div class="table-wrap table table-responsive">
-        <table class="data-table">
+        <table class="data-table" id="dashboardTable">
             <thead>
                 <tr>
                     <th>#</th>
+                    <th>Roll Number</th>
                     <th>Student Name</th>
+                    <th>Email</th>
                     <th>Course</th>
-                    <th>Program</th>
-                    <th>Admission Date</th>
+                    <th>Semester</th>
+                    <th>Exam</th>
                     <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                @{
-                    int i = 1;
-                }
-                @foreach (var item in Model.RecentAdmissions)
-                {
-                    <tr>
-                        <td class="row-num">@i</td>
-                        <td>
-                            <div class="student-cell">
-                                <span>@item.StudentName</span>
-                            </div>
-                        </td>
-                        <td>@item.CourseName</td>
-                        <td>@item.ProgramName</td>
-                        <td>@item.AdmissionDate.ToString("dd MMM yyyy")</td>
-                        <td>
-                            <span class="status-pill status-@item.Status.ToLower()">@item.Status</span>
-                        </td>
-                    </tr>
-                    i++;
-                }
+            <tbody id="dashboardTbody">
+                <tr><td colspan="8" class="text-center">Loading...</td></tr>
             </tbody>
         </table>
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+
+        // Helper: animate count from 0 to target
+        function animateCount(elementId, target) {
+            var el = document.getElementById(elementId);
+            var start = 0;
+            var duration = 800;
+            var step = Math.ceil(target / (duration / 16));
+            var timer = setInterval(function () {
+                start += step;
+                if (start >= target) {
+                    start = target;
+                    clearInterval(timer);
+                }
+                el.textContent = start;
+            }, 16);
+        }
+
+        // 1. Total Students + Recent Admissions table — from Exam/rolllist
+        fetch(ApiBaseUrl + 'Exam/rolllist')
+            .then(res => res.json())
+            .then(function (data) {
+                animateCount('totalStudents', data.length);
+
+                var tbody = document.getElementById('dashboardTbody');
+                tbody.innerHTML = '';
+
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No enrolled students found.</td></tr>';
+                    return;
+                }
+
+                data.forEach(function (row, index) {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td class="row-num">${index + 1}</td>
+                            <td>${row.rollNumber ?? ''}</td>
+                            <td><div class="student-cell"><span>${row.userName ?? ''}</span></div></td>
+                            <td>${row.email ?? ''}</td>
+                            <td>${row.courseName ?? ''}</td>
+                            <td>${row.semesterName ?? ''}</td>
+                            <td>${row.examName ?? ''}</td>
+                            <td><span class="status-pill status-active">Active</span></td>
+                        </tr>`;
+                });
+            })
+            .catch(function () {
+                document.getElementById('dashboardTbody').innerHTML =
+                    '<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>';
+                document.getElementById('totalStudents').textContent = 'N/A';
+            });
+
+        // 2. Total Courses — from Course/GetCourses
+        fetch(ApiBaseUrl + 'Course/GetCourses')
+            .then(res => res.json())
+            .then(function (data) {
+                animateCount('totalCourses', data.length);
+            })
+            .catch(function () {
+                document.getElementById('totalCourses').textContent = 'N/A';
+            });
+
+        // 3. Total Subjects — from Subject/list
+        fetch(ApiBaseUrl + 'Subject/list')
+            .then(res => res.json())
+            .then(function (data) {
+                animateCount('totalSubjects', data.length);
+            })
+            .catch(function () {
+                document.getElementById('totalSubjects').textContent = 'N/A';
+            });
+
+        // 4. Active Students — from StudentEnrollment/GetStudentEnrollmentList (isVerify === true)
+       fetch(ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList')
+    .then(res => res.json())
+    .then(function (data) {
+        // Debug: log to console so you can inspect actual values
+        console.log('Enrollment data sample:', data.slice(0, 3));
+        console.log('Total enrollment records:', data.length);
+
+        // Handle bool true OR numeric 1 (SQL bit can come as either)
+        var active = data.filter(s => s.isVerify === true || s.isVerify === 1).length;
+        console.log('Active (verified) count:', active);
+
+        // If NO one is verified yet, show total enrolled instead as fallback
+        animateCount('totalActiveStudents', active);
+    })
+    .catch(function () {
+        document.getElementById('totalActiveStudents').textContent = 'N/A';
+    });
+
+    });
+</script>
