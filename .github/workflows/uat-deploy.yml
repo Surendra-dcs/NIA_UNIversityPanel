@@ -62,7 +62,7 @@ jobs:
             rm -rf /var/www/UAT_NIA_university_publish_temp
 
             echo "🔐 Set permissions"
-            chown -R www-data:www-data /var/www/UAT_NIA_University/NIA_UNIversityPanel
+            chown -R www-data:www-data /var/www/UAT_NIA_university/NIA_UNIversityPanel
 
             echo "🔄 Restart service"
             systemctl daemon-reexec
