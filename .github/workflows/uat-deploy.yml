@@ -53,10 +53,10 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             echo "🧹 Cleaning old build"
-            rm -rf /var/www/UAT_NIA_University/NIA_UNIversityPanel/publish/*
+            rm -rf /var/www/UAT_NIA_university/NIA_UNIversityPanel/publish/*
 
             echo "🚀 Copy new build"
-            cp -r /var/www/UAT_NIA_university_publish_temp/. /var/www/UAT_NIA_University/NIA_UNIversityPanel/publish/
+            cp -r /var/www/UAT_NIA_university_publish_temp/. /var/www/UAT_NIA_university/NIA_UNIversityPanel/publish/
 
             echo "🧹 Remove temp"
             rm -rf /var/www/UAT_NIA_university_publish_temp
