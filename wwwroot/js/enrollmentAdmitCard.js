@@ -69,7 +69,8 @@ function printEnrollment(data) {
 
     var photoHtml = photoSrc
         ? '<img src="' + photoSrc + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;" ' +
-        'onerror="this.parentElement.innerHTML=\'<span style=\\\"font-size:10px;color:#aaa;display:block;text-align:center;padding:10px;\\\">Photo</span>\';" />'
+        'onerror="this.onerror=null;this.style.display=\'none\';" />' +
+        '<span class="photo-fallback" style="font-size:10px;color:#aaa;display:none;text-align:center;padding:10px;">Photo</span>'
         : '<span style="font-size:10px;color:#aaa;text-align:center;display:block;padding:10px;">Photo</span>';
 
     var sigHtml = sigSrc
@@ -102,6 +103,7 @@ function printEnrollment(data) {
         "  box-shadow: 0 0 8px rgba(0,0,0,.35); position: relative;" +
         "}" +
         ".outer-border { border: 2px solid #000; position: relative; }" +
+
 
         // copy label
         ".copy-label {" +
