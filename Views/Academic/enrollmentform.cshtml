@@ -4,6 +4,17 @@
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
 
+<div style="display:flex; gap:10px; margin-bottom:10px;">
+    <select id="sortOrder" class="form-control" style="width:200px;">
+        <option value="">-- Sort By --</option>
+        <option value="asc"> Ascending </option>
+        <option value="desc"> Descending </option>
+    </select>
+    <button id="btnnBulkGenerate" class="btn btn-success" style="background:#89e7b5" disabled>
+        Generate Enrollment Numbers
+    </button>
+
+</div>
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Student Enrollment Form</h3>
@@ -125,5 +136,25 @@
     function closeStudentModal() {
         $('#studentModal').hide();
     }
+
+    $('#sortOrder').change(function () {
+        var val = $(this).val();
+
+        if (val === "asc") {
+            table.order([5, 'asc']).draw();
+        } else if (val === "desc") {
+            table.order([5, 'desc']).draw();
+        }
+    });
+
+        $('#btnBulkGenerate').click(function () {
+        if (!confirm("Generate enrollment numbers for all pending records?"))
+            return;
+
+        $.post(ApiBaseUrl+'StudentEnrollment/generate-bulk', function (res) {
+            alert(res.message);
+            $('#studentEnrollmenttbl').DataTable().ajax.reload();
+        });
+    });
 
 </script>
