@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NIAUNIVERSITYPANEL.Models;
+using System.Net.Http;
+using System.Text;
 
 namespace NIAUNIVERSITYPANEL.Controllers
 {
@@ -16,11 +19,17 @@ namespace NIAUNIVERSITYPANEL.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string mobile)
         {
-            await _api.SendOtp(mobile);
-            ViewBag.Mobile = mobile;
+            var result = await _api.SendOtp(mobile);
+            if (!result.success)
+            {
+                ViewBag.Error = result.message; 
+                return View();               
+            }
+
+            ViewBag.Mobile = mobile;    
             return View();
         }
-        
+     
         [HttpPost]
         public async Task<IActionResult> VerifyOtp(string mobile, string otp)
         {

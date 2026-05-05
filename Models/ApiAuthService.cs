@@ -12,14 +12,33 @@ namespace NIAUNIVERSITYPANEL.Models
             _http = http;
         }
 
-        public async Task SendOtp(string mobile)
+        //public async Task SendOtp(string mobile)
+        //{
+        //    var data = new { MobileNumber = mobile };
+        //    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+        //    await _http.PostAsync("auth/login", content);
+        //}
+        public async Task<(bool success, string message)> SendOtp(string mobile)
         {
-            var data = new { MobileNumber = mobile };
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            var payload = new
+            {
+                MobileNumber = mobile
+            };
 
-            await _http.PostAsync("auth/login", content);
+            var content = new StringContent(
+                JsonConvert.SerializeObject(payload),
+                Encoding.UTF8,
+                "application/json"
+            );
+
+            var response = await _http.PostAsync("Auth/login", content);
+
+            var json = await response.Content.ReadAsStringAsync();
+            dynamic result = JsonConvert.DeserializeObject(json);
+
+            return (result.success, result.message);
         }
-
         public async Task<string> VerifyOtp(string mobile, string otp)
         {
             var data = new { MobileNumber = mobile, OTP = otp };
