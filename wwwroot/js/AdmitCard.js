@@ -122,15 +122,17 @@ function printRollAdmitCard(data) {
     var semesterName = data.semesterName || '—';
     var examName = data.examName || '—';
     var gender = data.gender ? data.gender.toUpperCase() : '—';
+    var examDate = data.examDate || '—';
+    var examDay = data.examDay || '—';
+    var examTime = data.examTime || '10:00 AM TO 01:00 PM';
+    var examCenter = data.examCenter || 'NIA, JAIPUR';
 
     // ── Resolve photo and signature URLs (same logic as printEnrollment) ──
     var photoSrc = _resolveImgUrl(data.candidateImagePath || '');
     var sigSrc = _resolveImgUrl(data.signatureImagePath || '');
 
     var photoHtml = photoSrc
-        ? '<img src="' + photoSrc + '" alt="Photo" ' +
-        'style="width:100%;height:100%;object-fit:cover;" ' +
-        'onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<span style=\\\"font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;\\\">Photo<br>Not Available</span>\';" />'
+        ? '<img src="' + photoSrc + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;" onerror="this.parentElement.innerHTML=\'<span style=&quot;font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;&quot;>Photo<br>Not Available</span>\';" />'
         : '<span style="font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;">Photo<br>Not Available</span>';
 
     var sigHtml = sigSrc
@@ -204,10 +206,10 @@ function printRollAdmitCard(data) {
         '<tbody><tr>' +
         '<td>1</td>' +
         '<td class="subject-col">' + examName + '</td>' +
-        '<td>&mdash;</td>' +
-        '<td>&mdash;</td>' +
-        '<td>10:00 AM TO 01:00 PM</td>' +
-        '<td>NIA, JAIPUR</td>' +
+        '<td>' + examDate + '</td>' +          // ← was &mdash;
+        '<td>' + examDay + '</td>' +           // ← was &mdash;
+        '<td>' + examTime + '</td>' +
+        '<td>' + examCenter + '</td>' +
         '</tr></tbody>' +
         '</table></div>' +
 
