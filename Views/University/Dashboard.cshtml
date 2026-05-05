@@ -4,6 +4,30 @@
 }
 
 <div class="stats-grid">
+
+    <div class="stat-card card-admissions">
+        <div class="stat-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+        </div>
+        <div class="stat-body">
+            <div class="stat-label">Total Enrolled Students</div>
+            <div class="stat-number" id="totalActiveStudents">—</div>
+            <div class="stat-badge badge-up">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
+                Verified enrollments
+            </div>
+        </div>
+        <div class="stat-sparkline">
+            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
+                <polyline points="0,26 15,20 28,17 40,12 55,8 70,5 80,3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
+            </svg>
+        </div>
+    </div>
+
+
     <div class="stat-card card-students">
         <div class="stat-icon-wrap">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -14,7 +38,7 @@
             </svg>
         </div>
         <div class="stat-body">
-            <div class="stat-label">Total Students</div>
+            <div class="stat-label">Total Exam Forms</div>
             <div class="stat-number" id="totalStudents">—</div>
             <div class="stat-badge badge-up">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
@@ -71,30 +95,10 @@
         </div>
     </div>
 
-    <div class="stat-card card-admissions">
-        <div class="stat-icon-wrap">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                <polyline points="22 4 12 14.01 9 11.01" />
-            </svg>
-        </div>
-        <div class="stat-body">
-            <div class="stat-label">Enrolled Students</div>
-            <div class="stat-number" id="totalActiveStudents">—</div>
-            <div class="stat-badge badge-up">
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15" /></svg>
-                Verified enrollments
-            </div>
-        </div>
-        <div class="stat-sparkline">
-            <svg viewBox="0 0 80 30" preserveAspectRatio="none">
-                <polyline points="0,26 15,20 28,17 40,12 55,8 70,5 80,3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5" />
-            </svg>
-        </div>
-    </div>
+    
 </div>
 
-<div class="section-card">
+@* <div class="section-card">
     <div class="section-header">
         <h2 class="section-title">Recent Admissions (Roll List)</h2>
     </div>
@@ -117,7 +121,7 @@
             </tbody>
         </table>
     </div>
-</div>
+</div> *@
 
 <script>
     $(document).ready(function () {
@@ -196,16 +200,7 @@
        fetch(ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList')
     .then(res => res.json())
     .then(function (data) {
-        // Debug: log to console so you can inspect actual values
-        console.log('Enrollment data sample:', data.slice(0, 3));
-        console.log('Total enrollment records:', data.length);
-
-        // Handle bool true OR numeric 1 (SQL bit can come as either)
-        var active = data.filter(s => s.isVerify === true || s.isVerify === 1).length;
-        console.log('Active (verified) count:', active);
-
-        // If NO one is verified yet, show total enrolled instead as fallback
-        animateCount('totalActiveStudents', active);
+        animateCount('totalActiveStudents', data.length);
     })
     .catch(function () {
         document.getElementById('totalActiveStudents').textContent = 'N/A';
