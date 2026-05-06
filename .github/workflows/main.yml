@@ -1,10 +1,13 @@
 name: Deploy NIA University (.NET)
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  workflow_dispatch:          # ← CHANGE: removed "push" trigger entirely
+    inputs:
+      deploy_production:
+        description: '🚀 Deploy to Production? (Only after QA approval)'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   build-and-deploy:
