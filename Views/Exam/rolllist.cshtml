@@ -3,12 +3,11 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
-
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Roll List</h3>
         <div class="table-actions">
-            <button class="btn btn-success mb-3" onclick="openExamModal()">Bulk Print Admit Card</button>
+            <button class="btn btn-success mb-3" onclick="bulkPrintAllAdmitCards()">Bulk Print Admit Card</button>
         </div>
     </div>
     <div class="table-responsive">
@@ -29,61 +28,59 @@
         </table>
     </div>
 </div>
-
-<!-- Include the shared admit card JS -->
 <script src="~/js/AdmitCard.js"></script>
-
 <script>
+    // ── IMPORTANT: must be on window so AdmitCard.js can read window._allApiRows ──
+    window._allApiRows = [];
 
     $(document).ready(function () {
-        $('#examTable').DataTable({
-            ajax: {
-                url: ApiBaseUrl + 'Exam/rolllist',
-                dataSrc: ''
-            },
-            columns: [
-                {
-                    data: null,
-                    render: (data, type, row, meta) =>
-                        meta.row + meta.settings._iDisplayStart + 1
-                },
-                { data: 'rollNumber' },
-                { data: 'userName' },
-                { data: 'email' },
-                { data: 'courseName' },
-                { data: 'semesterName' },
-                { data: 'examName' },
-                {
-                    data: null,
-                    render: function (data) {
-                        return `
-                            <button class="btn btn-edit"
-                                onclick='printRollAdmitCard(${JSON.stringify(data)})'>
-                                Print Admit Card
-                            </button>
-                        `;
+        $.ajax({
+            url: ApiBaseUrl + 'Exam/rolllist',
+            method: 'GET',
+            success: function (data) {
+                // Store ALL rows on window — AdmitCard.js reads window._allApiRows
+                window._allApiRows = data;
+
+                // ── Deduplicate for the TABLE only: one row per rollNumber ──────────
+                var seen = {};
+                var tableRows = [];
+                data.forEach(function (r) {
+                    if (!seen[r.rollNumber]) {
+                        seen[r.rollNumber] = true;
+                        tableRows.push(r);
                     }
-                }
-            ]
+                });
+
+                // ── Init DataTable with deduplicated rows ─────────────────────────
+                $('#examTable').DataTable({
+                    data: tableRows,
+                    columns: [
+                        {
+                            data: null,
+                            render: (data, type, row, meta) =>
+                                meta.row + meta.settings._iDisplayStart + 1
+                        },
+                        { data: 'rollNumber' },
+                        { data: 'userName' },
+                        { data: 'email' },
+                        { data: 'courseName' },
+                        { data: 'semesterName' },
+                        { data: 'examName' },
+                        {
+                            data: null,
+                            render: function (data) {
+                                return `<button class="btn btn-edit"
+                                            onclick='printRollAdmitCardByRoll("${data.rollNumber}")'>
+                                            Print Admit Card
+                                        </button>`;
+                            }
+                        }
+                    ]
+                });
+            },
+            error: function () {
+                alert('Failed to load roll list.');
+            }
         });
     });
-
-    function openExamModal() {
-        // Bulk print: iterate all loaded rows and open admit cards
-        var dtInstance = $('#examTable').DataTable();
-        var rows = dtInstance.rows().data().toArray();
-
-        if (rows.length === 0) {
-            alert('No data available to print.');
-            return;
-        }
-
-        if (!confirm('This will open ' + rows.length + ' admit card(s) in new tabs. Make sure pop-ups are allowed. Continue?'))
-            return;
-
-        rows.forEach(function (row) {
-            printRollAdmitCard(row);
-        });
-    }
-
 </script>

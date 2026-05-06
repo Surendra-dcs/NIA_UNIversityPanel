@@ -1,10 +1,8 @@
-﻿// ── AdmitCard.js ─────────────────────────────────────────────────
-// Place at: wwwroot/js/AdmitCard.js
-// Used by: Exam/rolllist → printRollAdmitCard(rowData)
-// ─────────────────────────────────────────────────────────────────
+﻿// ── AdmitCard.js ──────────────────────────────────────────────────────────────
+// Reads window._allApiRows (set by rolllist.cshtml after the API call)
+// to collect ALL subject rows for a student before rendering the admit card.
+// ─────────────────────────────────────────────────────────────────────────────
 
-// ── Helper: resolve image URL from a relative server path ────────
-// ApiBaseUrl is a global JS variable already defined in your layout.
 function _resolveImgUrl(path) {
     if (!path || path.trim() === '') return '';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -14,10 +12,8 @@ function _resolveImgUrl(path) {
     return base + (path.startsWith('/') ? path : '/' + path);
 }
 
-// ── CSS ───────────────────────────────────────────────────────────
 function _admitCardCss() {
-    return '' +
-        '@import url(\'https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap\');' +
+    return '@import url(\'https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap\');' +
         '* { margin:0; padding:0; box-sizing:border-box; }' +
         'body { background:#f0f0f0; font-family:Arial,sans-serif; font-size:11px; }' +
         '.page { width:210mm; margin:10mm auto; background:#fff; }' +
@@ -35,7 +31,7 @@ function _admitCardCss() {
         '.header-right table { width:100%; border-collapse:collapse; }' +
         '.header-right td { padding:2px; }' +
         '.header-right .label { font-weight:bold; white-space:nowrap; }' +
-        '.header-right .roll-value { font-size:14px; font-weight:bold; }' +
+        '.header-right .roll-value { font-size:9px; font-weight:bold; }' +
         '.exam-title-box { border-bottom:2px solid #000; text-align:center; padding:4px 6px; }' +
         '.exam-title-box .main-title { font-size:12px; font-weight:bold; letter-spacing:0.3px; }' +
         '.exam-title-box .sub-title { font-size:11px; font-style:italic; margin-top:1px; }' +
@@ -74,18 +70,11 @@ function _admitCardCss() {
         '.btn-pr { background:#fff; color:#7B1C1C; }' +
         '.btn-pr:hover { background:#f5f5f5; }' +
         '@page { size:A4; }' +
-        '@media print {' +
-        '  body { background:#fff; zoom:0.9; }' +
-        '  .no-print { display:none !important; }' +
-        '  .page { margin:0; box-shadow:none; }' +
-        '  * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }' +
-        '}';
+        '@media print { body { background:#fff; zoom:0.9; } .no-print { display:none !important; } .page { margin:0; box-shadow:none; } * { -webkit-print-color-adjust:exact; print-color-adjust:exact; } }';
 }
 
-// ── Important notes ───────────────────────────────────────────────
 function _buildImportantNotes() {
-    return '' +
-        '<div class="important-notes">' +
+    return '<div class="important-notes">' +
         '<div class="note-heading">Note:-</div>' +
         '<ol>' +
         '<li style="font-size:12px;font-weight:bold;color:#ff1111;margin-bottom:4px;font-family:\'Noto Sans Devanagari\',Arial,sans-serif;">यदि आपके हिंदी व अंग्रेजी नाम में कोई त्रुटि है तो परीक्षा अनुभाग से संपर्क कर उसे सही करवाएं</li>' +
@@ -102,51 +91,37 @@ function _buildImportantNotes() {
         '<li>Candidates are warned not to mark their Roll Number, Name or any other mark anywhere on the inside of their Answer Book other than the answers. Violators will be liable for punishment for adopting unfair means.</li>' +
         '<li>No candidate will leave his seat before the end of the examination without special permission of the Centre Superintendent.</li>' +
         '<li>Candidates found using unfair means will be liable for serious action as per rules.</li>' +
-        '</ol>' +
-        '</div>';
+        '</ol></div>';
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// ROLL LIST — printRollAdmitCard(data)
-//   data comes from DataTable row (Rolllist model).
-//   Now includes candidateImagePath, signatureImagePath, gender,
-//   and enrollmentNumber fetched via LEFT JOIN in GetRolllist().
-// ═══════════════════════════════════════════════════════════════════
-function printRollAdmitCard(data) {
+// ── Core HTML builder ─────────────────────────────────────────────────────────
+// rows = ALL API rows for this student (one per subject, already filtered by rollNumber)
+function _buildAdmitCardHtml(rows) {
+    var d = rows[0];
 
-    var rollNo = data.rollNumber || '—';
-    var enrollNo = data.enrollmentNumber || '—';
-    var studentName = data.userName || '—';
-    var email = data.email || '—';
-    var courseName = data.courseName || '—';
-    var semesterName = data.semesterName || '—';
-    var examName = data.examName || '—';
-    var gender = data.gender ? data.gender.toUpperCase() : '—';
-    var examDate = data.examDate || '—';
-    var examDay = data.examDay || '—';
-    var examTime = data.examTime || '10:00 AM TO 01:00 PM';
-    var examCenter = data.examCenter || 'NIA, JAIPUR';
+    var rollNo = d.rollNumber || '—';
+    var enrollNo = d.enrollmentNumber || '—';
+    var studentName = d.userName || '—';
+    var email = d.email || '—';
+    var courseName = d.courseName || '—';
+    var semesterName = d.semesterName || '—';
+    var examName = d.examName || '—';
+    var gender = d.gender ? d.gender.toUpperCase() : '—';
 
-    // ── Resolve photo and signature URLs (same logic as printEnrollment) ──
-    var photoSrc = _resolveImgUrl(data.candidateImagePath || '');
-    var sigSrc = _resolveImgUrl(data.signatureImagePath || '');
+    var photoSrc = _resolveImgUrl(d.candidateImagePath || '');
+    var sigSrc = _resolveImgUrl(d.signatureImagePath || '');
 
     var photoHtml = photoSrc
         ? '<img src="' + photoSrc + '" alt="Photo" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;" onerror="this.parentElement.innerHTML=\'<span style=&quot;font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;&quot;>Photo<br>Not Available</span>\';" />'
         : '<span style="font-size:9px;color:#888;text-align:center;display:block;padding-top:40px;">Photo<br>Not Available</span>';
 
     var sigHtml = sigSrc
-        ? '<img src="' + sigSrc + '" alt="Signature" ' +
-        'style="max-width:100%;max-height:100%;object-fit:contain;" ' +
-        'onerror="this.style.display=\'none\';" />'
+        ? '<img src="' + sigSrc + '" alt="Signature" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display=\'none\';" />'
         : '<span style="font-size:9px;color:#888;">Signature</span>';
 
-    // ── Header ─────────────────────────────────────────────────────
     var header =
         '<div class="header">' +
-        '<div class="header-logo">' +
-        '<img src="/images/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" />' +
-        '</div>' +
+        '<div class="header-logo"><img src="/images/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" /></div>' +
         '<div class="header-center">' +
         '<div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA</div>' +
         '<div class="inst-sub">Deemed to be University</div>' +
@@ -162,13 +137,13 @@ function printRollAdmitCard(data) {
         '</table></div>' +
         '</div>';
 
-    // ── Body ────────────────────────────────────────────────────────
-    var body = header +
+    var titleBand =
         '<div class="exam-title-box">' +
         '<div class="main-title">' + examName + '</div>' +
         '<div class="sub-title">' + courseName + ' &nbsp;|&nbsp; Semester: ' + semesterName + '</div>' +
-        '</div>' +
+        '</div>';
 
+    var infoSection =
         '<div class="info-photo-row">' +
         '<div class="info-table"><table>' +
         '<tr><td class="lbl">NAME</td><td class="val name">' + studentName + '</td></tr>' +
@@ -180,50 +155,92 @@ function printRollAdmitCard(data) {
         '<tr><td class="lbl">GENDER</td><td class="val">' + gender + '</td></tr>' +
         '<tr><td class="lbl">EMAIL</td><td class="val">' + email + '</td></tr>' +
         '</table></div>' +
-
         '<div class="photo-sig-box">' +
         '<div class="photo-box">' + photoHtml + '</div>' +
         '<div class="sig-box">' + sigHtml + '</div>' +
-        '</div>' +
-        '</div>' +
+        '</div></div>';
 
+    var notesRow =
         '<div class="notes-row">' +
         '<p><b>NOTE:-</b> MOBILE PHONE &amp; OTHER ELECTRONIC DEVICES NOT ALLOWED IN THE EXAMINATION HALL</p>' +
         '<p><b>REMARK:-</b> CANDIDATE WILL BE ADMITTED TO THE EXAMINATION HALL ONLY ON PRODUCTION OF ADMIT CARD.</p>' +
-        '</div>' +
+        '</div>';
 
+    // ── Build subject rows ────────────────────────────────────────────────────
+    // FIX: Deduplicate by subjectName (not subjectId) to avoid duplicates
+    //      where two different subjectIds share the same subject name.
+    //      Also include subjects with subjectId === 0 only if they have a name.
+    var seenSubjectNames = {};
+    var uniqueSubjects = [];
+    rows.forEach(function (r) {
+        var sname = (r.subjectName || '').trim();
+        // Skip rows with empty subject names
+        if (sname === '') return;
+        // Skip duplicate subject names
+        if (seenSubjectNames[sname]) return;
+        seenSubjectNames[sname] = true;
+        uniqueSubjects.push(r);
+    });
+
+    var subjectRows = '';
+    if (uniqueSubjects.length === 0) {
+        // Absolute fallback — no subjects found at all
+        subjectRows =
+            '<tr>' +
+            '<td>1</td>' +
+            '<td class="subject-col">—</td>' +
+            '<td>—</td><td>—</td><td>—</td><td>NIA, JAIPUR</td>' +
+            '</tr>';
+    } else {
+        uniqueSubjects.forEach(function (r, idx) {
+            // Clean SQL datetime artefact e.g. "Jan  1 1900 10:00AM"
+            var rawTime = (r.examTime || '').trim();
+            var cleanTime = rawTime.replace(/^[A-Za-z]{3}\s+\d+\s+\d{4}\s+/i, '').trim();
+            if (cleanTime === '') cleanTime = '—';
+
+            var examDate = (r.examDate || '').trim() || '—';
+            var examDay = (r.examDay || '').trim() || '—';
+            var examCenter = (r.examCenter || '').trim() || 'NIA, JAIPUR';
+
+            subjectRows +=
+                '<tr>' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td class="subject-col">' + r.subjectName + '</td>' +
+                '<td>' + examDate + '</td>' +
+                '<td>' + examDay + '</td>' +
+                '<td>' + cleanTime + '</td>' +
+                '<td>' + examCenter + '</td>' +
+                '</tr>';
+        });
+    }
+
+    var examProg =
         '<div class="exam-prog-box">' +
         '<div class="exam-prog-title">Examination Programme for Subject(s) offered</div>' +
-        '<table class="exam-prog-table">' +
-        '<thead><tr>' +
+        '<table class="exam-prog-table"><thead><tr>' +
         '<th style="width:30px;">S.No</th>' +
         '<th>Subject</th>' +
         '<th style="width:80px;">Exam Date</th>' +
         '<th style="width:65px;">Exam Day</th>' +
         '<th style="width:110px;">Exam Time</th>' +
         '<th style="width:80px;">Exam Center</th>' +
-        '</tr></thead>' +
-        '<tbody><tr>' +
-        '<td>1</td>' +
-        '<td class="subject-col">' + examName + '</td>' +
-        '<td>' + examDate + '</td>' +          // ← was &mdash;
-        '<td>' + examDay + '</td>' +           // ← was &mdash;
-        '<td>' + examTime + '</td>' +
-        '<td>' + examCenter + '</td>' +
-        '</tr></tbody>' +
-        '</table></div>' +
+        '</tr></thead><tbody>' + subjectRows + '</tbody></table></div>';
 
+    var sigRow =
         '<div class="confirm-row">All details in the admission card is correct</div>' +
-
         '<div class="sig-row">' +
         '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
         '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
         '<div class="sig-col-right"><div class="prof-name">Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
-        '</div>' +
+        '</div>';
 
-        _buildImportantNotes();
+    return header + titleBand + infoSection + notesRow + examProg + sigRow + _buildImportantNotes();
+}
 
-    // ── Action bar ─────────────────────────────────────────────────
+// ── Open the admit card in a new window ───────────────────────────────────────
+function _openAdmitCardWindow(rows) {
+    var rollNo = (rows[0] && rows[0].rollNumber) ? rows[0].rollNumber : 'unknown';
+
     var actionBar =
         '<div class="action-bar no-print">' +
         '<button class="btn-action btn-dl" onclick="window.print()">&#128190; Download / Print Admit Card</button>' +
@@ -239,15 +256,58 @@ function printRollAdmitCard(data) {
         '<style>' + _admitCardCss() + '</style>' +
         '</head><body>' +
         actionBar +
-        '<div class="page"><div class="container">' + body + '</div></div>' +
+        '<div class="page"><div class="container">' + _buildAdmitCardHtml(rows) + '</div></div>' +
         actionBar +
         '</body></html>';
 
     var w = window.open('', '_blank');
-    if (w) {
-        w.document.write(html);
-        w.document.close();
-    } else {
-        alert('Pop-up blocked. Please allow pop-ups to download the admit card.');
+    if (w) { w.document.write(html); w.document.close(); }
+    else { alert('Pop-up blocked. Please allow pop-ups for this site.'); }
+}
+
+// ── Called from the DataTable button via rollNumber string ────────────────────
+// rolllist.cshtml calls this function with the rollNumber directly.
+function printRollAdmitCardByRoll(rollNo) {
+    var rows = (window._allApiRows || []).filter(function (r) {
+        return r.rollNumber === rollNo;
+    });
+    if (rows.length === 0) {
+        alert('No data found for roll number: ' + rollNo);
+        return;
     }
+    _openAdmitCardWindow(rows);
+}
+
+// ── Legacy: called with a full rowData object (backward compatibility) ─────────
+function printRollAdmitCard(rowData) {
+    var rollNo = rowData.rollNumber;
+    var rows = (window._allApiRows || []).filter(function (r) {
+        return r.rollNumber === rollNo;
+    });
+    if (rows.length === 0) rows = [rowData];
+    _openAdmitCardWindow(rows);
+}
+
+// ── Bulk print ────────────────────────────────────────────────────────────────
+function bulkPrintAllAdmitCards() {
+    var allRows = window._allApiRows || [];
+    if (allRows.length === 0) {
+        alert('No data loaded yet. Please wait for the table to finish loading.');
+        return;
+    }
+
+    // Group by rollNumber
+    var grouped = {};
+    allRows.forEach(function (r) {
+        if (!grouped[r.rollNumber]) grouped[r.rollNumber] = [];
+        grouped[r.rollNumber].push(r);
+    });
+
+    var keys = Object.keys(grouped);
+    if (!confirm('This will open ' + keys.length + ' admit card(s) in new tabs.\nMake sure pop-ups are allowed. Continue?'))
+        return;
+
+    keys.forEach(function (key) {
+        _openAdmitCardWindow(grouped[key]);
+    });
 }
