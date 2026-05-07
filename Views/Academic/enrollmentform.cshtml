@@ -3,7 +3,6 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
-
 <div style="display:flex; gap:10px; margin-bottom:10px;">
     <select id="sortOrder" class="form-control" style="width:200px;">
         <option value="">-- Sort By --</option>
@@ -13,7 +12,6 @@
     <button id="btnnBulkGenerate" class="btn btn-success" style="background:#89e7b5" disabled>
         Generate Enrollment Numbers
     </button>
-
 </div>
 <div class="table-card">
     <div class="table-header">
@@ -147,7 +145,7 @@
         }
     });
 
-        $('#btnBulkGenerate').click(function () {
+    $('#btnBulkGenerate').click(function () {
         if (!confirm("Generate enrollment numbers for all pending records?"))
             return;
 
