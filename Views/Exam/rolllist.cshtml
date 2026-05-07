@@ -3,11 +3,30 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
+<div style="display:flex; gap:10px; margin-bottom:10px;">
+
+    <select id="sortOrder" class="form-control" style="width:200px;">
+        <option value="">-- Sort By --</option>
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+    </select>
+
+    <button id="btnBulkrollnoGenerate"
+            class="btn btn-success"
+            style="background:#89e7b5;" disabled>
+        Generate Roll Numbers
+    </button>
+
+</div>
+
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Roll List</h3>
         <div class="table-actions">
-            <button class="btn btn-success mb-3" onclick="bulkPrintAllAdmitCards()">Bulk Print Admit Card</button>
+            <button class="btn btn-success mb-3"
+                    onclick="bulkPrintAllAdmitCards()">
+                Bulk Print Admit Card
+            </button>
         </div>
     </div>
     <div class="table-responsive">
@@ -30,57 +49,169 @@
 </div>
 <script src="~/js/AdmitCard.js"></script>
 <script>
-    // ── IMPORTANT: must be on window so AdmitCard.js can read window._allApiRows ──
     window._allApiRows = [];
+    let table;
 
     $(document).ready(function () {
+
+        loadRollList();
+
+    });
+    function loadRollList() {
+
         $.ajax({
+
             url: ApiBaseUrl + 'Exam/rolllist',
             method: 'GET',
             success: function (data) {
-                // Store ALL rows on window — AdmitCard.js reads window._allApiRows
                 window._allApiRows = data;
 
-                // ── Deduplicate for the TABLE only: one row per rollNumber ──────────
-                var seen = {};
-                var tableRows = [];
+                let seen = {};
+                let tableRows = [];
+
                 data.forEach(function (r) {
+
+                    if (!r.rollNumber || r.rollNumber.trim() === "") {
+
+                        tableRows.push(r);
+                        return;
+                    }
+
                     if (!seen[r.rollNumber]) {
+
                         seen[r.rollNumber] = true;
                         tableRows.push(r);
                     }
+
                 });
 
-                // ── Init DataTable with deduplicated rows ─────────────────────────
-                $('#examTable').DataTable({
+                if ($.fn.DataTable.isDataTable('#examTable')) {
+
+                    $('#examTable').DataTable().destroy();
+                }
+
+                $('#examTable tbody').empty();
+                table = $('#examTable').DataTable({
+
                     data: tableRows,
+
+                    pageLength: 10,
+
+                    responsive: true,
+
                     columns: [
+
                         {
                             data: null,
-                            render: (data, type, row, meta) =>
-                                meta.row + meta.settings._iDisplayStart + 1
+                            render: function (data, type, row, meta) {
+
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
                         },
-                        { data: 'rollNumber' },
-                        { data: 'userName' },
-                        { data: 'email' },
-                        { data: 'courseName' },
-                        { data: 'semesterName' },
-                        { data: 'examName' },
+
+                        {
+                            data: 'rollNumber',
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'userName',
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'email',
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'courseName',
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'semesterName',
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'examName',
+                            defaultContent: '-'
+                        },
+
                         {
                             data: null,
+                            orderable: false,
+
                             render: function (data) {
-                                return `<button class="btn btn-edit"
-                                            onclick='printRollAdmitCardByRoll("${data.rollNumber}")'>
+
+                                return `
+                                    <button class="btn btn-edit btn-sm"
+                                            onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
                                             Print Admit Card
-                                        </button>`;
+                                    </button>
+                                `;
                             }
                         }
+
                     ]
+
                 });
+
             },
+
             error: function () {
+
                 alert('Failed to load roll list.');
             }
+
         });
+
+    }
+
+
+    $('#sortOrder').change(function () {
+
+        let val = $(this).val();
+
+        if (val === "asc") {
+
+            table.order([2, 'asc']).draw();
+
+        }
+        else if (val === "desc") {
+
+            table.order([2, 'desc']).draw();
+        }
+
     });
+
+
+    $('#btnBulkrollnoGenerate').click(function () {
+
+        if (!confirm("Generate Roll numbers for all pending records?"))
+            return;
+
+        $.ajax({
+
+            url: ApiBaseUrl + 'StudentEnrollment/generaterollnumber-bulk',
+            method: 'POST',
+
+            success: function (res) {
+
+                alert(res.message || "Roll numbers generated successfully.");
+
+                // Reload table data
+                loadRollList();
+            },
+
+            error: function () {
+
+                alert("Failed to generate roll numbers.");
+            }
+
+        });
+
+    });
+
 </script>

@@ -206,6 +206,7 @@ function _buildAdmitCardHtml(rows) {
                 '<tr>' +
                 '<td>' + (idx + 1) + '</td>' +
                 '<td class="subject-col">' + r.subjectName + '</td>' +
+                '<td class="subject-col">' + r.subjectCode + '</td>' +
                 '<td>' + examDate + '</td>' +
                 '<td>' + examDay + '</td>' +
                 '<td>' + cleanTime + '</td>' +
@@ -220,6 +221,7 @@ function _buildAdmitCardHtml(rows) {
         '<table class="exam-prog-table"><thead><tr>' +
         '<th style="width:30px;">S.No</th>' +
         '<th>Subject</th>' +
+        '<th>Subject Code</th>' +
         '<th style="width:80px;">Exam Date</th>' +
         '<th style="width:65px;">Exam Day</th>' +
         '<th style="width:110px;">Exam Time</th>' +
