@@ -23,8 +23,11 @@
     <div class="table-header">
         <h3 class="table-title">Roll List</h3>
         <div class="table-actions">
-            <button class="btn btn-success mb-3"
+           @*  <button class="btn btn-success mb-3"
                     onclick="bulkPrintAllAdmitCards()">
+                Bulk Print Admit Card
+            </button> *@
+            <button class="btn btn-success mb-3">
                 Bulk Print Admit Card
             </button>
         </div>
@@ -53,54 +56,37 @@
     let table;
 
     $(document).ready(function () {
-
         loadRollList();
-
     });
     function loadRollList() {
-
         $.ajax({
-
             url: ApiBaseUrl + 'Exam/rolllist',
             method: 'GET',
             success: function (data) {
                 window._allApiRows = data;
-
                 let seen = {};
                 let tableRows = [];
-
                 data.forEach(function (r) {
-
                     if (!r.rollNumber || r.rollNumber.trim() === "") {
-
                         tableRows.push(r);
                         return;
                     }
-
                     if (!seen[r.rollNumber]) {
-
                         seen[r.rollNumber] = true;
                         tableRows.push(r);
                     }
-
                 });
 
                 if ($.fn.DataTable.isDataTable('#examTable')) {
-
                     $('#examTable').DataTable().destroy();
                 }
 
                 $('#examTable tbody').empty();
                 table = $('#examTable').DataTable({
-
                     data: tableRows,
-
                     pageLength: 10,
-
                     responsive: true,
-
                     columns: [
-
                         {
                             data: null,
                             render: function (data, type, row, meta) {
@@ -108,17 +94,14 @@
                                 return meta.row + meta.settings._iDisplayStart + 1;
                             }
                         },
-
                         {
                             data: 'rollNumber',
                             defaultContent: '-'
                         },
-
                         {
                             data: 'userName',
                             defaultContent: '-'
                         },
-
                         {
                             data: 'email',
                             defaultContent: '-'
@@ -142,12 +125,10 @@
                         {
                             data: null,
                             orderable: false,
-
                             render: function (data) {
-
                                 return `
-                                    <button class="btn btn-edit btn-sm"
-                                            onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
+                                  
+                                      <button class="btn btn-edit btn-sm">
                                             Print Admit Card
                                     </button>
                                 `;
@@ -168,19 +149,17 @@
         });
 
     }
-
+      // <button class="btn btn-edit btn-sm"
+                                    //         onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
+                                    //         Print Admit Card
+                                    // </button>
 
     $('#sortOrder').change(function () {
-
         let val = $(this).val();
-
         if (val === "asc") {
-
             table.order([2, 'asc']).draw();
-
         }
         else if (val === "desc") {
-
             table.order([2, 'desc']).draw();
         }
 
@@ -188,23 +167,15 @@
 
 
     $('#btnBulkrollnoGenerate').click(function () {
-
         if (!confirm("Generate Roll numbers for all pending records?"))
             return;
-
         $.ajax({
-
             url: ApiBaseUrl + 'StudentEnrollment/generaterollnumber-bulk',
             method: 'POST',
-
             success: function (res) {
-
-                alert(res.message || "Roll numbers generated successfully.");
-
-                // Reload table data
+                alert(res.message || "Roll numbers generated successfully.");               
                 loadRollList();
             },
-
             error: function () {
 
                 alert("Failed to generate roll numbers.");
