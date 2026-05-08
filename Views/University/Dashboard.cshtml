@@ -125,7 +125,7 @@
 
 <script>
     $(document).ready(function () {
-
+        loadDashboardCounts();
         // Helper: animate count from 0 to target
         function animateCount(elementId, target) {
             var el = document.getElementById(elementId);
@@ -146,7 +146,7 @@
         fetch(ApiBaseUrl + 'Exam/rolllist')
             .then(res => res.json())
             .then(function (data) {
-                animateCount('totalStudents', data.length);
+               
 
                 var tbody = document.getElementById('dashboardTbody');
                 tbody.innerHTML = '';
@@ -173,30 +173,9 @@
             .catch(function () {
                 document.getElementById('dashboardTbody').innerHTML =
                     '<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>';
-                document.getElementById('totalStudents').textContent = 'N/A';
+              
             });
 
-        // 2. Total Courses — from Course/GetCourses
-        fetch(ApiBaseUrl + 'Course/GetCourses')
-            .then(res => res.json())
-            .then(function (data) {
-                animateCount('totalCourses', data.length);
-            })
-            .catch(function () {
-                document.getElementById('totalCourses').textContent = 'N/A';
-            });
-
-        // 3. Total Subjects — from Subject/list
-        fetch(ApiBaseUrl + 'Subject/list')
-            .then(res => res.json())
-            .then(function (data) {
-                animateCount('totalSubjects', data.length);
-            })
-            .catch(function () {
-                document.getElementById('totalSubjects').textContent = 'N/A';
-            });
-
-        // 4. Active Students — from StudentEnrollment/GetStudentEnrollmentList (isVerify === true)
        fetch(ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList')
     .then(res => res.json())
     .then(function (data) {
@@ -207,4 +186,38 @@
     });
 
     });
+
+
+    function loadDashboardCounts() {
+        $.ajax({
+            url: ApiBaseUrl + 'Exam/Dashboardcount',
+            type: 'GET',
+              success: function (res) {
+                $("#totalActiveStudents").text(
+                    res.totalRollNumbers ?? 0
+                );
+                $("#totalStudents").text(
+                    res.totalApplications ?? 0
+                );
+                $("#totalCourses").text(
+                    res.totalCourses ?? 0
+                );
+                $("#totalSubjects").text(
+                    res.totalSubjects ?? 0
+                );
+
+            },
+
+            error: function (xhr, status, error) {
+
+                console.log("Dashboard count load failed");
+
+                console.log(error);
+
+            }
+
+        });
+
+    }
+
 </script>
