@@ -58,50 +58,50 @@
     $(document).ready(function () {
         loadRollList();
     });
-    function loadRollList() {
+     function loadRollList() {
+
         $.ajax({
             url: ApiBaseUrl + 'Exam/rolllist',
             method: 'GET',
+
             success: function (data) {
+
                 window._allApiRows = data;
-                let seen = {};
-                let tableRows = [];
-                data.forEach(function (r) {
-                    if (!r.rollNumber || r.rollNumber.trim() === "") {
-                        tableRows.push(r);
-                        return;
-                    }
-                    if (!seen[r.rollNumber]) {
-                        seen[r.rollNumber] = true;
-                        tableRows.push(r);
-                    }
-                });
+
+                let tableRows = data;
 
                 if ($.fn.DataTable.isDataTable('#examTable')) {
                     $('#examTable').DataTable().destroy();
                 }
 
                 $('#examTable tbody').empty();
+
                 table = $('#examTable').DataTable({
+
                     data: tableRows,
+
                     pageLength: 10,
                     responsive: true,
+
                     columns: [
+
                         {
                             data: null,
                             render: function (data, type, row, meta) {
-
                                 return meta.row + meta.settings._iDisplayStart + 1;
                             }
                         },
+
                         {
                             data: 'rollNumber',
                             defaultContent: '-'
                         },
+
                         {
                             data: 'userName',
                             defaultContent: '-'
                         },
+
                         {
                             data: 'email',
                             defaultContent: '-'
@@ -125,29 +125,24 @@
                         {
                             data: null,
                             orderable: false,
+
                             render: function (data) {
+
                                 return `
-                                  
-                                      <button class="btn btn-edit btn-sm">
-                                            Print Admit Card
+                                    <button class="btn btn-edit btn-sm">
+                                        Print Admit Card
                                     </button>
                                 `;
                             }
                         }
-
                     ]
-
                 });
-
             },
 
             error: function () {
-
                 alert('Failed to load roll list.');
             }
-
         });
-
     }
       // <button class="btn btn-edit btn-sm"
                                     //         onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>

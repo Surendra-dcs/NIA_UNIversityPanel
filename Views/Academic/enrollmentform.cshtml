@@ -12,6 +12,9 @@
     <button id="btnnBulkGenerate" class="btn btn-success" style="background:#89e7b5" disabled>
         Generate Enrollment Numbers
     </button>
+    <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5" disabled>
+        Bulk Verify
+    </button>
 </div>
 <div class="table-card">
     <div class="table-header">
@@ -21,7 +24,11 @@
         <table id="studentEnrollmenttbl" class="display custom-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th style="width:57px;text-align:center">
+                        Select<br />
+                        <input type="checkbox" id="selectAll">
+                    </th>
+                    <th>Sr.No.</th>                   
                     <th>Enrollment Number</th>
                     <th>College</th>
                     <th>Program</th>
@@ -68,11 +75,28 @@
                 }
             },
             columns: [
-                {
-                    data: null,
-                    render: (data, type, row, meta) =>
-                        meta.row + meta.settings._iDisplayStart + 1
-                },
+                      {
+                      data: null,
+                      render: function (data) {
+                      
+                          if (data.isVerify)
+                              return '';
+                      
+                          return `
+                              <div style="text-align:center;">
+                                  <input type="checkbox"
+                                         class="rowCheckbox"
+                                         value="${data.id}">
+                              </div>
+                          `;
+                      },
+                      orderable: false
+                     },
+                   {
+                       data: null,
+                       render: (data, type, row, meta) =>
+                           meta.row + meta.settings._iDisplayStart + 1
+                   },
                 { data: 'enrollmentNumber' },
                 { data: 'collegeName' },
                 { data: 'programName' },
@@ -82,25 +106,24 @@
                 { data: 'mobile' },
                 {
                     data: null,
-                    render: function (data) {
-
-                        let verifyDisabled = data.isVerify ? 'disabled' : '';
-                        let verifyStyle = data.isVerify
+                    render: function (data) {                    
+                        let isVerified = data.isVerify;                    
+                        let buttonText = isVerified ? 'Verified' : 'Verify';                    
+                        let verifyDisabled = isVerified ? 'disabled' : '';                    
+                        let verifyStyle = isVerified
                             ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
-                            : 'background: #2d7dd2; color: white;';
-
+                            : 'background: #2d7dd2; color: white;';                    
                         return `
                             <button class="btn btn-success btn-sm ms-1"
                                 style="background: #b99e11; color: white;"
                                 onclick='printEnrollment(${JSON.stringify(data)})'>
                                 Print
-                            </button>
-
+                            </button>                    
                             <button class="btn btn-success btn-sm ms-1"
                                 style="${verifyStyle}"
                                 onclick='verifyForm(${data.id})'
                                 ${verifyDisabled}>
-                                Verify
+                                ${buttonText}
                             </button>
                         `;
                     }
@@ -153,4 +176,31 @@
         });
     });
 
+    $(document).on('change', '#selectAll', function () {
+        $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+    });
+
+    $('#bulkVerifyBtn').click(function () {
+        let ids = [];
+        $('.rowCheckbox:checked').each(function () {
+            ids.push(parseInt($(this).val()));
+        });
+        if (ids.length === 0) {
+            alert('Please select at least one student');
+            return;
+        }
+        $.ajax({
+            url: ApiBaseUrl + 'StudentEnrollment/BulkVerify',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function () {
+                alert('Students verified successfully');
+                table.ajax.reload();
+            },
+            error: function () {
+                alert('Bulk verify failed');
+            }
+        });
+    });
 </script>
