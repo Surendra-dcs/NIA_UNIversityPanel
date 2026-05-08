@@ -58,72 +58,91 @@
     $(document).ready(function () {
         loadRollList();
     });
-     function loadRollList() {
-
+         function loadRollList() {
         $.ajax({
             url: ApiBaseUrl + 'Exam/rolllist',
             method: 'GET',
-
             success: function (data) {
-
                 window._allApiRows = data;
+                let uniqueRows = [];
+                let seen = {};
+                data.forEach(function (item) {
+                    let key =
+                        item.rollNumber + "|" +
+                        item.userName + "|" +
+                        item.email + "|" +
+                        item.courseName + "|" +
+                        item.semesterName + "|" +
+                        item.examName;
 
-                let tableRows = data;
+                    if (!seen[key]) {
+
+                        seen[key] = true;
+
+                        uniqueRows.push(item);
+                    }
+
+                });
 
                 if ($.fn.DataTable.isDataTable('#examTable')) {
                     $('#examTable').DataTable().destroy();
                 }
-
                 $('#examTable tbody').empty();
-
                 table = $('#examTable').DataTable({
-
-                    data: tableRows,
-
+                    data: uniqueRows,
                     pageLength: 10,
                     responsive: true,
-
                     columns: [
 
                         {
                             data: null,
+
                             render: function (data, type, row, meta) {
-                                return meta.row + meta.settings._iDisplayStart + 1;
+
+                                return meta.row +
+                                    meta.settings._iDisplayStart + 1;
                             }
                         },
 
                         {
                             data: 'rollNumber',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: 'userName',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: 'email',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: 'courseName',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: 'semesterName',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: 'examName',
+
                             defaultContent: '-'
                         },
 
                         {
                             data: null,
+
                             orderable: false,
 
                             render: function (data) {
@@ -140,7 +159,9 @@
             },
 
             error: function () {
+
                 alert('Failed to load roll list.');
+
             }
         });
     }
