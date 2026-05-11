@@ -1,0 +1,165 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNIVERSITY PANEL</title>
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link href="~/css/admin-light.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/admin.js"></script>
+    @inject IConfiguration Configuration
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+    </script>
+    <style>
+        .topbar {
+            height: var(--topbar-height);
+            background: var(--bg-card);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            gap: 14px;
+            position: sticky;
+            height: auto;
+            top: 0;
+            z-index: 200;
+            flex-shrink: 0;
+            border-bottom: 1.5px solid #dceaf7;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-name">
+                <span>
+                    <img src="~/Logo/rwe.png" style="height:58px;width:73px;" />
+                    @*    <img src="~/logo/nia_logo.png"  /> *@
+                </span>
+            </div>
+
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" onclick="closeSidebar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-item" id="nav-dashboard">
+                <a href="/UGDeputyManager/Dashboard" class="nav-link">
+                    <i class="fas fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+
+
+            <div class="nav-item has-dropdown" id="User">
+                <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                    <i class="fas fa-file-lines"></i>
+                    <span>Academic Menus</span>
+                    <i class="fas fa-chevron-right arrow-icon"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a href="/UGDeputyManager/enrollmentform"><i class="fas fa-circle dot"></i>Enrollment/Registration form</a></li>
+                    <li><a href="/UGDeputyManager/studentadmissiondetails"><i class="fas fa-circle dot"></i>Admissions Students</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-item has-dropdown" id="subject">
+                <div class="nav-link nav-toggle" onclick="toggleDropdown('subject', event)">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Examinination</span>
+                    <i class="fas fa-chevron-right arrow-icon"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a href="/UGDeputyManager/rolllist"><i class="fas fa-circle dot"></i>RollList</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-item has-dropdown" id="Evaluation">
+                <div class="nav-link nav-toggle" onclick="toggleDropdown('Evaluation', event)">
+                    <i class="fas fa-qrcode"></i>
+                    <span>Statistics /आंकड़े </span>
+                    <i class="fas fa-chevron-right arrow-icon"></i>
+                </div>
+                <ul class="dropdown-menu">
+                    <li><a href="/UGDeputyManager/paymentstatus"><i class="fas fa-circle dot"></i>Date Wise Payment Statistics</a></li>
+                    <li><a href="/UGDeputyManager/stexamwisestatistics"><i class="fas fa-circle dot"></i>Student Statistics Exam Wise</a></li>
+                    <li><a href="/UGDeputyManager/statisticsofresult"><i class="fas fa-circle dot"></i>Statistics Of Result(pass and fail)</a></li>
+                    <li><a href="/UGDeputyManager/resultreport"><i class="fas fa-circle dot"></i>Result Report</a></li>
+                </ul>
+            </div>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <button class="logout-btn" onclick="handleLogout()">
+                <i class="fas fa-right-from-bracket"></i>
+                <span>Log Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="main-wrapper" id="mainWrapper">
+        <header class="topbar">
+            <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div style="width:100%;text-align:center">
+                <h1 class="hindi text-lg sm:text-xl font-bold" style="background:linear-gradient(90deg,#065f46,#0f766e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                    राष्ट्रीय आयुर्वेद संस्थान
+                </h1>
+                <p class="hindi text-[11px] text-slate-500 leading-tight">मानद विश्वविद्यालय (डी. नोवो) | आयुष मंत्रालय, भारत सरकार</p>
+                <p class="text-[10px] font-semibold text-emerald-700 tracking-wide uppercase mt-0.5">National Institute of Ayurveda (Deemed to be University)</p>
+            </div><br />
+            <div class="topbar-right">
+                <div class="admin-info">
+                    <i class="fas fa-circle-user"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </header>
+        <main class="page-body">
+            @RenderBody()
+
+        </main>
+        <footer class="page-footer">
+            <p>© 2026 DCS Technosis Pvt. Ltd. All Rights Reserved.</p>
+        </footer>
+    </div>
+    <script src="~/script.js"></script>
+    <script>
+            document.querySelectorAll(".onlyNumber").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+        document.querySelectorAll(".onlyText").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll(".onlyNumber").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+        document.querySelectorAll(".onlyText").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+            });
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

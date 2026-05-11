@@ -1,0 +1,204 @@
+﻿@{
+    ViewData["Title"] = "Roll List";
+    Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div style="display:flex; gap:10px; margin-bottom:10px;">
+
+    <select id="sortOrder" class="form-control" style="width:200px;">
+        <option value="">-- Sort By --</option>
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+    </select>
+
+    <button id="btnBulkrollnoGenerate"
+            class="btn btn-success"
+            style="background:#89e7b5;" disabled>
+        Generate Roll Numbers
+    </button>
+
+</div>
+
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Roll List</h3>
+        <div class="table-actions">
+           @*  <button class="btn btn-success mb-3"
+                    onclick="bulkPrintAllAdmitCards()">
+                Bulk Print Admit Card
+            </button> *@
+            <button class="btn btn-success mb-3">
+                Bulk Print Admit Card
+            </button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="examTable" class="display custom-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Roll Number</th>
+                    <th>Student Name</th>
+                    <th>Student Email</th>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Exam</th>
+                    <th style="text-align:center;">Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<script src="~/js/AdmitCard.js"></script>
+<script>
+    window._allApiRows = [];
+    let table;
+
+    $(document).ready(function () {
+        loadRollList();
+    });
+         function loadRollList() {
+        $.ajax({
+            url: ApiBaseUrl + 'Exam/rolllistPG',
+            method: 'GET',
+            success: function (data) {
+                window._allApiRows = data;
+                let uniqueRows = [];
+                let seen = {};
+                data.forEach(function (item) {
+                    let key =
+                        item.rollNumber + "|" +
+                        item.userName + "|" +
+                        item.email + "|" +
+                        item.courseName + "|" +
+                        item.semesterName + "|" +
+                        item.examName;
+
+                    if (!seen[key]) {
+
+                        seen[key] = true;
+
+                        uniqueRows.push(item);
+                    }
+
+                });
+
+                if ($.fn.DataTable.isDataTable('#examTable')) {
+                    $('#examTable').DataTable().destroy();
+                }
+                $('#examTable tbody').empty();
+                table = $('#examTable').DataTable({
+                    data: uniqueRows,
+                    pageLength: 10,
+                    responsive: true,
+                    columns: [
+
+                        {
+                            data: null,
+
+                            render: function (data, type, row, meta) {
+
+                                return meta.row +
+                                    meta.settings._iDisplayStart + 1;
+                            }
+                        },
+
+                        {
+                            data: 'rollNumber',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'userName',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'email',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'courseName',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'semesterName',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: 'examName',
+
+                            defaultContent: '-'
+                        },
+
+                        {
+                            data: null,
+
+                            orderable: false,
+
+                            render: function (data) {
+
+                                return `
+                                    <button class="btn btn-edit btn-sm">
+                                        Print Admit Card
+                                    </button>
+                                `;
+                            }
+                        }
+                    ]
+                });
+            },
+
+            error: function () {
+
+                alert('Failed to load roll list.');
+
+            }
+        });
+    }
+      // <button class="btn btn-edit btn-sm"
+                                    //         onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
+                                    //         Print Admit Card
+                                    // </button>
+
+    $('#sortOrder').change(function () {
+        let val = $(this).val();
+        if (val === "asc") {
+            table.order([2, 'asc']).draw();
+        }
+        else if (val === "desc") {
+            table.order([2, 'desc']).draw();
+        }
+
+    });
+
+
+    $('#btnBulkrollnoGenerate').click(function () {
+        if (!confirm("Generate Roll numbers for all pending records?"))
+            return;
+        $.ajax({
+            url: ApiBaseUrl + 'StudentEnrollment/generaterollnumber-bulk',
+            method: 'POST',
+            success: function (res) {
+                alert(res.message || "Roll numbers generated successfully.");               
+                loadRollList();
+            },
+            error: function () {
+
+                alert("Failed to generate roll numbers.");
+            }
+
+        });
+
+    });
+
+</script>

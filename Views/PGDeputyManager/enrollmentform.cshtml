@@ -1,0 +1,206 @@
+﻿@{
+    ViewData["Title"] = "Enrollment Form";
+    Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
+}
+<link href="~/css/programandcourse.css" rel="stylesheet" />
+<div style="display:flex; gap:10px; margin-bottom:10px;">
+    <select id="sortOrder" class="form-control" style="width:200px;">
+        <option value="">-- Sort By --</option>
+        <option value="asc"> Ascending </option>
+        <option value="desc"> Descending </option>
+    </select>
+    <button id="btnnBulkGenerate" class="btn btn-success" style="background:#89e7b5" disabled>
+        Generate Enrollment Numbers
+    </button>
+    <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5">
+        Bulk Verify
+    </button>
+</div>
+<div class="table-card">
+    <div class="table-header">
+        <h3 class="table-title">Student Enrollment Form</h3>
+    </div>
+    <div class="table-responsive">
+        <table id="studentEnrollmenttbl" class="display custom-table">
+            <thead>
+                <tr>
+                    <th style="width:57px;text-align:center">
+                        Select<br />
+                        <input type="checkbox" id="selectAll">
+                    </th>
+                    <th>Sr.No.</th>                   
+                    <th>Enrollment Number</th>
+                    <th>College</th>
+                    <th>Program</th>
+                    <th>Course</th>
+                    <th>Student Name</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Student Details Modal -->
+<div id="studentModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Student Details</h3>
+            <span class="close-btn" onclick="closeStudentModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="studentDetails"></div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Include the shared admit card JS -->
+<script src="~/js/enrollmentAdmitCard.js"></script>
+
+<script>
+
+    let table;
+    let allData = [];
+    $(document).ready(function () {
+        table = $('#studentEnrollmenttbl').DataTable({
+            ajax: {
+                url: ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentListPG',
+                dataSrc: function (json) {
+                    allData = json;
+                    return json;
+                }
+            },
+            columns: [
+                      {
+                      data: null,
+                      render: function (data) {
+                      
+                          if (data.isVerify)
+                              return '';
+                      
+                          return `
+                              <div style="text-align:center;">
+                                  <input type="checkbox"
+                                         class="rowCheckbox"
+                                         value="${data.id}">
+                              </div>
+                          `;
+                      },
+                      orderable: false
+                     },
+                   {
+                       data: null,
+                       render: (data, type, row, meta) =>
+                           meta.row + meta.settings._iDisplayStart + 1
+                   },
+                { data: 'enrollmentNumber' },
+                { data: 'collegeName' },
+                { data: 'programName' },
+                { data: 'courseName' },
+                { data: 'studentName' },
+                { data: 'email' },
+                { data: 'mobile' },
+                {
+                    data: null,
+                    render: function (data) {                    
+                        let isVerified = data.isVerify;                    
+                        let buttonText = isVerified ? 'Verified' : 'Verify';                    
+                        let verifyDisabled = isVerified ? 'disabled' : '';                    
+                        let verifyStyle = isVerified
+                            ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
+                            : 'background: #2d7dd2; color: white;';                    
+                        return `
+                            <button class="btn btn-success btn-sm ms-1"
+                                style="background: #b99e11; color: white;"
+                                onclick='printEnrollment(${JSON.stringify(data)})'>
+                                Print
+                            </button>                    
+                            <button class="btn btn-success btn-sm ms-1"
+                                style="${verifyStyle}"
+                                onclick='verifyForm(${data.id})'
+                                ${verifyDisabled}>
+                                ${buttonText}
+                            </button>
+                        `;
+                    }
+                }
+            ]
+        });
+
+    });
+
+    function verifyForm(id) {
+        if (!confirm("Are you sure you want to verify this student?"))
+            return;
+
+        $.ajax({
+            url: ApiBaseUrl + 'StudentEnrollment/VerifyStudent',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: id }),
+            success: function () {
+                alert("Student verified successfully");
+                table.ajax.reload();
+            },
+            error: function () {
+                alert("Verification failed");
+            }
+        });
+    }
+
+    function closeStudentModal() {
+        $('#studentModal').hide();
+    }
+
+    $('#sortOrder').change(function () {
+        var val = $(this).val();
+
+        if (val === "asc") {
+            table.order([5, 'asc']).draw();
+        } else if (val === "desc") {
+            table.order([5, 'desc']).draw();
+        }
+    });
+
+    $('#btnBulkGenerate').click(function () {
+        if (!confirm("Generate enrollment numbers for all pending records?"))
+            return;
+
+        $.post(ApiBaseUrl+'StudentEnrollment/generate-bulk', function (res) {
+            alert(res.message);
+            $('#studentEnrollmenttbl').DataTable().ajax.reload();
+        });
+    });
+
+    $(document).on('change', '#selectAll', function () {
+        $('.rowCheckbox').prop('checked', $(this).prop('checked'));
+    });
+
+    $('#bulkVerifyBtn').click(function () {
+        let ids = [];
+        $('.rowCheckbox:checked').each(function () {
+            ids.push(parseInt($(this).val()));
+        });
+        if (ids.length === 0) {
+            alert('Please select at least one student');
+            return;
+        }
+        $.ajax({
+            url: ApiBaseUrl + 'StudentEnrollment/BulkVerify',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(ids),
+            success: function () {
+                alert('Students verified successfully');
+                table.ajax.reload();
+            },
+            error: function () {
+                alert('Bulk verify failed');
+            }
+        });
+    });
+</script>
