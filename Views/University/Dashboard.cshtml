@@ -121,71 +121,72 @@
             </tbody>
         </table>
     </div>
-</div> *@
+</div>
+// Helper: animate count from 0 to target
+    //     function animateCount(elementId, target) {
+    //         var el = document.getElementById(elementId);
+    //         var start = 0;
+    //         var duration = 800;
+    //         var step = Math.ceil(target / (duration / 16));
+    //         var timer = setInterval(function () {
+    //             start += step;
+    //             if (start >= target) {
+    //                 start = target;
+    //                 clearInterval(timer);
+    //             }
+    //             el.textContent = start;
+    //         }, 16);
+    //     }
+
+    //     // 1. Total Students + Recent Admissions table — from Exam/rolllist
+    //     fetch(ApiBaseUrl + 'Exam/rolllist')
+    //         .then(res => res.json())
+    //         .then(function (data) {
+               
+
+    //             var tbody = document.getElementById('dashboardTbody');
+    //             tbody.innerHTML = '';
+
+    //             if (data.length === 0) {
+    //                 tbody.innerHTML = '<tr><td colspan="8" class="text-center">No enrolled students found.</td></tr>';
+    //                 return;
+    //             }
+
+    //             data.forEach(function (row, index) {
+    //                 tbody.innerHTML += `
+    //                     <tr>
+    //                         <td class="row-num">${index + 1}</td>
+    //                         <td>${row.rollNumber ?? ''}</td>
+    //                         <td><div class="student-cell"><span>${row.userName ?? ''}</span></div></td>
+    //                         <td>${row.email ?? ''}</td>
+    //                         <td>${row.courseName ?? ''}</td>
+    //                         <td>${row.semesterName ?? ''}</td>
+    //                         <td>${row.examName ?? ''}</td>
+    //                         <td><span class="status-pill status-active">Active</span></td>
+    //                     </tr>`;
+    //             });
+    //         })
+    //         .catch(function () {
+    //             document.getElementById('dashboardTbody').innerHTML =
+    //                 '<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>';
+              
+    //         });
+
+    //    fetch(ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList')
+    // .then(res => res.json())
+    // .then(function (data) {
+    //     // animateCount('totalActiveStudents', data.length);
+    // })
+    // .catch(function () {
+    //     // document.getElementById('totalActiveStudents').textContent = 'N/A';
+    // });
+
+    // });
+*@
 
 <script>
     $(document).ready(function () {
-        loadDashboardCounts();
-        // Helper: animate count from 0 to target
-        function animateCount(elementId, target) {
-            var el = document.getElementById(elementId);
-            var start = 0;
-            var duration = 800;
-            var step = Math.ceil(target / (duration / 16));
-            var timer = setInterval(function () {
-                start += step;
-                if (start >= target) {
-                    start = target;
-                    clearInterval(timer);
-                }
-                el.textContent = start;
-            }, 16);
-        }
-
-        // 1. Total Students + Recent Admissions table — from Exam/rolllist
-        fetch(ApiBaseUrl + 'Exam/rolllist')
-            .then(res => res.json())
-            .then(function (data) {
-               
-
-                var tbody = document.getElementById('dashboardTbody');
-                tbody.innerHTML = '';
-
-                if (data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="8" class="text-center">No enrolled students found.</td></tr>';
-                    return;
-                }
-
-                data.forEach(function (row, index) {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="row-num">${index + 1}</td>
-                            <td>${row.rollNumber ?? ''}</td>
-                            <td><div class="student-cell"><span>${row.userName ?? ''}</span></div></td>
-                            <td>${row.email ?? ''}</td>
-                            <td>${row.courseName ?? ''}</td>
-                            <td>${row.semesterName ?? ''}</td>
-                            <td>${row.examName ?? ''}</td>
-                            <td><span class="status-pill status-active">Active</span></td>
-                        </tr>`;
-                });
-            })
-            .catch(function () {
-                document.getElementById('dashboardTbody').innerHTML =
-                    '<tr><td colspan="8" class="text-center text-danger">Failed to load data.</td></tr>';
-              
-            });
-
-       fetch(ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList')
-    .then(res => res.json())
-    .then(function (data) {
-        animateCount('totalActiveStudents', data.length);
-    })
-    .catch(function () {
-        document.getElementById('totalActiveStudents').textContent = 'N/A';
-    });
-
-    });
+        loadDashboardCounts();       
 
 
     function loadDashboardCounts() {
@@ -194,10 +195,10 @@
             type: 'GET',
               success: function (res) {
                 $("#totalActiveStudents").text(
-                    res.totalRollNumbers ?? 0
+                   res.totalApplications ?? 0
                 );
-                $("#totalStudents").text(
-                    res.totalApplications ?? 0
+                $("#totalStudents").text(                    
+                     res.totalRollNumbers ?? 0
                 );
                 $("#totalCourses").text(
                     res.totalCourses ?? 0
@@ -219,5 +220,5 @@
         });
 
     }
-
+    });
 </script>
