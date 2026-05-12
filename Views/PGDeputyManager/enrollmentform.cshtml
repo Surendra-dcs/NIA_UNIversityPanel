@@ -3,6 +3,134 @@
     Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
+<style>
+    .student-container {
+        font-family: Arial, sans-serif;
+        padding: 15px;
+    }
+
+    .student-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .student-header h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .student-header p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+        }
+
+    .student-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: 0.2s;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #34495e;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .card p {
+            margin: 6px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .card b {
+            color: #222;
+        }
+
+    .modal-box {
+        background: #fff;
+        width: 850px;
+        border-radius: 14px;
+        box-shadow: 0 10px 35px rgba(0,0,0,0.15);
+        animation: fadeIn 0.25s ease;
+        overflow: hidden;
+    }
+
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .modal-content {
+        max-width: 95vw;
+        max-height: 95vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        background: white;
+    }
+
+    .preview-img {
+        height: 150px;
+        width: 150px;
+        border: 1px solid #ccc;
+        padding: 5px;
+        cursor: pointer;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 30px;
+        color: white;
+        font-size: 45px;
+        cursor: pointer;
+        z-index: 100000;
+    }
+
+
+    /* Rotate Button */
+    .rotate-btn {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        padding: 10px 20px;
+        border: none;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        z-index: 100000;
+    }
+</style>
 <div style="display:flex; gap:10px; margin-bottom:10px;">
     <select id="sortOrder" class="form-control" style="width:200px;">
         <option value="">-- Sort By --</option>
@@ -36,6 +164,7 @@
                     <th>Student Name</th>
                     <th>Email</th>
                     <th>Mobile</th>
+                    <th>View</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -57,7 +186,26 @@
         </div>
     </div>
 </div>
-
+<!-- Student Details Modal -->
+<div id="studentModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Student Details</h3>
+            <span class="close-btn" onclick="closeStudentModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="studentDetails"></div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="imageModal" class="image-modal" style="display:none;">
+    <span class="close-btn" onclick="closeImage()">&times;</span>
+    <button class="rotate-btn" onclick="rotateImage()">
+        Rotate
+    </button>
+    <img class="modal-content" id="popupImage">
+</div>
 <!-- Include the shared admit card JS -->
 <script src="~/js/enrollmentAdmitCard.js"></script>
 
@@ -104,6 +252,16 @@
                 { data: 'studentName' },
                 { data: 'email' },
                 { data: 'mobile' },
+                {
+                    data: null,
+                    render: function (data) {
+                        return `
+                            <button class="btn btn-info btn-sm" style="background: #05960a; color: white;"  onclick='viewStudent(${JSON.stringify(data)})'>
+                                View
+                            </button>
+                        `;
+                    }
+                },
                 {
                     data: null,
                     render: function (data) {                    
@@ -202,5 +360,137 @@
                 alert('Bulk verify failed');
             }
         });
+    });
+
+    function openStudentModal() {
+        $('#studentModal').css('display', 'flex');
+    }
+
+    function closeStudentModal() {
+        $('#studentModal').hide();
+    }
+
+    function viewStudent(data) {
+
+        let html = `
+        <div class="student-container">
+
+            <div class="student-header">
+                <h2>${data.studentName}</h2>
+                <p>${data.programName} - ${data.courseName}</p>
+            </div>
+
+            <div class="student-grid" style="overflow-y:scroll;height:440px">
+
+                <div class="card">
+                    <h3>Personal Details</h3>
+                    <p><b>Father:</b> ${data.fatherName}</p>
+                    <p><b>Mother:</b> ${data.motherName || '-'}</p>
+                    <p><b>Gender:</b> ${data.gender}</p>
+                    <p><b>DOB:</b> ${new Date(data.dateOfBirth).toLocaleDateString()}</p>
+                    <p><b>Category:</b> ${data.category}</p>
+                    <p><b>Religion:</b> ${data.religion}</p>
+                    <p><b>Nationality:</b> ${data.nationality}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Contact Details</h3>
+                    <p><b>Mobile:</b> ${data.mobile}</p>
+                    <p><b>Email:</b> ${data.email}</p>
+                    <p><b>Address:</b> ${data.addressLine1}</p>
+                    <p><b>City:</b> ${data.city}</p>
+                    <p><b>District:</b> ${data.district}</p>
+                    <p><b>State:</b> ${data.state}</p>
+                    <p><b>PIN:</b> ${data.pinCode}</p>
+                    <p><b>Country:</b> ${data.country}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Academic Details</h3>
+                    <p><b>College:</b> ${data.collegeName}</p>
+                    <p><b>Program:</b> ${data.programName}</p>
+                    <p><b>Course:</b> ${data.courseName}</p>
+                </div>
+
+                <div class="card">
+                <h3>Identification</h3>
+               ${
+                   data.nationality === 'Foreign'
+                       ? `
+                           <p><b>Passport Number:</b> ${data.passportNumber ?? ''}</p>
+                         `
+                       : `
+                           <p><b>Aadhaar:</b> ${data.aadhaarNumber ?? ''}</p>
+                           <p><b>ABC ID:</b> ${data.abcId ?? ''}</p>
+                         `
+               }
+              </div>
+              <div class="card" style="display:flex; gap:20px; align-items:center;width:354px;">
+                  <span>
+                      <img src="${data.candidateImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Candidate Image">
+                  </span>
+                  <span>
+                      <img src="${data.signatureImagePath}"  class="preview-img"  onclick="openImage(this.src)" alt="Signature Image">
+                  </span>
+              </div>
+
+                <div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; width:100%;">
+                   ${
+                       data.nationality === 'Foreign'
+                           ? `
+                               <img src="${data.passportImagePath}" class="preview-img"  onclick="openImage(this.src)" alt="Passport Image">
+                               <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">
+                             `
+                           : `
+                              <img src="${data.aadhaarFrontImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Front">
+                              <img src="${data.aadhaarBackImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Back Image">
+                              <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">
+                             `
+                   }
+               </div>
+
+            </div>
+        </div>
+        `;
+
+        document.getElementById('studentDetails').innerHTML = html;
+        openStudentModal();
+    }
+
+    $(window).on('click', function (e) {
+        if ($(e.target).is('#studentModal')) {
+            closeStudentModal();
+        }
+    });
+     function closeImage() {
+        $('#imageModal').fadeOut();
+    }
+    let currentRotation = 0;
+    function openImage(src) {
+        currentRotation = 0;
+        $('#popupImage')
+            .attr('src', src)
+            .css({
+                'transform': 'rotate(0deg)',
+                'display': 'block'
+            });
+        $('#imageModal').css('display', 'flex');
+    }
+      function closeImage() {
+        $('#imageModal').hide();
+    }
+
+
+    function rotateImage() {
+        currentRotation += 90;
+        $('#popupImage').css(
+            'transform',
+            `rotate(${currentRotation}deg)`
+        );
+    }
+    $('#imageModal').click(function (e) {
+        if (e.target.id === 'imageModal') {
+            closeImage();
+        }
     });
 </script>
