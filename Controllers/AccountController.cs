@@ -29,21 +29,61 @@ namespace NIAUNIVERSITYPANEL.Controllers
             ViewBag.Mobile = mobile;    
             return View();
         }
-     
+
+        //[HttpPost]
+        //public async Task<IActionResult> VerifyOtp(string mobile, string otp)
+        //{
+        //    try
+        //    {
+        //        var token = await _api.VerifyOtp(mobile, otp);
+        //        if (string.IsNullOrEmpty(token))
+        //        {
+        //            ViewBag.Mobile = mobile;
+        //            ViewBag.Error = "Invalid OTP or OTP expired!";
+        //            return View("Login");
+        //        }
+        //        HttpContext.Session.SetString("JWT", token);
+        //        return RedirectToAction("Dashboard", "University");
+        //    }
+        //    catch (Exception)
+        //    {
+        //        ViewBag.Mobile = mobile;
+        //        ViewBag.Error = "Something went wrong. Please try again!";
+        //        return View("Login");
+        //    }
+        //}
+
         [HttpPost]
         public async Task<IActionResult> VerifyOtp(string mobile, string otp)
         {
             try
             {
-                var token = await _api.VerifyOtp(mobile, otp);
-                if (string.IsNullOrEmpty(token))
+                var response = await _api.VerifyOtp(mobile, otp);
+
+                if (response == null || string.IsNullOrEmpty(response.Token))
                 {
                     ViewBag.Mobile = mobile;
                     ViewBag.Error = "Invalid OTP or OTP expired!";
                     return View("Login");
                 }
-                HttpContext.Session.SetString("JWT", token);
-                return RedirectToAction("Dashboard", "University");
+
+                HttpContext.Session.SetString("JWT", response.Token);
+
+                switch (response.Role)
+                {
+                    case 1:
+                        return RedirectToAction("Dashboard", "University");
+
+                    case 2:
+                        return RedirectToAction("Dashboard", "UGDeputyManager");
+
+                    case 3:
+                        return RedirectToAction("Dashboard", "PGDeputyManager");
+
+                    default:
+                        ViewBag.Error = "Invalid Role!";
+                        return View("Login");
+                }
             }
             catch (Exception)
             {
