@@ -140,13 +140,13 @@
         <option value="desc"> Descending </option>
     </select>
 
-    @*   <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5">
-        Bulk Verify
-    </button> *@
+    <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5">
+        Bulk Exam From Verify
+    </button>
 </div>
 <div class="table-card">
     <div class="table-header">
-        <h3 class="table-title">Student Form Verification</h3>
+        <h3 class="table-title">Exam Form Verification</h3>
     </div>
     <div class="table-responsive">
         <table id="studentformtbl" class="display custom-table">
@@ -154,7 +154,7 @@
                 <tr>
                     <th style="width:57px;text-align:center">
                         Select<br />
-                        @* <input type="checkbox" id="selectAll"> *@
+                        <input type="checkbox" id="selectAll">
                     </th>
                     <th>Sr.No.</th>
                     <th>Roll Number</th>
@@ -195,8 +195,7 @@
 <script>
     let table;
     let allData = [];
-          $(document).ready(function () {
-
+      $(document).ready(function () {
         table = $('#studentformtbl').DataTable({
             ajax: {
                 url: ApiBaseUrl + 'StudentEnrollment/GetStudentformList',
@@ -206,7 +205,6 @@
                     return json;
                 }
             },
-
             columns: [
                 {
                     data: null,
@@ -234,8 +232,6 @@
                 },
                     orderable: false
                 },
-
-                // SR NO
                 {
                     data: null,
                     render: function (data, type, row, meta) {
@@ -274,7 +270,6 @@
                 {
                     data: null,
                     render: function (data) {
-
                         return `
                             <button class="btn btn-sm"
                                     style="background:#05960a;color:white;"
@@ -287,7 +282,6 @@
                 {
                     data: null,
                     render: function (data) {
-
                         let isVerified = data.isVerify;
                         let buttonText = isVerified
                             ? 'Verified'
@@ -314,16 +308,12 @@
             ]
         });
         $('#selectAll').on('change', function () {
-
             $('.rowCheckbox').prop(
                 'checked',
                 $(this).prop('checked')
             );
-
         });
-
     });
-
        function verifyForm(id) {
         let checkbox = $(`.rowCheckbox[value="${id}"]`);
         if (!checkbox.prop('checked')) {
@@ -377,7 +367,7 @@
             return;
         }
         $.ajax({
-            url: ApiBaseUrl + 'StudentEnrollment/BulkVerify',
+            url: ApiBaseUrl + 'StudentEnrollment/BulkformVerify',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(ids),
@@ -391,7 +381,6 @@
         });
     });
 
-
     function openStudentModal() {
         $('#studentModal').css('display', 'flex');
     }
@@ -399,21 +388,15 @@
     function closeStudentModal() {
         $('#studentModal').hide();
     }
-
      function viewStudent(id) {
-
         let student = allData.find(x => x.id == id);
-
         if (!student) {
             alert("Student not found");
             return;
         }
         let subjectRows = '';
-
         if (student.subjects && student.subjects.length > 0) {
-
             student.subjects.forEach((s, index) => {
-
                 subjectRows += `
                     <tr>
                         <td>${index + 1}</td>
@@ -424,7 +407,6 @@
             });
 
         } else {
-
             subjectRows = `
                 <tr>
                     <td colspan="7" style="text-align:center;">
@@ -437,14 +419,11 @@
         let html = `
 
         <div class="student-container">
-
             <!-- HEADER -->
             <div class="student-header" style="margin-bottom:20px;">
-
                 <h2 style="margin-bottom:5px;">
                     ${student.studentName || '-'}
                 </h2>
-
                 <p>
                     ${student.programName || '-'}
                     -
@@ -565,52 +544,39 @@
                     <h3 style="margin-bottom:15px;">
                         Subject Details
                     </h3>
-
                     <div style="overflow-x:auto;">
-
                         <table class="table table-bordered"
                                style="width:100%;
                                       border-collapse:collapse;">
 
                             <thead style="background:#2d7dd2;
                                            color:white;">
-
                                 <tr>
                                     <th>Sr.No</th>
                                     <th>Subject Name</th>
                                     <th>Subject Code</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-
                                 ${subjectRows}
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
         `;
 
-        $('#studentDetails').html(html);
-
+    $('#studentDetails').html(html);
         openStudentModal();
     }
-
     $(window).on('click', function (e) {
         if ($(e.target).is('#studentModal')) {
             closeStudentModal();
         }
     });
-     function closeImage() {
-        $('#imageModal').fadeOut();
+    function closeImage() {
+    $('#imageModal').fadeOut();
     }
     let currentRotation = 0;
     function openImage(src) {
@@ -623,11 +589,9 @@
             });
         $('#imageModal').css('display', 'flex');
     }
-      function closeImage() {
+    function closeImage() {
         $('#imageModal').hide();
     }
-
-
     function rotateImage() {
         currentRotation += 90;
         $('#popupImage').css(
@@ -640,8 +604,6 @@
             closeImage();
         }
     });
-
-
 </script>
 
 
