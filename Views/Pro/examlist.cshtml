@@ -25,7 +25,7 @@
                     <th>Program </th>
                     <th>Course </th>
                     <th>Exam </th>
-                    <th>Status</th>
+                    <th style="width:60px">Status</th>
                     <th style="text-align:center;">Action</th>
                 </tr>
             </thead>
@@ -93,8 +93,8 @@
                     data: 'status',
                     render: d =>
                         d
-                            ? '<span class="badge bg-success">Active</span>'
-                            : '<span class="badge bg-danger">Inactive</span>'
+                            ? '<div class="status-active"><span>Active</span></div>'
+                            : '<div class="status-inactive"><span>Inactive</span></div>'
                 },
                 {
                     data: 'examId',
@@ -230,8 +230,17 @@
     }
      
     $('#statusFilter').on('change', function () {
-        var table = $('#examTable').DataTable();
-        table.column(4).search(this.value).draw(); 
+         var table = $('#examTable').DataTable();
+        var value = this.value;
+        if (value === "Active") {
+            table.column(4).search('^Active$', true, false).draw();
+        }
+        else if (value === "Inactive") {
+            table.column(4).search('^Inactive$', true, false).draw();
+        }
+        else {
+            table.column(4).search('').draw();
+        }
     });
 </script>
 

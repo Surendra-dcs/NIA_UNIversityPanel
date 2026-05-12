@@ -16,6 +16,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult ExamformVerification()
+        {
+            return View();
+        }
 
         public IActionResult studentadmissiondetails()
         {
