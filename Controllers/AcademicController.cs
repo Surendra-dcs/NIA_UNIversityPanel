@@ -44,6 +44,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult ExamformVerification()
+        {
+            return View();
+        }
 
     }
 }
