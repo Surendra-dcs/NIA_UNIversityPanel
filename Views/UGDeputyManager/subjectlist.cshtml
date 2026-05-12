@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewData["Title"] = "subjectlist";
-    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+    Layout = "~/Views/Shared/_UGManagerLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
 <div class="table-card">
@@ -14,7 +14,7 @@
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
             </select>
-            <button class="btn btn-success" onclick="openSubjectModal()"> + Add Subject</button>
+            @* <button class="btn btn-success" onclick="openSubjectModal()"> + Add Subject</button> *@
         </div>
     </div>
     <div class="table-responsive">
@@ -27,8 +27,8 @@
                     <th>Subject Name</th>
                     <th>Subject Code</th>
                     <th>Semester/Part</th>
-                    <th>Status</th>
-                    <th style="text-align:center;">Action</th>
+                    <th style="text-align:center;">Status</th>
+                    @* <th style="text-align:center;">Action</th> *@
                 </tr>
             </thead>
             <tbody></tbody>
@@ -93,8 +93,8 @@
     $(document).ready(function () {
       $('#subjectTable').DataTable({
         ajax: {
-            url: ApiBaseUrl + 'Subject/list', 
-            type: 'GET',
+             url: ApiBaseUrl + 'Subject/listUG',
+             type: 'GET',
             dataSrc: ''
         },
         columns: [
@@ -119,15 +119,15 @@
                 }
             },
 
-            {
-                data: 'subjectId',
-                render: function (data, type, row) {
-                    return `
-                        <button class="btn btn-edit" onclick="editSubject(${data})">Edit</button>
-                        <button class="btn btn-delete" onclick="deleteSubject(${data})">Delete</button>
-                    `;
-                }
-            }
+            // {
+            //     data: 'subjectId',
+            //     render: function (data, type, row) {
+            //         return `
+            //             <button class="btn btn-edit" onclick="editSubject(${data})">Edit</button>
+            //             <button class="btn btn-delete" onclick="deleteSubject(${data})">Delete</button>
+            //         `;
+            //     }
+            // }
         ],
 
         pageLength: 10,

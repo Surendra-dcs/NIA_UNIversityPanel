@@ -69,6 +69,68 @@
         animation: fadeIn 0.25s ease;
         overflow: hidden;
     }
+
+    .image-modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .modal-content {
+        max-width: 95vw;
+        max-height: 95vh;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        border-radius: 10px;
+        background: white;
+    }
+
+    .preview-img {
+        height: 150px;
+        width: 150px;
+        border: 1px solid #ccc;
+        padding: 5px;
+        cursor: pointer;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 30px;
+        color: white;
+        font-size: 45px;
+        cursor: pointer;
+        z-index: 100000;
+    }
+
+
+    /* Rotate Button */
+    .rotate-btn {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        padding: 10px 20px;
+        border: none;
+        background: #007bff;
+        color: white;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        z-index: 100000;
+    }
 </style>
 <div class="table-card">
     <div class="table-header">

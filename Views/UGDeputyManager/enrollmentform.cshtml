@@ -28,7 +28,7 @@
                         Select<br />
                         <input type="checkbox" id="selectAll">
                     </th>
-                    <th>Sr.No.</th>                   
+                    <th>Sr.No.</th>
                     <th>Enrollment Number</th>
                     <th>College</th>
                     <th>Program</th>
@@ -36,6 +36,7 @@
                     <th>Student Name</th>
                     <th>Email</th>
                     <th>Mobile</th>
+                    <th>View</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -57,7 +58,26 @@
         </div>
     </div>
 </div>
-
+<!-- Student Details Modal -->
+<div id="studentModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Student Details</h3>
+            <span class="close-btn" onclick="closeStudentModal()">&times;</span>
+        </div>
+        <div class="modal-body" id="studentDetails"></div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeStudentModal()">Close</button>
+        </div>
+    </div>
+</div>
+<div id="imageModal" class="image-modal" style="display:none;">
+    <span class="close-btn" onclick="closeImage()">&times;</span>
+    <button class="rotate-btn" onclick="rotateImage()">
+        Rotate
+    </button>
+    <img class="modal-content" id="popupImage">
+</div>
 <!-- Include the shared admit card JS -->
 <script src="~/js/enrollmentAdmitCard.js"></script>
 
@@ -78,10 +98,10 @@
                       {
                       data: null,
                       render: function (data) {
-                      
+
                           if (data.isVerify)
                               return '';
-                      
+
                           return `
                               <div style="text-align:center;">
                                   <input type="checkbox"
@@ -106,19 +126,29 @@
                 { data: 'mobile' },
                 {
                     data: null,
-                    render: function (data) {                    
-                        let isVerified = data.isVerify;                    
-                        let buttonText = isVerified ? 'Verified' : 'Verify';                    
-                        let verifyDisabled = isVerified ? 'disabled' : '';                    
+                    render: function (data) {
+                        return `
+                            <button class="btn btn-info btn-sm" style="background: #05960a; color: white;"  onclick='viewStudent(${JSON.stringify(data)})'>
+                                View
+                            </button>
+                        `;
+                    }
+                },
+                {
+                    data: null,
+                    render: function (data) {
+                        let isVerified = data.isVerify;
+                        let buttonText = isVerified ? 'Verified' : 'Verify';
+                        let verifyDisabled = isVerified ? 'disabled' : '';
                         let verifyStyle = isVerified
                             ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
-                            : 'background: #2d7dd2; color: white;';                    
+                            : 'background: #2d7dd2; color: white;';
                         return `
                             <button class="btn btn-success btn-sm ms-1"
                                 style="background: #b99e11; color: white;"
                                 onclick='printEnrollment(${JSON.stringify(data)})'>
                                 Print
-                            </button>                    
+                            </button>
                             <button class="btn btn-success btn-sm ms-1"
                                 style="${verifyStyle}"
                                 onclick='verifyForm(${data.id})'
@@ -202,5 +232,137 @@
                 alert('Bulk verify failed');
             }
         });
+    });
+
+    function openStudentModal() {
+        $('#studentModal').css('display', 'flex');
+    }
+
+    function closeStudentModal() {
+        $('#studentModal').hide();
+    }
+
+    function viewStudent(data) {
+
+        let html = `
+        <div class="student-container">
+
+            <div class="student-header">
+                <h2>${data.studentName}</h2>
+                <p>${data.programName} - ${data.courseName}</p>
+            </div>
+
+            <div class="student-grid" style="overflow-y:scroll;height:440px">
+
+                <div class="card">
+                    <h3>Personal Details</h3>
+                    <p><b>Father:</b> ${data.fatherName}</p>
+                    <p><b>Mother:</b> ${data.motherName || '-'}</p>
+                    <p><b>Gender:</b> ${data.gender}</p>
+                    <p><b>DOB:</b> ${new Date(data.dateOfBirth).toLocaleDateString()}</p>
+                    <p><b>Category:</b> ${data.category}</p>
+                    <p><b>Religion:</b> ${data.religion}</p>
+                    <p><b>Nationality:</b> ${data.nationality}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Contact Details</h3>
+                    <p><b>Mobile:</b> ${data.mobile}</p>
+                    <p><b>Email:</b> ${data.email}</p>
+                    <p><b>Address:</b> ${data.addressLine1}</p>
+                    <p><b>City:</b> ${data.city}</p>
+                    <p><b>District:</b> ${data.district}</p>
+                    <p><b>State:</b> ${data.state}</p>
+                    <p><b>PIN:</b> ${data.pinCode}</p>
+                    <p><b>Country:</b> ${data.country}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Academic Details</h3>
+                    <p><b>College:</b> ${data.collegeName}</p>
+                    <p><b>Program:</b> ${data.programName}</p>
+                    <p><b>Course:</b> ${data.courseName}</p>
+                </div>
+
+                <div class="card">
+                <h3>Identification</h3>
+               ${
+                   data.nationality === 'Foreign'
+                       ? `
+                           <p><b>Passport Number:</b> ${data.passportNumber ?? ''}</p>
+                         `
+                       : `
+                           <p><b>Aadhaar:</b> ${data.aadhaarNumber ?? ''}</p>
+                           <p><b>ABC ID:</b> ${data.abcId ?? ''}</p>
+                         `
+               }
+              </div>
+              <div class="card" style="display:flex; gap:20px; align-items:center;width:354px;">
+                  <span>
+                      <img src="${data.candidateImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Candidate Image">
+                  </span>
+                  <span>
+                      <img src="${data.signatureImagePath}"  class="preview-img"  onclick="openImage(this.src)" alt="Signature Image">
+                  </span>
+              </div>
+
+                <div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; width:100%;">
+                   ${
+                       data.nationality === 'Foreign'
+                           ? `
+                               <img src="${data.passportImagePath}" class="preview-img"  onclick="openImage(this.src)" alt="Passport Image">
+                               <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">
+                             `
+                           : `
+                              <img src="${data.aadhaarFrontImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Front">
+                              <img src="${data.aadhaarBackImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Back Image">
+                              <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">
+                             `
+                   }
+               </div>
+
+            </div>
+        </div>
+        `;
+
+        document.getElementById('studentDetails').innerHTML = html;
+        openStudentModal();
+    }
+
+    $(window).on('click', function (e) {
+        if ($(e.target).is('#studentModal')) {
+            closeStudentModal();
+        }
+    });
+     function closeImage() {
+        $('#imageModal').fadeOut();
+    }
+    let currentRotation = 0;
+    function openImage(src) {
+        currentRotation = 0;
+        $('#popupImage')
+            .attr('src', src)
+            .css({
+                'transform': 'rotate(0deg)',
+                'display': 'block'
+            });
+        $('#imageModal').css('display', 'flex');
+    }
+      function closeImage() {
+        $('#imageModal').hide();
+    }
+
+
+    function rotateImage() {
+        currentRotation += 90;
+        $('#popupImage').css(
+            'transform',
+            `rotate(${currentRotation}deg)`
+        );
+    }
+    $('#imageModal').click(function (e) {
+        if (e.target.id === 'imageModal') {
+            closeImage();
+        }
     });
 </script>
