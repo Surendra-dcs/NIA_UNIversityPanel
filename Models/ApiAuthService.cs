@@ -39,16 +39,40 @@ namespace NIAUNIVERSITYPANEL.Models
 
             return (result.success, result.message);
         }
-        public async Task<string> VerifyOtp(string mobile, string otp)
+        //public async Task<string> VerifyOtp(string mobile, string otp)
+        //{
+        //    var data = new { MobileNumber = mobile, OTP = otp };
+        //    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+        //    var res = await _http.PostAsync("auth/verify", content);
+        //    var json = await res.Content.ReadAsStringAsync();
+
+        //    dynamic result = JsonConvert.DeserializeObject(json);
+        //    return result.token;
+        //}
+
+        public async Task<VerifyOtpResponse> VerifyOtp(string mobile, string otp)
         {
-            var data = new { MobileNumber = mobile, OTP = otp };
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            var data = new
+            {
+                MobileNumber = mobile,
+                OTP = otp
+            };
 
-            var res = await _http.PostAsync("auth/verify", content);
-            var json = await res.Content.ReadAsStringAsync();
+            var content = new StringContent(
+                JsonConvert.SerializeObject(data),
+                Encoding.UTF8,
+                "application/json"
+            );
 
-            dynamic result = JsonConvert.DeserializeObject(json);
-            return result.token;
+            var response = await _http.PostAsync("auth/verify", content);
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<VerifyOtpResponse>(json);
         }
     }
 }
