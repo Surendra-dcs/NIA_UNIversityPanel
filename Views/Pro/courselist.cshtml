@@ -83,8 +83,8 @@
             {
                 data: 'isActive',
                 render: d => d
-                    ? '<span class="status-active">Active</span>'
-                    : '<span class="status-inactive">Inactive</span>'
+                     ? '<div class="status-active"><span>Active</span></div>'
+                       : '<div class="status-inactive"><span>Inactive</span></div>'
             },
             {
                 data: 'course_Id',
@@ -209,9 +209,20 @@
          });
      }
 
-       $('#statusFilter').on('change', function () {
+
+      $('#statusFilter').on('change', function () {
           var table = $('#courseTable').DataTable();
-         table.column(3).search(this.value).draw();
+         var value = this.value;
+         if (value === "Active") {
+             table.column(3).search('^Active$', true, false).draw();
+         }
+         else if (value === "Inactive") {
+             table.column(3).search('^Inactive$', true, false).draw();
+         }
+         else {
+             table.column(3).search('').draw();
+         }
      });
+
 </script>
 

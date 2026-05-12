@@ -267,10 +267,20 @@
             $('#subjectTable').DataTable().ajax.reload();
         });
     }
-     
-       $('#statusFilter').on('change', function () {
+       
+      $('#statusFilter').on('change', function () {
             var table = $('#subjectTable').DataTable();
-          table.column(6).search(this.value).draw();
+          var value = this.value;
+          if (value === "Active") {
+              table.column(6).search('^Active$', true, false).draw();
+          }
+          else if (value === "Inactive") {
+              table.column(6).search('^Inactive$', true, false).draw();
+          }
+          else {
+              table.column(6).search('').draw();
+          }
       });
+
 </script>
 

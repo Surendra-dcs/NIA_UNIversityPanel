@@ -536,8 +536,11 @@
         var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
+        formData.append("ImageType", "Photo");
+        formData.append("userId", userId);
+
         $.ajax({
-            url: ApiBaseUrl + 'StudentCorrection/UploadPhoto',
+            url: ApiBaseUrl + 'StudentCorrection/UploadPhotoAsync',
             type: 'POST', data: formData, processData: false, contentType: false,
             success: function (res) {
                 alert("Photo uploaded successfully");
@@ -555,6 +558,8 @@
         var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
+        formData.append("ImageType", "Signature");
+        formData.append("userId", userId);
         $.ajax({
             url: ApiBaseUrl + 'StudentCorrection/UploadSignature',
             type: 'POST', data: formData, processData: false, contentType: false,

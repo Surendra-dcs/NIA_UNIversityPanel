@@ -55,31 +55,41 @@
 }
 
 .status-active {
-    background: #e6f7f4;
-    color: #1aa891;
+    background: #18910d;
+    color: #e4ede4;
+    height: 28px;
+    border-radius: 10px;
+    text-align: center;
+    line-height: 2;
 }
 
 .status-inactive {
-    background: #fde8e8;
-    color: #e85a3a;
+    background: #da5110;
+    color: #e9e4e3;
+    height: 28px;
+    text-align: center;
+    border-radius: 10px;
+    line-height: 2;
 }
 
 .btn {
-    padding: 5px 10px;
-    font-size: 12px;
-    border-radius: 6px;
+    padding: 5px 14px;
+    border-radius: 8px;
     border: none;
+    font-size: 13px;
     cursor: pointer;
+    transition: 0.2s;
+    margin-right: 10px;
 }
 
 .btn-edit {
-    background: #eaf3ff;
-    color: #2d7dd2;
+    background: #11468d;
+    color: #d8dee4;
 }
 
 .btn-delete {
-    background: #fde8e8;
-    color: #e85a3a;
+    background: #d22828;
+    color: #ece4e2;
 }
 
 .dataTables_filter input {

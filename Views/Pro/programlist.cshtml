@@ -206,6 +206,15 @@
     }
     $('#statusFilter').on('change', function () {
         var table = $('#programTable').DataTable();
-        table.column(2).search(this.value).draw();
+        var value = this.value;
+        if (value === "Active") {
+            table.column(2).search('^Active$', true, false).draw();
+        }
+        else if (value === "Inactive") {
+            table.column(2).search('^Inactive$', true, false).draw();
+        }
+        else {
+            table.column(2).search('').draw();
+        }
     });
 </script>
