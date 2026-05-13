@@ -22,18 +22,15 @@
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Roll List</h3>
-        <div class="table-actions">
-           @*  <button class="btn btn-success mb-3"
-                    onclick="bulkPrintAllAdmitCards()">
-                Bulk Print Admit Card
-            </button> *@
+        <div class="table-actions">         
 
-            <a href="~/rollnumberlist.xlsx" target="_blank">
+            <a href="~/RollNumberList.xlsx" target="_blank">
             <button class="btn btn-success mb-3">
                 Download Roll Number List
             </button>
             </a>
-            <button class="btn btn-success mb-3">
+             <button class="btn btn-success mb-3"
+                    onclick="bulkPrintAllAdmitCards()">
                 Bulk Print Admit Card
             </button>
         </div>
@@ -154,8 +151,9 @@
                             render: function (data) {
 
                                 return `
-                                    <button class="btn btn-edit btn-sm">
-                                        Print Admit Card
+                                     <button class="btn btn-edit btn-sm"
+                                            onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
+                                            Print Admit Card
                                     </button>
                                 `;
                             }
@@ -171,10 +169,7 @@
             }
         });
     }
-      // <button class="btn btn-edit btn-sm"
-                                    //         onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>
-                                    //         Print Admit Card
-                                    // </button>
+                                   
 
     $('#sortOrder').change(function () {
         let val = $(this).val();
