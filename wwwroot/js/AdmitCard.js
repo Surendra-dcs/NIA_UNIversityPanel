@@ -31,7 +31,7 @@ function _admitCardCss() {
         '.header-right table { width:100%; border-collapse:collapse; }' +
         '.header-right td { padding:2px; }' +
         '.header-right .label { font-weight:bold; white-space:nowrap; }' +
-        '.header-right .roll-value { font-size:9px; font-weight:bold; }' +
+        '.header-right .roll-value { font-size:12px; font-weight:bold; }' +
         '.exam-title-box { border-bottom:2px solid #000; text-align:center; padding:4px 6px; }' +
         '.exam-title-box .main-title { font-size:12px; font-weight:bold; letter-spacing:0.3px; }' +
         '.exam-title-box .sub-title { font-size:11px; font-style:italic; margin-top:1px; }' +
@@ -102,6 +102,14 @@ function _buildAdmitCardHtml(rows) {
     var rollNo = d.rollNumber || '—';
     var enrollNo = d.enrollmentNumber || '—';
     var studentName = d.userName || '—';
+    var hindiName = d.hindiName || '—';
+    var fatherName = d.fatherName || '—';
+    var fatherNameHindi = d.fatherNameHindi || '—';
+    var motherName = d.motherName || '—';
+    var motherNameHindi = d.motherNameHindi || '—';
+    var formNumber = d.formNumber || '—';
+    var dateOfBirth = d.dateOfBirth || '—';
+    var category = d.category || '—';
     var email = d.email || '—';
     var courseName = d.courseName || '—';
     var semesterName = d.semesterName || '—';
@@ -121,18 +129,17 @@ function _buildAdmitCardHtml(rows) {
 
     var header =
         '<div class="header">' +
-        '<div class="header-logo"><img src="/images/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" /></div>' +
+        '<div class="header-logo"><img src="/logo/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" /></div>' +
         '<div class="header-center">' +
         '<div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA</div>' +
         '<div class="inst-sub">Deemed to be University</div>' +
         '<div class="inst-ministry">(Ministry of AYUSH, Govt. of India)</div>' +
         '<div class="inst-address">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>' +
-        '<div class="perm-title"><b>(PROVISIONALLY ALLOWED)</b> PERMISSION LETTER CUM ADMISSION CARD</div>' +
+        '<div class="perm-title"><b>(PROVISIONALLY ALLOWED)</b> PERMISSION LETTER CUM ADMIT CARD</div>' +
         '</div>' +
         '<div class="header-right"><table>' +
         '<tr><td class="label">ROLL NO.:</td><td class="roll-value">' + rollNo + '</td></tr>' +
         '<tr><td class="label">ENROL NO.:</td><td style="font-weight:bold;font-size:10px;">' + enrollNo + '</td></tr>' +
-        '<tr><td class="label">SEMESTER:</td><td style="font-weight:bold;font-size:10px;">' + semesterName + '</td></tr>' +
         '<tr><td class="label">GENDER:</td><td style="font-weight:bold;font-size:10px;">' + gender + '</td></tr>' +
         '</table></div>' +
         '</div>';
@@ -140,20 +147,22 @@ function _buildAdmitCardHtml(rows) {
     var titleBand =
         '<div class="exam-title-box">' +
         '<div class="main-title">' + examName + '</div>' +
-        '<div class="sub-title">' + courseName + ' &nbsp;|&nbsp; Semester: ' + semesterName + '</div>' +
+        '<div class="sub-title">' + courseName + '</div>' +
         '</div>';
 
     var infoSection =
         '<div class="info-photo-row">' +
         '<div class="info-table"><table>' +
         '<tr><td class="lbl">NAME</td><td class="val name">' + studentName + '</td></tr>' +
-        '<tr><td class="lbl">ROLL NUMBER</td><td class="val">' + rollNo + '</td></tr>' +
-        '<tr><td class="lbl">ENROLMENT NO.</td><td class="val">' + enrollNo + '</td></tr>' +
-        '<tr><td class="lbl">COURSE</td><td class="val">' + courseName + '</td></tr>' +
-        '<tr><td class="lbl">SEMESTER</td><td class="val">' + semesterName + '</td></tr>' +
-        '<tr><td class="lbl">EXAM</td><td class="val">' + examName + '</td></tr>' +
-        '<tr><td class="lbl">GENDER</td><td class="val">' + gender + '</td></tr>' +
-        '<tr><td class="lbl">EMAIL</td><td class="val">' + email + '</td></tr>' +
+        '<tr><td class="lbl">NAME</td><td class="val name">' + hindiName + '</td></tr>' +
+        '<tr><td class="lbl">FATHER NAME</td><td class="val name">' + fatherName + '</td></tr>' +
+        '<tr><td class="lbl">FATHER NAME</td><td class="val name">' + fatherNameHindi + '</td></tr>' +
+        '<tr><td class="lbl">MOTHER NAME</td><td class="val name">' + motherName + '</td></tr>' +
+        '<tr><td class="lbl">MOTHER NAME</td><td class="val name">' + motherNameHindi + '</td></tr>' +
+        '<tr><td class="lbl">FORM NO</td><td class="val">' + formNumber + '</td></tr>' +
+        '<tr><td class="lbl">DATE OF BIRTH</td><td class="val">' + dateOfBirth + '</td></tr>' +
+        '<tr><td class="lbl">CATEGORY</td><td class="val">' + category + '</td></tr>' +
+       
         '</table></div>' +
         '<div class="photo-sig-box">' +
         '<div class="photo-box">' + photoHtml + '</div>' +
@@ -229,11 +238,11 @@ function _buildAdmitCardHtml(rows) {
         '</tr></thead><tbody>' + subjectRows + '</tbody></table></div>';
 
     var sigRow =
-        '<div class="confirm-row">All details in the admission card is correct</div>' +
+        '<div class="confirm-row">All details in the Admit card is correct</div>' +
         '<div class="sig-row">' +
         '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
         '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
-        '<div class="sig-col-right"><div class="prof-name">Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
+        '<div class="sig-col-right"><div class="prof-name"><img src=".././logo/AdminSignatur.jpg" style="width:150px;height:40px"/><br/>Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
         '</div>';
 
     return header + titleBand + infoSection + notesRow + examProg + sigRow + _buildImportantNotes();
@@ -267,8 +276,6 @@ function _openAdmitCardWindow(rows) {
     else { alert('Pop-up blocked. Please allow pop-ups for this site.'); }
 }
 
-// ── Called from the DataTable button via rollNumber string ────────────────────
-// rolllist.cshtml calls this function with the rollNumber directly.
 function printRollAdmitCardByRoll(rollNo) {
     var rows = (window._allApiRows || []).filter(function (r) {
         return r.rollNumber === rollNo;
@@ -280,7 +287,6 @@ function printRollAdmitCardByRoll(rollNo) {
     _openAdmitCardWindow(rows);
 }
 
-// ── Legacy: called with a full rowData object (backward compatibility) ─────────
 function printRollAdmitCard(rowData) {
     var rollNo = rowData.rollNumber;
     var rows = (window._allApiRows || []).filter(function (r) {
@@ -290,9 +296,10 @@ function printRollAdmitCard(rowData) {
     _openAdmitCardWindow(rows);
 }
 
-// ── Bulk print ────────────────────────────────────────────────────────────────
 function bulkPrintAllAdmitCards() {
+
     var allRows = window._allApiRows || [];
+
     if (allRows.length === 0) {
         alert('No data loaded yet. Please wait for the table to finish loading.');
         return;
@@ -300,16 +307,74 @@ function bulkPrintAllAdmitCards() {
 
     // Group by rollNumber
     var grouped = {};
+
     allRows.forEach(function (r) {
-        if (!grouped[r.rollNumber]) grouped[r.rollNumber] = [];
+
+        if (!grouped[r.rollNumber]) {
+            grouped[r.rollNumber] = [];
+        }
+
         grouped[r.rollNumber].push(r);
+
     });
 
     var keys = Object.keys(grouped);
-    if (!confirm('This will open ' + keys.length + ' admit card(s) in new tabs.\nMake sure pop-ups are allowed. Continue?'))
+
+    if (!confirm('Generate all admit cards in one printable PDF?'))
         return;
 
-    keys.forEach(function (key) {
-        _openAdmitCardWindow(grouped[key]);
+    // Build ALL admit cards in one HTML
+    var allCardsHtml = '';
+
+    keys.forEach(function (key, index) {
+
+        allCardsHtml +=
+            '<div class="page">' +
+            '<div class="container">' +
+            _buildAdmitCardHtml(grouped[key]) +
+            '</div>' +
+            '</div>';
+
+        // Page break except last
+        if (index !== keys.length - 1) {
+            allCardsHtml +=
+                '<div style="page-break-after:always;"></div>';
+        }
+
     });
+
+    var actionBar =
+        '<div class="action-bar no-print">' +
+        '<button class="btn-action btn-dl" onclick="window.print()">&#128190; Download / Print Admit Cards</button>' +
+        '<button class="btn-action btn-pr" onclick="window.print()">&#128424; Print</button>' +
+        '</div>';
+
+    var html =
+        '<!DOCTYPE html>' +
+        '<html lang="en">' +
+        '<head>' +
+        '<meta charset="UTF-8">' +
+        '<title>Bulk Admit Cards</title>' +
+        '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">' +
+        '<style>' + _admitCardCss() + '</style>' +
+        '</head>' +
+        '<body>' +
+        actionBar +
+        allCardsHtml +
+        actionBar +
+        '</body>' +
+        '</html>';
+
+    var w = window.open('', '_blank');
+
+    if (w) {
+
+        w.document.write(html);
+        w.document.close();
+
+    } else {
+
+        alert('Pop-up blocked. Please allow pop-ups for this site.');
+
+    }
 }
