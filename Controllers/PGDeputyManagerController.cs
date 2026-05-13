@@ -65,6 +65,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
             return View();
         }
 
+        public IActionResult stcorrection()
+        {
+            return View();
+        }
         public IActionResult AttendanceSeet()
         {
             return View();
