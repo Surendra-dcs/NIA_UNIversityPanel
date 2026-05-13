@@ -1,0 +1,796 @@
+﻿@{
+    ViewData["Title"] = "AttendanceSheet";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+
+<style>
+
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        background: #f3f3f3;
+    }
+
+    .top-panel {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+
+        .top-panel h2 {
+            margin-bottom: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            color: #222;
+        }
+
+    .search-area {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    #ddlsubject {
+        width: 350px;
+        height: 42px;
+    }
+
+    .a4-page {
+        width: 210mm;
+        min-height: 297mm;
+        background: #fff;       
+        margin: 20px auto;
+        box-shadow: 0 0 10px rgba(0,0,0,0.15);
+        page-break-after: always;
+    }
+
+    .header {
+        border: 2px solid #000;
+        padding: 8px;
+    }
+
+    .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo-area img {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+    }
+
+    .header-center {
+        flex: 1;
+        text-align: center;
+        padding: 0 10px;
+    }
+
+    .inst-name {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .exam-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 5px;
+    }
+
+    .exam-session {
+        margin-top: 4px;
+        font-size: 14px;
+    }
+
+    .page-badge {
+        border: 1px solid #000;
+        padding: 5px 10px;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .meta-info {
+        border: 2px solid #000;
+        border-top: none;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .sheet-title {
+        border: 2px solid #000;
+        border-top: none;
+        text-align: center;
+        padding: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #000;
+        border-top: none;
+    }
+
+        .attendance-table th {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            font-size: 13px;
+            background: #f5f5f5;
+        }
+
+        .attendance-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+    .candidate-row td {
+        height: 90px;
+    }
+
+    .candidate-name {
+        text-align: left !important;
+        padding-left: 10px !important;
+        font-weight: 600;
+    }
+
+    .candidate-photo img {
+        width: 70px;
+        height: 80px;
+        object-fit: cover;
+        border: 1px solid #999;
+    }
+
+    .candidate-sign img {
+        width: 90px;
+        height: 40px;
+        object-fit: contain;
+    }
+
+    .footer-area {
+        border: 2px solid #000;
+        border-top: none;
+        padding: 12px;
+    }
+
+    .footer-grid {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .footer-line {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .signature-box {
+        margin-top: 40px;
+        text-align: right;
+        font-weight: bold;
+    }
+
+    #attendanceTable_wrapper {
+        margin-top: 20px;
+    }
+
+    @@media print {
+
+        @@page {
+            size: A4 portrait;
+            margin: 10mm;
+        }
+
+        body {
+            background: #fff;
+        }
+
+            body * {
+                visibility: hidden;
+            }
+
+        #printArea,
+        #printArea * {
+            visibility: visible;
+        }
+
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        .top-panel,
+        .dataTables_wrapper,
+        .dataTables_length,
+        .dataTables_filter,
+        .dataTables_info,
+        .dataTables_paginate {
+            display: none !important;
+        }
+
+        .a4-page {
+            margin: 0;
+            box-shadow: none;
+        }
+    }
+
+</style>
+
+<div class="container-fluid">
+
+    <div class="top-panel">
+
+        <h2 style="color:red">Attendance Sheet</h2>
+
+        <div class="search-area">
+
+            <select id="ddlsubject" class="form-control">
+                <option value="">-- Select Subject --</option>
+            </select>
+
+            <button type="button"
+                    id="btnSearch"
+                    class="btn btn-success" style="height: 40px;width:76px;background: green; color: white;">
+
+                Search
+
+            </button>
+
+            <button type="button"
+                    id="btnPrint"
+                    class="btn btn-primary" style="height: 40px; width: 60px; background: blue; color: white;">
+
+                Print
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="printArea" class="a4-page">
+
+    <div class="header">
+
+        <div class="header-top">
+
+            <div class="logo-area">
+                <img src="/logo/nia_logo.png" />
+            </div>
+
+            <div class="header-center">
+
+                <div class="inst-name">
+                    National Institute of Ayurveda, Jaipur
+                </div>
+
+                <div class="exam-title">
+                    ATTENDANCE SHEET
+                </div>
+
+                <div class="exam-session">
+                    (June-July 2025)
+                </div>
+
+            </div>
+
+            <div class="page-badge">
+                Page:1
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="meta-info">
+
+        <div class="meta-row">
+
+            <div>
+                <b>Name of Centre :</b>
+                NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
+            </div>
+
+        </div>
+
+        <div class="meta-row">
+
+            <div>
+                <b>Date :</b>
+                <span id="lblExamDate"></span>
+            </div>
+
+            <div>
+                <b>Time :</b>
+                <span id="lblExamTime"></span>
+            </div>
+
+        </div>
+
+        <div class="meta-row">
+
+            <div>
+                <b>Subject :</b>
+                <span id="lblSubject"></span>
+            </div>
+
+            <div>
+                <b>Paper Code :</b>
+                <span id="lblSubjectCode"></span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="sheet-title">
+        ATTENDANCE-SHEET
+    </div>
+
+    <table id="tblAttendance" class="attendance-table">
+
+        <thead>
+
+            <tr>
+
+                <th style="width:5%;">S.No</th>
+                <th style="width:25%;">Name of Candidate</th>
+                <th style="width:12%;">Roll No</th>
+                <th style="width:18%;">Main Answer Book</th>
+                <th style="width:15%;">Photo</th>
+                <th style="width:15%;">Signature</th>
+                <th style="width:10%;">Remark</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="attendanceBody">
+        </tbody>
+
+    </table>
+
+    <div class="footer-area">
+
+        <div class="footer-grid">
+
+            <div>
+
+                <div class="footer-line">
+                    Total Present :
+                    <span id="lblPresent"></span>
+                </div>
+
+                <div class="footer-line">
+                    Total Absent :
+                    0
+                </div>
+
+            </div>
+
+            <div class="signature-box">
+
+                Signature & Seal of Centre Supdt.
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        loadSubjects();
+
+        $("#btnSearch").click(function () {
+
+            var subjectName = $("#ddlsubject").val();
+
+            if (subjectName == "") {
+
+                alert("Please select subject");
+                return;
+            }
+
+            getAttendanceSheet(subjectName);
+
+        });
+
+        // PRINT BUTTON
+        $("#btnPrint").click(function () {
+
+            if ($("#printArea").html().trim() == "") {
+
+                alert("Please search attendance first");
+                return;
+            }
+
+            window.print();
+
+        });
+
+    });
+
+    // =========================================
+    // LOAD SUBJECTS
+    // =========================================
+
+    function loadSubjects() {
+
+        $.ajax({
+
+            url: ApiBaseUrl + "Exam/GetSubjectList",
+
+            type: "GET",
+
+            success: function (response) {
+
+                $("#ddlsubject").empty();
+
+                $("#ddlsubject").append(
+                    '<option value="">-- Select Subject --</option>'
+                );
+
+                $.each(response, function (i, item) {
+
+                    $("#ddlsubject").append(
+                        '<option value="' + item + '">' + item + '</option>'
+                    );
+
+                });
+
+            },
+
+            error: function () {
+
+                alert("Failed to load subject list");
+
+            }
+
+        });
+
+    }
+
+    // =========================================
+    // GET ATTENDANCE
+    // =========================================
+
+    function getAttendanceSheet(subjectName) {
+
+        $.ajax({
+
+            url: ApiBaseUrl + "Exam/GetAttendanceSheet?subjectName=" + encodeURIComponent(subjectName),
+
+            type: "GET",
+
+            success: function (response) {
+
+                if (!response || response.length == 0) {
+
+                    alert("No data found");
+                    return;
+                }
+
+                bindAttendanceSheet(response);
+
+            },
+
+            error: function (xhr) {
+
+                console.log(xhr.responseText);
+
+                alert("Error loading attendance sheet");
+
+            }
+
+        });
+
+    }
+
+    // =========================================
+    // BIND ATTENDANCE
+    // =========================================
+
+    function bindAttendanceSheet(data) {
+
+        $("#printArea").html("");
+
+        var totalRecords = data.length;
+
+        var recordsPerPage = 20;
+
+        var totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+        for (var page = 0; page < totalPages; page++) {
+
+            var start = page * recordsPerPage;
+
+            var end = start + recordsPerPage;
+
+            var pageData = data.slice(start, end);
+
+            var first = pageData[0];
+
+            var rows = "";
+
+            $.each(pageData, function (i, item) {
+
+                rows += `
+
+                    <tr class="candidate-row">
+
+                        <td>
+                            ${start + i + 1}
+                        </td>
+
+                        <td class="candidate-name">
+                            ${item.FirstName || ""}
+                        </td>
+
+                        <td>
+                            ${item.RollNumber || ""}
+                        </td>
+
+                        <td></td>
+
+                        <td class="candidate-photo">
+
+                            <img src="${item.CandidateImagePath || ''}"
+                                 style="
+                                    width:70px;
+                                    height:80px;
+                                    object-fit:cover;
+                                    border:1px solid #999;
+                                 " />
+
+                        </td>
+
+                        <td class="candidate-sign">
+
+                            <img src="${item.SignatureImagePath || ''}"
+                                 style="
+                                    width:90px;
+                                    height:40px;
+                                    object-fit:contain;
+                                 " />
+
+                        </td>
+
+                        <td></td>
+
+                    </tr>
+
+                `;
+            });
+
+            // ONLY LAST PAGE SHOW TOTAL
+            var footerHtml = "";
+
+            if (page == totalPages - 1) {
+
+                footerHtml = `
+
+                    <div class="footer-area">
+
+                        <div class="footer-grid">
+
+                            <div>
+
+                                <div class="footer-line">
+
+                                    Total Present :
+                                    ${totalRecords}
+
+                                </div>
+
+                                <div class="footer-line">
+
+                                    Total Absent : 0
+
+                                </div>
+
+                            </div>
+
+                            <div class="signature-box">
+
+                                Signature & Seal of Centre Supdt.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `;
+            }
+
+            var pageHtml = `
+
+                <div class="a4-page print-page">
+
+                    <div class="header">
+
+                        <div class="header-top">
+
+                            <div class="logo-area">
+
+                                <img src="/logo/nia_logo.png"
+                                     style="
+                                        width:60px;
+                                        height:60px;
+                                     " />
+
+                            </div>
+
+                            <div class="header-center">
+
+                                <div class="inst-name">
+
+                                    National Institute of Ayurveda, Jaipur
+
+                                </div>
+
+                                <div class="exam-title">
+
+                                    ATTENDANCE SHEET
+
+                                </div>
+
+                                <div class="exam-session">
+
+                                    (June-July 2025)
+
+                                </div>
+
+                            </div>
+
+                            <div class="page-badge">
+
+                                Page : ${page + 1}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="meta-info">
+
+                        <div class="meta-row">
+
+                            <div>
+
+                                <b>Name of Centre :</b>
+
+                                NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
+
+                            </div>
+
+                        </div>
+
+                        <div class="meta-row">
+
+                            <div>
+
+                                <b>Date :</b>
+
+                                ${first.Examdate || ""}
+
+                            </div>
+
+                            <div>
+
+                                <b>Time :</b>
+
+                                ${first.Examtime || ""}
+
+                            </div>
+
+                        </div>
+
+                        <div class="meta-row">
+
+                            <div>
+
+                                <b>Subject :</b>
+
+                                ${first.SubjectName || ""}
+
+                            </div>
+
+                            <div>
+
+                                <b>Paper Code :</b>
+
+                                ${first.SubjectCode || ""}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="sheet-title">
+
+                        ATTENDANCE-SHEET
+
+                    </div>
+
+                    <table class="attendance-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th style="width:5%;">S.No</th>
+
+                                <th style="width:25%;">
+                                    Name of Candidate
+                                </th>
+
+                                <th style="width:12%;">
+                                    Roll No
+                                </th>
+
+                                <th style="width:18%;">
+                                    Main Answer Book
+                                </th>
+
+                                <th style="width:15%;">
+                                    Photo
+                                </th>
+
+                                <th style="width:15%;">
+                                    Signature
+                                </th>
+
+                                <th style="width:10%;">
+                                    Remark
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            ${rows}
+
+                        </tbody>
+
+                    </table>
+
+                    ${footerHtml}
+
+                </div>
+
+            `;
+
+            $("#printArea").append(pageHtml);
+
+        }
+
+    }
+
+</script>
