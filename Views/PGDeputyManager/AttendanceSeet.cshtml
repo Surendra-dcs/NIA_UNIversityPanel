@@ -1,6 +1,7 @@
-﻿@{
-    ViewData["Title"] = "AttendanceSheet";
-    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+﻿
+@{
+    ViewData["Title"] = "AttendanceSeet";
+    Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
 }
 
 <style>
@@ -40,7 +41,7 @@
     .a4-page {
         width: 210mm;
         min-height: 297mm;
-        background: #fff;       
+        background: #fff;
         margin: 20px auto;
         box-shadow: 0 0 10px rgba(0,0,0,0.15);
         page-break-after: always;
@@ -356,7 +357,8 @@
                 <th style="width:18%;">Serial No. of Main Answer book </th>
                 <th style="width:15%;">Photo</th>
                 <th style="width:15%;">Signature</th>
-                <th style="width:15%;"> Signature of Candidate
+                <th style="width:15%;">
+                    Signature of Candidate
                 </th>
                 <th style="width:10%;">Remark</th>
 
@@ -798,3 +800,4 @@
     }
 
 </script>
+
