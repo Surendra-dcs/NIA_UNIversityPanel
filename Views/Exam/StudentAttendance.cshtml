@@ -221,19 +221,79 @@
         });
     }
 
-    function loadAttendance(subjectName) {
+
+         function loadAttendance(subjectName) {
+
         $.ajax({
-            url: ApiBaseUrl + "Exam/GetAttendanceSeetForPersentAndAbsent?subjectName="+ encodeURIComponent(subjectName),
+
+            url: ApiBaseUrl +
+                "Exam/GetAttendanceSeetForPersentAndAbsent?subjectName="
+                + encodeURIComponent(subjectName),
+
             type: "GET",
+
             success: function (response) {
+
                 $("#tblStudentAtt").empty();
+
+                $("#attendanceMessage").remove();
+
+                $("#ddlAttendence").prop('disabled', false);
+
+                $("#ddlStatus").prop('disabled', false);
+
+                $("#btnSave").show();
+
                 if (!response || response.length == 0) {
+
                     $("#tblStudentAtt").html(
                         '<tr><td colspan="8">No Record Found</td></tr>'
                     );
+
                     return;
+
                 }
+
+                // ==========================================
+                // CHECK IF ATTENDANCE ALREADY FILLED
+                // ==========================================
+
+                var alreadyLocked = response.some(function (item) {
+
+                    return item.attendanceStatus != null
+                        && item.attendanceStatus != ""
+                        && item.lockStatus != null
+                        && item.lockStatus != "";
+
+                });
+
+                if (alreadyLocked) {
+
+                    $("#btnSave").hide();
+
+                    $("#ddlAttendence").prop('disabled', true);
+
+                    $("#ddlStatus").prop('disabled', true);
+
+                    $("#tblStudentAtt").html(
+                        '<tr>' +
+                        '<td colspan="8" ' +
+                        'style="text-align:center;color:red;font-weight:bold;font-size:16px;padding:20px;">' +
+                           'The attendance for this subject has been successfully submitted and locked.' +
+                        '</td>' +
+                        '</tr>'
+                    );
+
+                    return;
+
+                }
+
+                // ==========================================
+                // BIND TABLE
+                // ==========================================
+
                 $.each(response, function (i, item) {
+
                     var row = ''
 
                         + '<tr>'
@@ -293,12 +353,19 @@
                         + '</tr>';
 
                     $("#tblStudentAtt").append(row);
+
                 });
+
             },
+
             error: function () {
+
                 alert("Error loading attendance data");
+
             }
+
         });
+
     }
 
     $("#btnSave").click(function () {
