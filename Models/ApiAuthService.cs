@@ -19,26 +19,50 @@ namespace NIAUNIVERSITYPANEL.Models
 
         //    await _http.PostAsync("auth/login", content);
         //}
-        public async Task<(bool success, string message)> SendOtp(string mobile)
+
+        public async Task<ApiResponse> Login(string mobile,string password)
         {
             var payload = new
             {
-                MobileNumber = mobile
+                MobileNumber = mobile,
+                Password = password
             };
 
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload),
                 Encoding.UTF8,
-                "application/json"
-            );
+                "application/json");
 
-            var response = await _http.PostAsync("Auth/login", content);
+            var response = await _http.PostAsync(
+                "Auth/login",
+                content);
 
             var json = await response.Content.ReadAsStringAsync();
-            dynamic result = JsonConvert.DeserializeObject(json);
 
-            return (result.success, result.message);
+            var result = JsonConvert.DeserializeObject<ApiResponse>(json);
+
+            return result;
         }
+        //public async Task<(bool success, string message)> SendOtp(string mobile)
+        //{
+        //    var payload = new
+        //    {
+        //        MobileNumber = mobile
+        //    };
+
+        //    var content = new StringContent(
+        //        JsonConvert.SerializeObject(payload),
+        //        Encoding.UTF8,
+        //        "application/json"
+        //    );
+
+        //    var response = await _http.PostAsync("Auth/login", content);
+
+        //    var json = await response.Content.ReadAsStringAsync();
+        //    dynamic result = JsonConvert.DeserializeObject(json);
+
+        //    return (result.success, result.message);
+        //}
         //public async Task<string> VerifyOtp(string mobile, string otp)
         //{
         //    var data = new { MobileNumber = mobile, OTP = otp };

@@ -4,8 +4,11 @@
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
 <div class="table-card">
-    <div class="table-header">
+    <div class="table-header" style="display:flex; align-items:center; justify-content:space-between;">
         <h3 class="table-title">Assigned Paper to Examiner</h3>
+        <button class="btn btn-primary" id="exportExcelBtn" style="background: white;color: black;">
+            Export Excel
+        </button>
     </div>
     <div class="table-responsive">
         <table id="assignedPaperExaminerTbl" class="display custom-table">
@@ -24,6 +27,8 @@
         </table>
     </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 
@@ -55,6 +60,30 @@
             ]
         });
 
+    });
+
+    $('#exportExcelBtn').click(function () {
+
+        let exportData = allData.map((item, index) => {
+            return {
+                "Examiner": item.examinerName,
+                "College": item.collegeName,
+                "Course": item.courseName,
+                "Exam": item.examName,
+                "Subject Name": item.subjectName,
+                "Paper Type": item.paperType
+            };
+        });
+
+        // Create worksheet
+        let ws = XLSX.utils.json_to_sheet(exportData);
+
+        // Create workbook
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Assigned Paper to Examiner");
+
+        // Download Excel
+        XLSX.writeFile(wb, "Assigned_paper_to_examiner.xlsx");
     });
 
 </script>
