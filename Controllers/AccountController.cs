@@ -16,18 +16,55 @@ namespace NIAUNIVERSITYPANEL.Controllers
         }
         public IActionResult Login() => View();
 
+        //[HttpPost]
+        //public async Task<IActionResult> Login(string mobile)
+        //{
+        //    var result = await _api.SendOtp(mobile);
+        //    if (!result.success)
+        //    {
+        //        ViewBag.Error = result.message; 
+        //        return View();               
+        //    }
+
+        //    ViewBag.Mobile = mobile;    
+        //    return View();
+        //}
+
         [HttpPost]
-        public async Task<IActionResult> Login(string mobile)
+        public async Task<IActionResult> Login(string mobile, string password)
         {
-            var result = await _api.SendOtp(mobile);
-            if (!result.success)
+            var response = await _api.Login(mobile, password);
+
+            if (!response.success)
             {
-                ViewBag.Error = result.message; 
-                return View();               
+                ViewBag.Error = response.message;
+                return View();
             }
 
-            ViewBag.Mobile = mobile;    
-            return View();
+            HttpContext.Session.SetString("Mobile", mobile);
+            HttpContext.Session.SetInt32("Role", response.role);
+
+            switch (response.role)
+            {
+                case 1:
+                    return RedirectToAction(
+                        "Dashboard",
+                        "University");
+
+                case 2:
+                    return RedirectToAction(
+                        "Dashboard",
+                        "UGDeputyManager");
+
+                case 3:
+                    return RedirectToAction(
+                        "Dashboard",
+                        "PGDeputyManager");
+
+                default:
+                    ViewBag.Error = "Invalid Role!";
+                    return View("Login");
+            }
         }
 
         //[HttpPost]
@@ -53,44 +90,6 @@ namespace NIAUNIVERSITYPANEL.Controllers
         //    }
         //}
 
-        [HttpPost]
-        public async Task<IActionResult> VerifyOtp(string mobile, string otp)
-        {
-            try
-            {
-                var response = await _api.VerifyOtp(mobile, otp);
 
-                if (response == null || string.IsNullOrEmpty(response.Token))
-                {
-                    ViewBag.Mobile = mobile;
-                    ViewBag.Error = "Invalid OTP or OTP expired!";
-                    return View("Login");
-                }
-
-                HttpContext.Session.SetString("JWT", response.Token);
-
-                switch (response.Role)
-                {
-                    case 1:
-                        return RedirectToAction("Dashboard", "University");
-
-                    case 2:
-                        return RedirectToAction("Dashboard", "UGDeputyManager");
-
-                    case 3:
-                        return RedirectToAction("Dashboard", "PGDeputyManager");
-
-                    default:
-                        ViewBag.Error = "Invalid Role!";
-                        return View("Login");
-                }
-            }
-            catch (Exception)
-            {
-                ViewBag.Mobile = mobile;
-                ViewBag.Error = "Something went wrong. Please try again!";
-                return View("Login");
-            }
-        }
     }
 }
