@@ -221,19 +221,114 @@
         });
     }
 
-    function loadAttendance(subjectName) {
+       function loadAttendance(subjectName) {
+
         $.ajax({
-            url: ApiBaseUrl + "Exam/GetAttendanceSeetForPersentAndAbsent?subjectName="+ encodeURIComponent(subjectName),
+
+            url: ApiBaseUrl +
+                "Exam/GetAttendanceSeetForPersentAndAbsent?subjectName="
+                + encodeURIComponent(subjectName),
+
             type: "GET",
+
             success: function (response) {
+
                 $("#tblStudentAtt").empty();
+
+
+                $("#ddlAttendence").prop('disabled', false);
+
+                $("#ddlStatus").prop('disabled', false);
+
+                $("#btnSave").show();
+
                 if (!response || response.length == 0) {
+
                     $("#tblStudentAtt").html(
                         '<tr><td colspan="8">No Record Found</td></tr>'
                     );
+
                     return;
+
                 }
+
                 $.each(response, function (i, item) {
+
+
+                    var attendanceDropdown = '';
+
+                    if (item.attendanceStatus != null
+                        && item.attendanceStatus != "") {
+
+                        attendanceDropdown =
+
+                            '<select class="form-control status-select attendanceStatus" disabled>'
+
+                            + '<option value="P" '
+                            + (item.attendanceStatus == "P" ? 'selected' : '')
+                            + '>P</option>'
+
+                            + '<option value="A" '
+                            + (item.attendanceStatus == "A" ? 'selected' : '')
+                            + '>A</option>'
+
+                            + '</select>';
+
+                        $("#ddlAttendence").prop('disabled', true);
+
+                    }
+                    else {
+
+                        attendanceDropdown =
+
+                            '<select class="form-control status-select attendanceStatus">'
+
+                            + '<option value="P">P</option>'
+
+                            + '<option value="A">A</option>'
+
+                            + '</select>';
+
+                    }
+
+                    var lockDropdown = '';
+
+                    if (item.lockStatus != null
+                        && item.lockStatus != "") {
+
+                        lockDropdown =
+
+                            '<select class="form-control lock-select lockStatus" disabled>'
+
+                            + '<option value="Unlock" '
+                            + (item.lockStatus == "Unlock" ? 'selected' : '')
+                            + '>Unlock</option>'
+
+                            + '<option value="Lock" '
+                            + (item.lockStatus == "Lock" ? 'selected' : '')
+                            + '>Lock</option>'
+
+                            + '</select>';
+
+                        $("#ddlStatus").prop('disabled', true);
+
+                        $("#btnSave").hide();
+
+                    }
+                    else {
+
+                        lockDropdown =
+
+                            '<select class="form-control lock-select lockStatus">'
+
+                            + '<option value="Unlock">Unlock</option>'
+
+                            + '<option value="Lock">Lock</option>'
+
+                            + '</select>';
+
+                    }                    
+
                     var row = ''
 
                         + '<tr>'
@@ -263,27 +358,11 @@
                         + '</td>'
 
                         + '<td>'
-
-                        + '<select class="form-control status-select attendanceStatus">'
-
-                        + '<option value="P">P</option>'
-
-                        + '<option value="A">A</option>'
-
-                        + '</select>'
-
+                        + attendanceDropdown
                         + '</td>'
 
                         + '<td>'
-
-                        + '<select class="form-control lock-select lockStatus">'
-
-                        + '<option value="Unlock">Unlock</option>'
-
-                        + '<option value="Lock">Lock</option>'
-
-                        + '</select>'
-
+                        + lockDropdown
                         + '</td>'
 
                         + '<input type="hidden" class="userId" value="'
@@ -293,12 +372,19 @@
                         + '</tr>';
 
                     $("#tblStudentAtt").append(row);
+
                 });
+
             },
+
             error: function () {
+
                 alert("Error loading attendance data");
+
             }
+
         });
+
     }
 
     $("#btnSave").click(function () {
