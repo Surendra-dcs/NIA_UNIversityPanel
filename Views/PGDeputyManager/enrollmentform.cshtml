@@ -143,6 +143,9 @@
     <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5">
         Bulk Verify
     </button>
+    <button class="btn btn-primary" id="exportExcelBtn" style="background: #1a3a5c;color: white;">
+        Export Excel
+    </button>
 </div>
 <div class="table-card">
     <div class="table-header">
@@ -208,6 +211,7 @@
 </div>
 <!-- Include the shared admit card JS -->
 <script src="~/js/enrollmentAdmitCard.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 
@@ -492,5 +496,30 @@
         if (e.target.id === 'imageModal') {
             closeImage();
         }
+    });
+
+    $('#exportExcelBtn').click(function () {
+
+        let exportData = allData.map((item, index) => {
+            return {
+                "Enrollment Number": item.enrollmentNumber,
+                "College": item.collegeName,
+                "Program": item.programName,
+                "Course": item.courseName,
+                "Student Name": item.studentName,
+                "Email": item.email,
+                "Mobile": item.mobile
+            };
+        });
+
+        // Create worksheet
+        let ws = XLSX.utils.json_to_sheet(exportData);
+
+        // Create workbook
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Student Enrollment");
+
+        // Download Excel
+        XLSX.writeFile(wb, "StudentEnrollment.xlsx");
     });
 </script>

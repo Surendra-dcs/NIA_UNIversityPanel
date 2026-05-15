@@ -519,7 +519,7 @@
     }
 
     /* ── Photo / Signature upload ── */
-        function uploadPhoto() {
+    function uploadPhoto() {
 
         var file = $('#photoFile')[0].files[0];
 
@@ -593,7 +593,12 @@
                 $('#signFile').val('');
                 $('#sigPreviewLabel').text('Current signature from records');
             },
-            error: function () { alert("Upload failed"); }
+            error: function (xhr) {
+
+                console.log(xhr);
+
+                alert(xhr.responseText || "Upload failed");
+            }
         });
     }
 

@@ -361,7 +361,7 @@
         </div>
 
         <!-- 2. PHOTO + SIGNATURE -->
-        @* <div class="flex-card" style="border: 2px dashed #e85a3a7d;">
+        <div class="flex-card" style="border: 2px dashed #e85a3a7d;">
             <div class="table-card">
                 <h5>Photo &amp; Signature</h5>
                 <div class="file-group">
@@ -386,7 +386,7 @@
                     <button class="btn btn-save" style="margin-top:6px;" onclick="uploadSignature()">Upload Signature</button>
                 </div>
             </div>
-        </div> *@
+        </div>
 
         <!-- 3. MOBILE (direct admin override — unchanged) -->
         <div class="flex-card" style="border: 2px dashed #88888887;">
@@ -420,6 +420,7 @@
 
     let currentStudentId = 0;
     let userId = 0;
+    let applicationId = 0;
 
     /* ── Image helpers ── */
     function _resolveImgUrl(path) {
@@ -469,6 +470,7 @@
             success: function (data) {
                 currentStudentId = data.id;
                 userId           = data.userId;
+                 applicationId    = data.applicationId;
                 $('#studentName').val(data.studentName);
                 $('#fatherName').val(data.fatherName);
                 $('#motherName').val(data.motherName);
@@ -518,24 +520,58 @@
 
     /* ── Photo / Signature upload ── */
     function uploadPhoto() {
+
         var file = $('#photoFile')[0].files[0];
-        if (!file) { alert("Select photo"); return; }
+
+        if (!file) {
+            alert("Select photo");
+            return;
+        }
+
         var formData = new FormData();
+
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
-        formData.append("ImageType", "Photo");
+
+        // FIXED HERE
+        formData.append("imageType", "Photo");
+
         formData.append("userId", userId);
+        formData.append("applicationId", applicationId);
 
         $.ajax({
-            url: ApiBaseUrl + 'StudentCorrection/UploadPhotoAsync',
-            type: 'POST', data: formData, processData: false, contentType: false,
+            url: ApiBaseUrl + 'StudentCorrection/UpdatePhotoAndSignaturAsync',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+
             success: function (res) {
-                alert("Photo uploaded successfully");
-                if (res && res.filePath) setPreviewFromPath('photoPreviewBox','photoPreviewLabel',res.filePath,'photo');
+
+                alert(res.message);
+
+                if (res && res.filePath) {
+
+                    setPreviewFromPath(
+                        'photoPreviewBox',
+                        'photoPreviewLabel',
+                        res.filePath,
+                        'photo'
+                    );
+                }
+
                 $('#photoFile').val('');
-                $('#photoPreviewLabel').text('Current photo from records');
+
+                $('#photoPreviewLabel')
+                    .text('Current photo from records');
             },
-            error: function () { alert("Upload failed"); }
+
+            error: function (xhr) {
+
+                console.log(xhr);
+
+                alert(xhr.responseText || "Upload failed");
+            }
         });
     }
 
@@ -545,10 +581,11 @@
         var formData = new FormData();
         formData.append("file", file);
         formData.append("studentId", currentStudentId);
-        formData.append("ImageType", "Signature");
+        formData.append("imageType", "Signature");
         formData.append("userId", userId);
+        formData.append("applicationId", applicationId);
         $.ajax({
-            url: ApiBaseUrl + 'StudentCorrection/UploadSignature',
+            url: ApiBaseUrl + 'StudentCorrection/UpdatePhotoAndSignaturAsync',
             type: 'POST', data: formData, processData: false, contentType: false,
             success: function (res) {
                 alert("Signature uploaded successfully");
@@ -556,7 +593,12 @@
                 $('#signFile').val('');
                 $('#sigPreviewLabel').text('Current signature from records');
             },
-            error: function () { alert("Upload failed"); }
+            error: function (xhr) {
+
+                console.log(xhr);
+
+                alert(xhr.responseText || "Upload failed");
+            }
         });
     }
 
