@@ -1,0 +1,928 @@
+﻿@model NIAUNIVERSITYPANEL.Models.ExaminerProfile
+@{
+    Layout = null;
+    @inject IConfiguration Configuration
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green: #1B4332;
+            --green-m: #2D6A4F;
+            --green-l: #E8F5EE;
+            --gold: #C9860A;
+            --gold-l: #FDF4E3;
+            --cream: #FDFAF5;
+            --ink: #1A1A1A;
+            --muted: #6B7280;
+            --border: #D1D5DB;
+            --white: #FFFFFF;
+            --radius: 14px;
+        }
+
+        body {
+            background: var(--cream);
+            font-family: 'DM Sans',sans-serif;
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 40px 20px 80px;
+        }
+
+        .alert-success {
+            background: #E8F5EE;
+            border: 1px solid #A7D4B8;
+            color: #1B4332;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin: 0 auto 24px;
+            max-width: 860px;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #991B1B;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin: 0 auto 24px;
+            max-width: 860px;
+        }
+
+        .field-error {
+            color: #DC2626;
+            font-size: 0.78rem;
+            margin-top: 4px;
+        }
+
+        .page-header {
+            max-width: 1024px;
+            margin: 0 auto 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 28px 36px;
+            background: var(--green);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .page-header::before {
+                content: '';
+                position: absolute;
+                right: -40px;
+                top: -40px;
+                width: 220px;
+                height: 220px;
+                border-radius: 50%;
+                background: rgba(255,255,255,.05);
+            }
+
+        .header-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--green);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-text {
+            position: relative;
+            z-index: 1;
+        }
+
+            .header-text h1 {
+                font-family: 'Cormorant Garamond',serif;
+                font-size: 1.55rem;
+                font-weight: 700;
+                color: var(--white);
+                line-height: 1.2;
+            }
+
+            .header-text p {
+                font-size: 0.8rem;
+                color: rgba(255,255,255,.72);
+                margin-top: 4px;
+                font-weight: 300;
+            }
+
+        .voucher-badge {
+            margin-left: auto;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.2);
+            border-radius: 10px;
+            padding: 10px 16px;
+            text-align: center;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+            .voucher-badge label {
+                display: block;
+                font-size: 0.68rem;
+                color: rgba(255,255,255,.6);
+                letter-spacing: .06em;
+                text-transform: uppercase;
+                margin-bottom: 4px;
+            }
+
+            .voucher-badge input {
+                background: transparent;
+                border: none;
+                border-bottom: 1px solid rgba(255,255,255,.4);
+                color: var(--white);
+                font-size: 1rem;
+                font-weight: 600;
+                outline: none;
+                width: 120px;
+                text-align: center;
+                padding: 2px 0;
+            }
+
+        .bill-banner {
+            max-width: 1024px;
+            margin: 0 auto 24px;
+            background: var(--gold-l);
+            border: 1.5px solid #E6C97A;
+            border-radius: 12px;
+            padding: 14px 24px;
+            text-align: center;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: .95rem;
+            font-weight: 600;
+            color: #7A5200;
+            line-height: 1.6;
+        }
+
+        .stepper-wrap {
+            max-width: 1024px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            padding: 10px 0 36px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            font-weight: 600;
+            color: var(--muted);
+            flex-shrink: 0;
+            transition: all .3s;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+        }
+
+            .step-circle.active {
+                border-color: var(--green);
+                background: var(--green);
+                color: var(--white);
+            }
+
+            .step-circle.done {
+                border-color: var(--green-m);
+                background: var(--green-l);
+                color: var(--green);
+            }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            transition: background .3s;
+        }
+
+            .step-line.done {
+                background: var(--green-m);
+            }
+
+        .step-label {
+            position: absolute;
+            top: 46px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: .68rem;
+            color: var(--muted);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .step-circle.active ~ .step-label, .step-circle.done ~ .step-label {
+            color: var(--green);
+        }
+
+        .form-card {
+            max-width: 1024px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            border: 1px solid #E5E7EB;
+            overflow: hidden;
+        }
+
+        .section-head {
+            background: var(--green-l);
+            border-bottom: 1px solid #BFD9CB;
+            padding: 14px 36px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .section-head .dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--green);
+                flex-shrink: 0;
+            }
+
+            .section-head h2 {
+                font-family: 'Cormorant Garamond',serif;
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--green);
+            }
+
+        .form-body {
+            padding: 32px 36px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 16px;
+        }
+
+        .col-full {
+            grid-column: 1 / -1;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #F3F4F6;
+            margin: 28px 0;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+            .field > label {
+                font-size: .75rem;
+                font-weight: 600;
+                color: var(--muted);
+                letter-spacing: .04em;
+                text-transform: uppercase;
+            }
+
+            .field input, .field select {
+                border: 1.5px solid var(--border);
+                border-radius: 10px;
+                padding: 11px 14px;
+                font-size: .9rem;
+                font-family: 'DM Sans',sans-serif;
+                color: var(--ink);
+                background: var(--white);
+                outline: none;
+                transition: border-color .2s, box-shadow .2s;
+            }
+
+                .field input.input-error {
+                    border-color: #DC2626;
+                }
+
+                .field input:focus, .field select:focus {
+                    border-color: var(--green);
+                    box-shadow: 0 0 0 3px rgba(27,67,50,.1);
+                }
+
+                .field input::placeholder {
+                    color: #C4C9D4;
+                }
+
+        .step-panel {
+            display: none;
+        }
+
+            .step-panel.active {
+                display: block;
+            }
+
+
+        .form-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 36px;
+            border-top: 1px solid #F3F4F6;
+            background: #FAFAFA;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-family: 'DM Sans',sans-serif;
+            font-size: .9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            border: 1.5px solid transparent;
+        }
+
+        .btn-outline {
+            background: var(--white);
+            border-color: var(--border);
+            color: var(--muted);
+        }
+
+            .btn-outline:hover {
+                border-color: var(--green);
+                color: var(--green);
+            }
+
+        .btn-primary {
+            background: var(--green);
+            color: var(--white);
+            border-color: var(--green);
+        }
+
+            .btn-primary:hover {
+                background: var(--green-m);
+            }
+
+        .btn-submit {
+            background: var(--gold);
+            color: var(--white);
+            border-color: transparent;
+            padding: 13px 40px;
+            font-size: 1rem;
+        }
+
+            .btn-submit:hover {
+                opacity: .9;
+                transform: translateY(-1px);
+            }
+
+        .step-indicator {
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+            .step-indicator strong {
+                color: var(--green);
+            }
+
+        .inner-section {
+            background: var(--green-l);
+            border-top: 1px solid #BFD9CB;
+            border-bottom: 1px solid #BFD9CB;
+            margin: 0 -36px 28px;
+            padding: 14px 36px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @@media (max-width:680px) {
+            .page-header {
+                flex-wrap: wrap;
+                padding: 22px 20px;
+                gap: 14px;
+            }
+
+            .voucher-badge {
+                margin-left: 0;
+                width: 100%;
+                text-align: left;
+            }
+
+            .form-body {
+                padding: 24px 20px;
+            }
+
+            .form-nav {
+                padding: 18px 20px;
+            }
+
+            .section-head {
+                padding: 12px 20px;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+
+            .stepper-wrap {
+                display: none;
+            }
+
+            .inner-section {
+                margin: 0 -20px 20px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+    <style>
+        .custom-alert-success,
+        .custom-alert-error {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 22px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            z-index: 9999;
+            animation: slideIn 0.4s ease-in-out;
+        }
+
+        .custom-alert-success {
+            background: linear-gradient(135deg, #28a745, #218838);
+        }
+
+        .custom-alert-error {
+            background: linear-gradient(135deg, #dc3545, #b52a37);
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        @@keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+    <header class="page-header">
+        <div class="header-logo">NIA</div>
+        <div class="header-text">
+            <h1>National Institute of Ayurveda</h1>
+            <p>Deemed To Be University (De Novo) &nbsp;·&nbsp; Ministry of AYUSH, Govt. of India</p>
+            <p>Jorawar Singh Gate, Amer Road, Jaipur – 302002 (Raj.)</p>
+        </div>
+        <div class="voucher-badge">
+            <label asp-for="VoucherNo">Voucher No.</label>
+            <input asp-for="VoucherNo" placeholder="VCH-0000" readonly
+                   style="opacity:0.7; cursor:not-allowed;" />
+        </div>
+    </header>
+    <div class="bill-banner">
+        Remuneration Bill for Setting Question Paper / Theory Answer Book Evaluation / Re-evaluation /<br />
+        Practical or Viva Examination / Thesis Evaluation
+    </div>
+    <div class="stepper-wrap">
+        <div class="step-item">
+            <div class="step-circle active" id="s1" onclick="goTo(1)">1</div>
+            <span class="step-label">Bank Details</span>
+            <div class="step-line" id="l1"></div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle" id="s2" onclick="goTo(2)">2</div>
+            <span class="step-label">Examiner</span>
+            <div class="step-line" id="l2"></div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle" id="s3" onclick="goTo(3)">3</div>
+            <span class="step-label">Address</span>
+            <div class="step-line" id="l3"></div>
+        </div>
+        <div class="step-item">
+            <div class="step-circle" id="s4" onclick="goTo(4)">4</div>
+            <span class="step-label">Examination</span>
+            <div class="step-line" style="visibility:hidden;"></div>
+        </div>
+    </div>
+
+    <form id="examinerForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div class="form-card">
+            <div class="step-panel active" id="panel-1">
+                <div class="section-head"><div class="dot"></div><h2>Bank Details</h2></div>
+                <div class="form-body">
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert-danger">Please review the highlighted fields and correct the errors before proceeding.</div>
+                    }
+                    <div class="grid-3">
+                        <div class="field">
+                            <input asp-for="VoucherNo" type="hidden" placeholder="PV-0000" readonly
+                                   style="opacity:0.7; cursor:not-allowed;" />
+                            <label asp-for="BankName"></label>
+                            <input asp-for="BankName" placeholder="e.g. State Bank of India" class="@(ViewData.ModelState["BankName"]?.Errors.Count > 0 ? "input-error" : "")" maxlength="100" />
+                            <span asp-validation-for="BankName" class="field-error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="BankAccountNo"></label>
+                            <input asp-for="BankAccountNo" placeholder="Account number" maxlength="30" class="@(ViewData.ModelState["BankAccountNo"]?.Errors.Count > 0 ? "input-error" : "") onlyNumber" />
+                            <span asp-validation-for="BankAccountNo" class="field-error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="IFSCCode"></label>
+                            <input asp-for="IFSCCode" placeholder="e.g. SBIN0001234" maxlength="20" class="@(ViewData.ModelState["IFSCCode"]?.Errors.Count > 0 ? "input-error" : "")" />
+                            <span asp-validation-for="IFSCCode" class="field-error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="MobileNo"></label>
+                            <input asp-for="MobileNo" placeholder="10-digit mobile" class="@(ViewData.ModelState["MobileNo"]?.Errors.Count > 0 ? "input-error" : "") onlyNumber" maxlength="10" />
+                            <span asp-validation-for="MobileNo" class="field-error"></span>
+                        </div>
+                        <div class="field">
+                            <label asp-for="Email"></label>
+                            <input asp-for="Email" type="email" placeholder="email@example.com" maxlength="100" value="@Context.Session.GetString("Email")" readonly />
+                        </div>
+                        <div class="field">
+                            <label asp-for="PANNo"></label>
+                            <input asp-for="PANNo" placeholder="ABCDE1234F" maxlength="20" class="@(ViewData.ModelState["PANNo"]?.Errors.Count > 0 ? "input-error" : "")" />
+                            <span asp-validation-for="PANNo" class="field-error"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-panel" id="panel-2">
+                <div class="section-head"><div class="dot"></div><h2>Examiner Details</h2></div>
+                <div class="form-body">
+                    <div class="field mb-20">
+                        <label asp-for="ExaminerName"></label>
+                        <input asp-for="ExaminerName" placeholder="Dr. Full Name" value="@Context.Session.GetString("UserName")" readonly/>
+                        <span asp-validation-for="ExaminerName" class="field-error"></span>
+                    </div>
+                    <div class="grid-4">
+                        <div class="field">
+                            <label asp-for="Qualification"></label>
+                            <input asp-for="Qualification" placeholder="BAMS / MD" />
+                        </div>
+                        <div class="field">
+                            <label asp-for="Specialization"></label>
+                            <input asp-for="Specialization" placeholder="Subject area" />
+                        </div>
+                        <div class="field">
+                            <label asp-for="TeachingUG"></label>
+                            <input asp-for="TeachingUG" placeholder="Years" class="onlyNumber" maxlength="2" />
+                        </div>
+                        <div class="field">
+                            <label asp-for="TeachingPG"></label>
+                            <input asp-for="TeachingPG" placeholder="Years" class="onlyNumber" maxlength="2" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-panel" id="panel-3">
+                <div class="section-head"><div class="dot"></div><h2>College Address</h2></div>
+                <div class="form-body">
+                    <div class="field mb-20">
+                        <label asp-for="CollegeAddress"></label>
+                        <input asp-for="CollegeAddress" placeholder="Building, Street, Area" />
+                    </div>
+                    <div class="grid-4">
+                        <div class="field">
+                            <label asp-for="CollegeState"></label>
+                            <select asp-for="CollegeState" class="form-control">
+                                <option value="">-- Select State --</option>                                
+                            </select>
+
+                        </div>
+                        <div class="field">
+                            <label asp-for="CollegeDistrict"></label>
+                            <select asp-for="CollegeDistrict" class="form-control">
+                                <option value="">-- Select District --</option>
+                            </select>
+
+                        </div>
+                        <div class="field"><label asp-for="CollegeCity"></label><input asp-for="CollegeCity" placeholder="City" /></div>
+                        <div class="field"><label asp-for="CollegePinCode"></label><input asp-for="CollegePinCode" placeholder="000000" class="onlyNumber" maxlength="6" /></div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <div class="inner-section"><div class="dot"></div><h2 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--green);">Residential Address</h2></div>
+                    <div class="field mb-20">
+                        <label asp-for="ResidentialAddress"></label>
+                        <input asp-for="ResidentialAddress" placeholder="House No., Street, Area" />
+                    </div>
+                    <div class="grid-4">
+                        <div class="field">
+                            <label asp-for="ResidentialState"></label>
+                            <select asp-for="ResidentialState" class="form-control">
+                                <option value="">-- Select State --</option>                              
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label asp-for="ResidentialDistrict"></label>
+                            <select asp-for="ResidentialDistrict" class="form-control">
+                                <option value="">-- Select District --</option>
+                            </select>
+                        </div>
+                        <div class="field"><label asp-for="ResidentialCity"></label><input asp-for="ResidentialCity" placeholder="City" /></div>
+                        <div class="field"><label asp-for="ResidentialPinCode"></label><input asp-for="ResidentialPinCode" placeholder="000000" class="onlyNumber" maxlength="6" /></div>
+                    </div>
+                </div>
+            </div>
+            <div class="step-panel" id="panel-4">
+                <div class="section-head"><div class="dot"></div><h2>Examination Details</h2></div>
+                <div class="form-body">
+                    <div class="grid-2 mb-20">
+                        <div class="field">
+                            <label asp-for="ExaminationtextName"></label>
+                            <input asp-for="ExaminationtextName" type="text" id="ExaminationtextName" value="@Context.Session.GetString("Examname")" readonly />
+                        </div>
+                        <div class="field">
+                            <label>Course</label>
+                            <input asp-for="CourseTextName" type="text" id="CourseTextName" value="@Context.Session.GetString("course_name")" readonly />
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label asp-for="SubjectTextName"></label>
+                        <input asp-for="SubjectTextName" type="text" id="SubjectTextName" value="@Context.Session.GetString("subject_name")" readonly />
+                        <input asp-for="SubjectCode" type="hidden" id="SubjectCode" readonly />
+                    </div><br />
+                    <div class="field ">                       
+                        <label asp-for="ExaminnerSignature"></label>
+                        <input asp-for="ExaminnerSignature" type="file" placeholder="Upload Signature" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-nav">
+                <button type="button" class="btn btn-outline" id="btn-prev" onclick="navigate(-1)" style="visibility:hidden;">← Previous</button>
+                <span class="step-indicator">Step <strong id="cur">1</strong> of <strong>4</strong></span>
+                <button type="button" class="btn btn-primary" id="btn-next" onclick="navigate(1)">Next →</button>
+                <button type="submit" class="btn btn-submit" id="btn-submit" style="display:none;">Submit</button>
+            </div>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>   
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+    </script>
+    <script>
+        $(document).ready(function () {
+            loadState();
+            $("#CollegeState").change(function () {
+                var stateId = $(this).val();
+                $("#CollegeDistrict").empty();
+                $("#CollegeDistrict").append('<option value="">-- Select District --</option>');
+                if (stateId) {
+                    $.ajax({
+                        url: ApiBaseUrl+'Course/GetDistricts',
+                        type: 'GET',
+                        data: { stateId: stateId },
+                        success: function (data) {
+                            $.each(data, function (i, district) {
+                                $("#CollegeDistrict").append(
+                                    `<option value="${district.districtId}">${district.districtName}</option>`
+                                );
+                            });
+                        },
+                        error: function () {
+                            alert("Failed to load districts.");
+                        }
+                    });
+                }
+            });
+            $("#ResidentialState").change(function () {
+                var stateId = $(this).val();
+                $("#ResidentialDistrict").empty();
+                $("#ResidentialDistrict").append('<option value="">-- Select District --</option>');
+                if (stateId) {
+                    $.ajax({
+                        url: ApiBaseUrl+'Course/GetDistricts',
+                        type: 'GET',
+                        data: { stateId: stateId },
+                        success: function (data) {
+                            $.each(data, function (i, district) {
+                                $("#ResidentialDistrict").append(
+                                    `<option value="${district.districtId}">${district.districtName}</option>`
+                                );
+                            });
+                        },
+                        error: function () {
+                            alert("Failed to load districts.");
+                        }
+                    });
+                }
+            });
+
+        });
+         function loadState() {
+            $.get(ApiBaseUrl + 'Course/GetState', function (res) {
+                let state = '<option value="">Select State</option>';
+                res.forEach(x => {
+                    state += `<option value="${x.stateId}">${x.stateName}</option>`;
+                });
+                $('#ResidentialState').html(state);
+                $('#CollegeState').html(state);
+            });
+         }
+        $("#examinerForm").submit(function (e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            $.ajax({
+                url: ApiBaseUrl+'Examiner/registerexaminer',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        alert("Record Saved Successfully"); 
+                        $("#examinerForm")[0].reset();
+                        $(".step-panel").removeClass("active");
+                        $("#panel-1").addClass("active");
+                        $("#cur").text("1");
+                        $("#btn-prev").css("visibility", "hidden");
+                        $("#btn-next").show();
+                        $("#btn-submit").hide();
+                        window.location.href="/Ex_Account/Logout"
+                    }
+                    else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr) {
+                    if (xhr.responseJSON) {
+                        alert(xhr.responseJSON.message);
+                    }
+                    else {
+                        alert("Something went wrong");
+                    }
+                    console.log(xhr);
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+      
+        
+            document.getElementById("SubjectTextName").value = @Context.Session.GetString("subject_name");
+            var match = selectedText.match(/\((.*?)\)/);
+            if (match && match[1]) {
+                document.getElementById("SubjectCode").value = match[1];
+            } else {
+                document.getElementById("SubjectCode").value = "";
+            }
+        
+        document.querySelectorAll(".onlyNumber").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        });
+        document.querySelectorAll(".onlyText").forEach(function (input) {
+            input.addEventListener("input", function () {
+                this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+            });
+        });
+
+    </script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function ()
+        {
+            var successMessage = document.getElementById("successMessage");
+            var errorMessage = document.getElementById("errorMessage");
+            function handleMessage(messageElement, shouldRefresh) {
+                if (messageElement) {
+                    if (!sessionStorage.getItem("messageShown")) {
+                        sessionStorage.setItem("messageShown", "true");
+                        setTimeout(function () {
+                            messageElement.classList.add("fade-out");
+                            setTimeout(function () {
+                                sessionStorage.removeItem("messageShown");
+                                if (shouldRefresh) {
+                                    window.location.href = window.location.pathname;
+                                }                        }, 500);
+                        }, 2000);
+                        } else {
+                            sessionStorage.removeItem("messageShown");
+                            messageElement.style.display = "none";
+                        }
+                        }
+                        }
+                        handleMessage(successMessage, true);
+                        handleMessage(errorMessage, false);
+                    });
+    </script>
+    <script>
+        let current = 1;
+        const total = 4;
+        function goTo(n) {
+            if (n < 1 || n > total) return;
+            document.getElementById('panel-' + current).classList.remove('active');
+            for (let i = 1; i <= total; i++) {
+                const c = document.getElementById('s' + i);
+                if (i < n)       c.className = 'step-circle done';
+                else if (i === n) c.className = 'step-circle active';
+                else              c.className = 'step-circle';
+                if (i < total) {
+                    const l = document.getElementById('l' + i);
+                    l.className = i < n ? 'step-line done' : 'step-line';
+                }
+            }
+            current = n;
+            document.getElementById('panel-' + current).classList.add('active');
+            document.getElementById('cur').textContent = current;
+            document.getElementById('btn-prev').style.visibility = current === 1 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').style.display    = current === total ? 'none' : '';
+            document.getElementById('btn-submit').style.display  = current === total ? '' : 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function navigate(dir) { goTo(current + dir); }
+        document.addEventListener('DOMContentLoaded', function () {
+            const hasErrors = document.querySelectorAll('.field-error:not(:empty)').length > 0;
+            if (hasErrors) {
+                for (let i = 1; i <= total; i++) {
+                    document.getElementById('panel-' + i).classList.add('active');
+                }
+                document.getElementById('btn-prev').style.visibility = 'hidden';
+                document.getElementById('btn-next').style.display = 'none';
+                document.getElementById('btn-submit').style.display = '';
+            }
+        });
+    </script>
+</body>
+</html>

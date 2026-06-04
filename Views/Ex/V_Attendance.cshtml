@@ -1,0 +1,625 @@
+﻿@{
+    ViewData["Title"] = "P_Attendance";
+    Layout = "~/Views/Shared/_ExaminerLayout.cshtml";
+}
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 95%;
+        margin: 30px auto;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 15px 20px;
+    }
+
+    .bg-primary {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .bg-success {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .col-md-3 {
+        width: 25%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+    }
+
+    .form-select,
+    .form-control {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #0d6efd;
+        }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .mt-3 {
+        margin-top: 15px;
+    }
+
+    .text-end {
+        text-align: right;
+    }
+
+    .btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .btn-success {
+        background: #198754;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+        }
+
+    .table-dark {
+        background: #212529;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f1f1f1;
+    }
+
+    .align-middle td,
+    .align-middle th {
+        vertical-align: middle;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+
+
+    @@media(max - width: 992px) {
+        .col-md-3 {
+            width: 50%;
+        }
+    }
+
+    @@media(max - width: 576px) {
+        .col-md-3 {
+            width: 100%;
+        }
+
+        .text-end {
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @@media print {
+
+        body * {
+            visibility: hidden;
+        }
+
+        #studentTable,
+        #studentTable * {
+            visibility: visible;
+        }
+
+        #studentTable {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+            #studentTable input {
+                border: none;
+            }
+
+        .dataTables_paginate,
+        .dataTables_filter,
+        .dataTables_length,
+        .dataTables_info {
+            display: none !important;
+        }
+    }
+</style>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Students Viva Attendance</h4>
+            <button type="button"
+                    class="btn btn-light btn-sm"
+                    onclick="printTable()" style="float:right;margin-top:-2%;">
+                🖨 Print
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Session</label>
+                    <select class="form-select" id="sessionId">
+                        <option value="">Select Session</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Program </label>
+                    <select class="form-select" id="programId">
+                        <option value="">Select Program</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Course </label>
+                    <select class="form-select" id="courseId">
+                        <option value="">Select Course</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Semester </label>
+                    <select class="form-select" id="semester">
+                        <option value="">Select Semester</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject </label>
+                    <select class="form-select" id="subjectId">
+                        <option value="">Select Subject</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"> </label>
+                    <button class="btn btn-primary" onclick="loadStudents()" style="margin-top:7%;">
+                        Search here...
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-lg border-0 mt-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Students Viva Attendance</h5>
+        </div>
+
+
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover align-middle" id="studentTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="text-align: center;">Sr.No.</th>
+                        <th style="text-align: center;">Roll Number</th>
+                        <th style="text-align: center;">Student Name</th>
+                        <th style="text-align: center;">Father Name</th>
+                        <th style="text-align: center;">Mobile Number</th>
+                        <th style="text-align: center;">
+                            Attendance
+                            <br />
+                            <select id="allAttendance"
+                                    class="form-control"
+                                    onchange="applyAttendanceToAll()"
+                                    style="height:30px;margin-top:5px;">
+                                <option value="">-Select-</option>
+                                <option value="P">P</option>
+                                <option value="A">A</option>
+                            </select>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody"></tbody>
+            </table>
+            <div class="text-end mt-3">
+                <button class="btn btn-success" id="btnSaveAttendance" onclick="saveStudentattendance()">
+                    Save Attendance
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+    loadPrograms();
+    loadSession();
+    });
+    function loadSession() {
+        $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+            let session = '<option value="">Select Session</option>';
+            res.forEach(x => {
+                session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+            });
+            $('#sessionId').html(session);
+        });
+    }
+    function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programId').html(opt);
+        });
+    }
+     document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+     document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        var selectedCourse = $("#courseId option:selected").text().trim();
+        var sessionCourse = '@Context.Session.GetString("course_name")';
+        if (selectedCourse !== sessionCourse) {
+            alert(`You are registered for "${sessionCourse}". Please select the same course.`);
+            return false;
+        }
+        $("#semester").val('');
+        $("#subjectId").val('');
+     fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+    document.getElementById("semester").addEventListener("change", function () {
+        let semId = this.value;
+        let courseId=$("#courseId").val();
+         $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/getsubject/${semId}/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("subjectId");
+                courseDropdown.innerHTML = '<option value="">Select subject</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                });
+            });
+       });
+
+    async function loadStudents() {
+           let sessionId = document.getElementById('sessionId').value;
+           let courseId = document.getElementById('courseId').value;
+           let subjectId = document.getElementById('subjectId').value;
+           let semester = document.getElementById('semester').value;
+           var selectedSubject = $("#subjectId option:selected").text().trim();
+           var sessionSubject = '@Context.Session.GetString("subject_name")';
+           if (!sessionSubject) {
+               alert("Your session has expired. Please logout and login again.");
+               window.location.href = '/Ex_Account/Logout';
+               return;
+           }
+
+           if (selectedSubject != sessionSubject) {
+               alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+               $("#subjectId").val('');
+               return;
+           }
+
+           try {
+
+               const response = await fetch(
+                   ApiBaseUrl + `PracticalMarks/GetStudentsforVivaAttendance?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
+               );
+
+               const students = await response.json();
+               if ($.fn.DataTable.isDataTable('#studentTable')) {
+                   $('#studentTable').DataTable().destroy();
+               }
+               let tbody = document.getElementById('studentTableBody');
+               tbody.innerHTML = '';
+                  const alreadySubmitted = students.some(x => {
+                  let status = (x.attendanceStatus || "").toString().trim().toUpperCase();
+                 return status === "P" || status === "A";
+                });
+                  if (alreadySubmitted) {
+                  tbody.innerHTML = `
+                      <tr>
+                          <td colspan="6"
+                              style="color:red;
+                                     font-weight:bold;
+                                     text-align:center;
+                                     font-size:20px;">
+                              This subject Attendance have already been submitted.
+                          </td>
+                      </tr>`;
+                  document.getElementById("btnSaveAttendance").style.display = "none";
+                  return;
+               }
+               document.getElementById("btnSaveAttendance").style.display = "inline-block";
+                   students.forEach((student, index) => {
+                   tbody.innerHTML += `
+                               <tr>
+                                   <td>${index + 1}</td>
+                                   <td>${student.rollNumber}</td>
+                                   <td>${student.studentName}</td>
+                                   <td>${student.fatherName}</td>
+                                   <td>${student.mobileNumber}</td>
+                                   <td>
+                                       <select class="form-control attendance">
+                                           <option value="">-Select-</option>
+                                           <option value="P">P</option>
+                                           <option value="A">A</option>
+                                       </select>
+                                       <input type="hidden" class="studentId" value="${student.studentId}">
+                                   </td>
+                               </tr>`;
+                  });
+
+               $('#studentTable').DataTable({
+                 pageLength: 10,
+                 responsive: true,
+                 searching: true,
+                 ordering: true,
+                 lengthMenu: [[10,25,50,100],[10,25,50,100]]
+               });
+
+               }
+           catch (error) {
+
+               console.error(error);
+               alert("Error loading students.");
+           }
+       }
+
+    function applyAttendanceToAll() {
+        let attendance = $("#allAttendance").val();
+        let table = $('#studentTable').DataTable();
+        table.$('.attendance').each(function () {
+            $(this).val(attendance);
+        });
+    }
+
+     async function saveStudentattendance() {
+        let attendanceList = [];
+        let table = $('#studentTable').DataTable();
+        table.rows().every(function () {
+            let row = this.node();
+               attendanceList.push({
+               studentId: $(row).find('.studentId').val(),
+               sessionId: $('#sessionId').val(),
+               courseId: $('#courseId').val(),
+               subjectId: $('#subjectId').val(),
+               semester: $('#semester').val(),
+               rollNumber: $(row).find('td:eq(1)').text().trim(),
+               attendanceStatus: $(row).find('.attendance').val()
+              });
+        });
+        let invalid = attendanceList.some(x => !x.attendanceStatus);
+        if (invalid) {
+            alert("Please select attendance for all students.");
+            return;
+        }
+        try {
+            const response = await fetch(
+                ApiBaseUrl + 'PracticalMarks/SaveVivaAttendance',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(attendanceList)
+                });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || "Attendance saved successfully");
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+            else {
+                alert(result.message || "Error while saving attendance");
+            }
+        }
+        catch (error) {
+            console.error(error);
+            alert("Server Error");
+        }
+    }
+
+    function printTable() {
+        let table = $('#studentTable').DataTable();
+        let allRows = table.rows().nodes();
+        let sessionName = $('#sessionId option:selected').text().trim();
+        let programName = $('#programId option:selected').text().trim();
+        let courseName = $('#courseId option:selected').text().trim();
+        let semesterName = $('#semester option:selected').text().trim();
+        let subjectName = $('#subjectId option:selected').text().trim();
+        let rowsHTML = '';
+        $(allRows).each(function (index) {
+            let roll = $(this).find('td:eq(1)').text().trim();
+            let name = $(this).find('td:eq(2)').text().trim();
+            let father = $(this).find('td:eq(3)').text().trim();
+            let mobile = $(this).find('td:eq(4)').text().trim();
+            let attendance = $(this).find('.attendance').val() || '';
+            rowsHTML += '<tr>'
+                + '<td>' + (index + 1) + '</td>'
+                + '<td>' + roll + '</td>'
+                + '<td>' + name + '</td>'
+                + '<td>' + father + '</td>'
+                + '<td>' + mobile + '</td>'
+                + '<td>' + attendance + '</td>'
+                + '</tr>';
+        });
+        $('#printIframe').remove();
+        let iframe = document.createElement('iframe');
+        iframe.id = 'printIframe';
+        iframe.style.cssText ='position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
+        document.body.appendChild(iframe);
+        let doc = iframe.contentWindow.document;
+        doc.open();
+        let parts = [];
+        parts.push('<!DOCTYPE html>');
+        parts.push('<' + 'html' + '>');
+        parts.push('<' + 'head' + '>');
+        parts.push('<title>Practical Attendance</' + 'title' + '>');
+        parts.push('<' + 'style' + '>');
+        parts.push('body{font-family:Arial,sans-serif;margin:20px;}');
+        parts.push('h3{text-align:center;margin-bottom:5px;color:#1a3a5c;}');
+        parts.push('.info-box{width:100%;border-collapse:collapse;margin-bottom:15px;}');
+        parts.push('.info-box td{padding:5px 12px;font-size:13px;width:33%;}');
+        parts.push('.info-box .label{font-weight:bold;color:#555;}');
+        parts.push('.info-box .value{color:#1a3a5c;font-weight:bold;}');
+        parts.push('.divider{border:none;border-top:2px solid #1a3a5c;margin-bottom:15px;}');
+        parts.push('table{width:100%;border-collapse:collapse;}');
+        parts.push('th,td{border:1px solid #333;padding:8px;text-align:center;font-size:13px;}');
+        parts.push('thead{background:#1a3a5c;color:white;-webkit-print-color-adjust:exact;}');
+        parts.push('</' + 'style' + '>');
+        parts.push('</' + 'head' + '>');
+        parts.push('<' + 'body' + '>');
+        parts.push('<div style="width:100%;text-align:center;margin-bottom:10px;">');
+        parts.push('<h2 style="margin:0;font-size:22px;font-weight:bold;color:#065f46;">');
+        parts.push('राष्ट्रीय आयुर्वेद संस्थान');
+        parts.push('</' + 'h2' + '>');
+        parts.push('<p style="margin:3px 0;font-size:12px;color:#555;">');
+        parts.push('मानद विश्वविद्यालय (डी. नोवो) | आयुष मंत्रालय, भारत सरकार');
+        parts.push('</' + 'p' + '>');
+        parts.push('<p style="margin:3px 0;font-size:11px;font-weight:600;color:#0f766e;">');
+        parts.push('National Institute of Ayurveda (Deemed to be University)');
+        parts.push('</' + 'p' + '>');
+        parts.push('</' + 'div' + '>');
+        parts.push('<hr class="divider">');
+        parts.push('<h3>');
+        parts.push('Practical Attendance Sheet');
+        parts.push('</' + 'h3' + '>');
+        parts.push('<hr class="divider">');
+        parts.push('<' + 'table' + ' class="info-box">');
+        parts.push('<tr>');
+        parts.push('<td><span class="label">Session : </span><span class="value">' + sessionName + '</span></td>');
+        parts.push('<td><span class="label">Program : </span><span class="value">' + programName + '</span></td>');
+        parts.push('<td><span class="label">Course : </span><span class="value">' + courseName + '</span></td>');
+        parts.push('</tr>');
+        parts.push('<tr>');
+        parts.push('<td><span class="label">Semester : </span><span class="value">' + semesterName + '</span></td>');
+        parts.push('<td><span class="label">Subject : </span><span class="value">' + subjectName + '</span></td>');
+        parts.push('<td></td>');
+        parts.push('</tr>');
+        parts.push('</' + 'table' + '>');
+        parts.push('<hr class="divider">');
+        parts.push('<' + 'table' + '>');
+        parts.push('<' + 'thead' + '>');
+        parts.push('<tr>');
+        parts.push('<th>Sr.No.</' + 'th' + '>');
+        parts.push('<th>Roll Number</' + 'th' + '>');
+        parts.push('<th>Student Name</' + 'th' + '>');
+        parts.push('<th>Father Name</' + 'th' + '>');
+        parts.push('<th>Mobile Number</' + 'th' + '>');
+        parts.push('<th>Attendance</' + 'th' + '>');
+        parts.push('</' + 'tr' + '>');
+        parts.push('</' + 'thead' + '>');
+        parts.push('<' + 'tbody' + '>');
+        parts.push(rowsHTML);
+        parts.push('</' + 'tbody' + '>');
+        parts.push('</' + 'table' + '>');
+        parts.push('<br><br><br>');
+        parts.push('<div style="width:100%;margin-top:40px;">');
+        parts.push('<div style="float:right;text-align:center;">');
+        parts.push('<p style="margin:0;">______________________</p>');
+        parts.push('<p style="margin-top:5px;">Examiner Signature</p>');
+        parts.push('</' + 'div' + '>');
+        parts.push('</' + 'div' + '>');
+        parts.push('</' + 'body' + '>');
+        parts.push('</' + 'html' + '>');
+        doc.write(parts.join(''));
+        doc.close();
+        iframe.contentWindow.focus();
+        setTimeout(function () {
+            iframe.contentWindow.print();
+            setTimeout(function () {
+                $('#printIframe').remove();
+            }, 1000);
+
+        }, 600);
+    }
+</script>
+

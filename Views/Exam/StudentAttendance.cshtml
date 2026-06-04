@@ -235,15 +235,10 @@
             success: function (response) {
 
                 $("#tblStudentAtt").empty();
-
                 $("#attendanceMessage").remove();
-
                 $("#ddlAttendence").prop('disabled', false);
-
                 $("#ddlStatus").prop('disabled', false);
-
                 $("#btnSave").show();
-
                 if (!response || response.length == 0) {
 
                     $("#tblStudentAtt").html(
@@ -270,11 +265,8 @@
                 if (alreadyLocked) {
 
                     $("#btnSave").hide();
-
                     $("#ddlAttendence").prop('disabled', true);
-
                     $("#ddlStatus").prop('disabled', true);
-
                     $("#tblStudentAtt").html(
                         '<tr>' +
                         '<td colspan="8" ' +
