@@ -10,16 +10,7 @@ namespace NIAUNIVERSITYPANEL.Models
         public ApiAuthService(HttpClient http)
         {
             _http = http;
-        }
-
-        //public async Task SendOtp(string mobile)
-        //{
-        //    var data = new { MobileNumber = mobile };
-        //    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-
-        //    await _http.PostAsync("auth/login", content);
-        //}
-
+        }  
         public async Task<ApiResponse> Login(string mobile,string password)
         {
             var payload = new
@@ -27,14 +18,27 @@ namespace NIAUNIVERSITYPANEL.Models
                 MobileNumber = mobile,
                 Password = password
             };
-
+            var content = new StringContent(JsonConvert.SerializeObject(payload),Encoding.UTF8,"application/json");
+            var response = await _http.PostAsync("Auth/login",content);
+            var json = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<ApiResponse>(json);
+            return result!;
+        }
+        public async Task<ApiResponse> ExLogin(string email, string password)
+        {
+            var payload = new
+            {
+                EmainId = email,
+                Password = password,
+                SystemId = Environment.MachineName
+            };
             var content = new StringContent(
                 JsonConvert.SerializeObject(payload),
                 Encoding.UTF8,
                 "application/json");
 
             var response = await _http.PostAsync(
-                "Auth/login",
+                "ExAuth/login",
                 content);
 
             var json = await response.Content.ReadAsStringAsync();
@@ -43,6 +47,61 @@ namespace NIAUNIVERSITYPANEL.Models
 
             return result;
         }
+
+        public async Task<ApiResponse>CheckLogin(string email)
+        {
+            var payload = new
+            {
+                Email = email,
+            };
+            var content = new StringContent(
+                JsonConvert.SerializeObject(payload),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _http.PostAsync(
+                "ExAuth/cheklogin",
+                content);
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<ApiResponse>(json);
+
+            return result;
+        }
+
+        public async Task Logout(string email)
+        {
+            var payload = new
+            {
+                Email = email
+            };
+
+            var content = new StringContent(
+                JsonConvert.SerializeObject(payload),
+                Encoding.UTF8,
+                "application/json");
+
+            await _http.PostAsync(
+                "ExAuth/logout",
+                content);
+        }
+
+        public async Task<string> GetVoucherNo()
+        {
+            var response = await _http.GetAsync("Examiner/get-voucher");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return "PV-0001";
+            }
+            var json = await response.Content.ReadAsStringAsync();
+
+            dynamic result = JsonConvert.DeserializeObject(json);
+
+            return result.voucherNo;
+        }
+
         //public async Task<(bool success, string message)> SendOtp(string mobile)
         //{
         //    var payload = new

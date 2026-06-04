@@ -1,0 +1,486 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Provisional Marksheet – NIA Jaipur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #d0d0d0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 10px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .page {
+            background: #fff;
+            width: 794px;
+            min-height: 1080px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .outer-border {
+          /*   border: 3px double #000; */
+            margin: 7px;
+            padding: 6px;
+        }
+
+        .inner-border {
+            border: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 10px 10px 6px;
+            border-bottom: 2px solid #000;
+        }
+
+        .logo-circle {
+            width: 110px;
+            height: 94px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            background: #fff;
+        }
+
+            .logo-circle img {
+                height: 66px;
+            }
+
+        .header-text-block {
+            float: left;
+        }
+
+        .inst-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .inst-sub {
+            font-size: 12px;
+            margin-top: 2px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+
+        .ayush-tag {
+            font-size: 11px;
+            font-style: italic;
+            margin-top: 1px;
+            font-weight: bold;
+        }
+
+        .address-tag {
+            font-size: 11px;
+            margin-top: 1px;
+            font-weight: bold;
+        }
+
+        .exam-line {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 6px;           
+        }
+
+        /* TITLE */
+        .marksheet-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+			text-transform: uppercase;
+			border-bottom: 2px solid #000;
+            padding: 7px 0;
+           
+        }
+
+        /* STUDENT INFO */
+        .student-info {
+            padding: 10px 14px 6px;
+            border-bottom: 1px solid #000;
+        }
+
+        .info-row {
+            display: flex;
+            gap: 0;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .info-col {
+            display: flex;
+            align-items: baseline;
+            flex: 1;
+        }
+
+        .lbl {
+            font-weight: bold;
+            white-space: nowrap;
+            min-width: 110px;
+        }
+
+        .colon {
+            margin: 0 6px;
+        }
+
+        .val {          
+            flex: 1;
+            min-width: 130px;
+            padding-bottom: 1px;
+        }
+
+        /* MARKS TABLE */
+        .table-wrap {
+            padding: 0;
+        }
+
+        table.marks {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+            table.marks th,
+            table.marks td {
+                border: 1px solid #000;
+                padding: 5px 7px;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            table.marks th {
+                background: #e8e8e8;
+                font-weight: bold;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+
+            table.marks td.left {
+                text-align: left;
+            }
+
+            table.marks td.code {
+                font-weight: bold;
+                font-size: 11.5px;
+            }
+
+            table.marks tfoot td {
+                font-weight: bold;
+                background: #f0f0f0;
+            }
+
+        .remark-f {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        /* RESULT */
+        .result-line {
+            text-align: right;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 8px 14px 4px;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            letter-spacing: 1px;
+        }
+
+        /* REMARKS KEY */
+        .remarks-key {
+            padding: 7px 14px;
+            font-size: 12.5px;
+            border-bottom: 1px solid #000;
+            font-weight: bold;
+        }
+
+        /* NOTE */
+        .note-section {
+            padding: 8px 14px 6px;
+            font-size: 11.5px;
+            border-bottom: 1px solid #000;
+            line-height: 1.55;
+        }
+
+            .note-section .note-head {
+                font-weight: bold;
+                text-decoration: underline;
+                margin-bottom: 4px;
+                font-size: 12px;
+            }
+
+            .note-section ol {
+                padding-left: 20px;
+            }
+
+            .note-section li {
+                margin-bottom: 2px;
+            }
+
+        /* DISCLAIMER */
+        .disclaimer {
+            padding: 8px 14px 6px;
+            font-size: 11px;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+            .disclaimer .dis-head {
+                font-weight: bold;
+                text-decoration: underline;
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .disclaimer p {
+                font-weight: bold;
+                line-height: 1.5;
+                text-transform: uppercase;
+                font-size: 8px;
+            }
+
+        /* FOOTER */
+        .footer-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 14px;
+            font-size: 11px;
+        }
+
+        /* PRINT BUTTON */
+        .print-btn {
+            display: block;
+            margin-bottom: 16px;
+            padding: 8px 28px;
+            background: #1a3a1a;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            border-radius: 4px;
+        }
+
+        /* ── PRINT STYLES ── */
+        @@media print {
+            /* Hide print button */
+            .no-print
+
+        {
+            display: none !important;
+        }
+
+        /* Remove screen background */
+        body {
+            background: #fff;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Full width, no shadow */
+        .page {
+            width: 100%;
+            box-shadow: none;
+            min-height: auto;
+        }
+
+        .outer-border {
+            margin: 6px;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div style="text-align:center">
+        <button class="print-btn no-print" onclick="window.print()">🖨️ Print Marksheet</button>
+    </div>
+
+    <div class="page">
+        <div class="outer-border">
+            <div class="inner-border">
+
+                <!-- HEADER -->
+                <div class="header">
+                    <div class="header-top">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <div class="logo-circle">
+                                    <img src="~/logo/nia_logo.png" />
+                                </div>
+                            </div>
+                            <div class="col-sm-10">
+                                <div class="header-text-block">
+                                    <div class="inst-name">National Institute of Ayurveda, Jaipur</div>
+                                    <div class="inst-sub">Deemed to be University</div>
+                                    <div class="ayush-tag">(Ministry of AYUSH, Govt. of India)</div>
+                                    <div class="address-tag">Jorawar Singh Gate, Amer Road, Jaipur – 302002</div>
+                                    <div class="exam-line">
+                                        MS(Ay.) Shalya Tantra SEMESTER-I Main BATCH-2024 Summative Assessment (October 2023)
+                                    </div>
+                                </div>
+                                
+                            </div>
+                         </div>
+                        
+                        
+                    </div>
+                   
+                </div>
+
+                <!-- TITLE -->
+                <div class="marksheet-title">Provisional Marksheet</div>
+
+                <!-- STUDENT INFO -->
+                <div class="student-info">
+                    <div class="info-row">
+                        <div class="info-col">
+                            <span class="lbl">Name</span>
+                            <span class="colon">:</span>
+                            <span class="val">Danish</span>
+                        </div>
+                        <div class="info-col" style="padding-left:20px;">
+                            <span class="lbl">Roll No.</span>
+                            <span class="colon">:</span>
+                            <span class="val">2402110</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-col">
+                            <span class="lbl">Father's Name</span>
+                            <span class="colon">:</span>
+                            <span class="val">Shahjada Quraishi</span>
+                        </div>
+                        <div class="info-col" style="padding-left:20px;">
+                            <span class="lbl">En. No.</span>
+                            <span class="colon">:</span>
+                            <span class="val">NIA24020111</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-col">
+                            <span class="lbl">Mother's Name</span>
+                            <span class="colon">:</span>
+                            <span class="val">Shayara</span>
+                        </div>
+                        <div class="info-col" style="padding-left:20px;">
+                            <span class="lbl">Attempt</span>
+                            <span class="colon">:</span>
+                            <span class="val">2nd</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MARKS TABLE -->
+                <div class="table-wrap">
+                    <table class="marks">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width:90px;">Subject<br />Code</th>
+                                <th rowspan="2" class="left">Subject Name</th>
+                                <th colspan="3">Marks Scheme</th>
+                                <th colspan="2">Obtained Marks</th>
+                                <th rowspan="2">Remark</th>
+                            </tr>
+                            <tr>
+                                <th>MAX</th>
+                                <th>MIN</th>
+                                <th>Total</th>
+                                <th>Theory</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="code">AYPG-RM</td>
+                                <td class="left">Research Methodology</td>
+                                <td>100</td>
+                                <td>50</td>
+                                <td>100</td>
+                                <td>61</td>
+                                <td>61</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td class="code">AYPG BS</td>
+                                <td class="left">Biostatistics</td>
+                                <td>100</td>
+                                <td>50</td>
+                                <td>100</td>
+                                <td>31</td>
+                                <td>31</td>
+                                <td class="remark-f">F</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" style="text-align:right; padding-right:10px;"></td>
+                                <td>200</td>
+                                <td colspan="2"><span style="float:right;margin-right:17%;">92</span></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- RESULT -->
+                <div class="result-line">RESULT : FAIL</div>
+
+                <!-- REMARKS KEY -->
+                <div class="remarks-key">
+                    REMARKS : &nbsp;&nbsp; D = DISTINCTION, &nbsp;&nbsp; I = FIRST CLASS, &nbsp;&nbsp; F = FAIL
+                </div>
+
+                <!-- NOTE -->
+                <div class="note-section">
+                    <div class="note-head">Note</div>
+                    <ol>
+                        <li>For candidate to pass, he/she shall require to obtain a minimum of 50% marks in Theory Examination.</li>
+                        <li>The candidate securing 65% marks or above in a subject shall be declared to have obtained First Class (Denoted by I) in that Subject.</li>
+                        <li>The candidate securing 75% marks or above shall be declared to have obtained distinction (Denoted by D).</li>
+                        <li>In case of any mistake being detected during the preparation of marksheet or brought to notice afterwards, the university will be fully empowered to correct the same.</li>
+                    </ol>
+                </div>
+
+                <!-- DISCLAIMER -->
+                <div class="disclaimer">
+                    <div class="dis-head">Disclaimer</div>
+                    <p>
+                        Utmost care has been taken to prepare these results. However, this is not your official marksheet and there may be a<br />
+                        small chance of error. The original / re-evaluated marksheet will be issued by the university separately.
+                    </p>
+                </div>
+
+                <!-- FOOTER -->
+                <div class="footer-line">
+                    <span>Print Date : 1 Dec 2025, Monday 11:20 PM</span>
+                    <span>Result Declaration Date : 28-11-2025</span>
+                </div>
+
+            </div><!-- inner-border -->
+        </div><!-- outer-border -->
+    </div><!-- page -->
+
+</body>
+</html>

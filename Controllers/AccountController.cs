@@ -9,41 +9,22 @@ namespace NIAUNIVERSITYPANEL.Controllers
     public class AccountController : Controller
     {
         private readonly ApiAuthService _api;
-
         public AccountController(ApiAuthService api)
         {
             _api = api;
         }
-        public IActionResult Login() => View();
-
-        //[HttpPost]
-        //public async Task<IActionResult> Login(string mobile)
-        //{
-        //    var result = await _api.SendOtp(mobile);
-        //    if (!result.success)
-        //    {
-        //        ViewBag.Error = result.message; 
-        //        return View();               
-        //    }
-
-        //    ViewBag.Mobile = mobile;    
-        //    return View();
-        //}
-
+        public IActionResult Login() => View();       
         [HttpPost]
         public async Task<IActionResult> Login(string mobile, string password)
         {
             var response = await _api.Login(mobile, password);
-
             if (!response.success)
             {
                 ViewBag.Error = response.message;
                 return View();
             }
-
             HttpContext.Session.SetString("Mobile", mobile);
             HttpContext.Session.SetInt32("Role", response.role);
-
             switch (response.role)
             {
                 case 1:
