@@ -27,7 +27,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
                 ViewBag.Error = response.message;
                 return View();
             }
-            if (response.stringrole.ToLower() == "examiner")
+            if (response.stringrole.ToLower() == "extenalexaminer")
             {
                 var response2 = await _api.CheckLogin(Email);
                 HttpContext.Session.Clear();
@@ -43,6 +43,23 @@ namespace NIAUNIVERSITYPANEL.Controllers
                     return RedirectToAction("C_file", "Ex");
                 }
                 return RedirectToAction("Dashboard", "Ex");
+            }
+            else if (response.stringrole.ToLower() == "intenalexaminer")
+            {
+                var response2 = await _api.CheckLogin(Email);
+                HttpContext.Session.Clear();
+                HttpContext.Session.SetString("UserName", response.username ?? "");
+                HttpContext.Session.SetString("Email", response.email ?? "");
+                HttpContext.Session.SetString("Role", response.stringrole ?? "");
+                HttpContext.Session.SetString("course_name", response.course_name ?? "");
+                HttpContext.Session.SetString("semyearcode", response.semyearcode ?? "");
+                HttpContext.Session.SetString("subject_name", response.subject_name ?? "");
+                HttpContext.Session.SetString("Examname", response.Examname ?? "");
+                if (!response2.success)
+                {
+                    return RedirectToAction("C_file", "Ex");
+                }
+                return RedirectToAction("Dashboard", "Internal");
             }
             ViewBag.Error = "Invalid Email or Password";
             return View();

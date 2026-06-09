@@ -462,6 +462,7 @@
      async function saveStudentattendance() {
         let attendanceList = [];
         let table = $('#studentTable').DataTable();
+          let examinerEmailId='@Context.Session.GetString("Email")';
         table.rows().every(function () {
             let row = this.node();
                attendanceList.push({
@@ -471,7 +472,8 @@
                subjectId: $('#subjectId').val(),
                semester: $('#semester').val(),
                rollNumber: $(row).find('td:eq(1)').text().trim(),
-               attendanceStatus: $(row).find('.attendance').val()
+               attendanceStatus: $(row).find('.attendance').val(),
+               ExaminerEmail: examinerEmailId,
               });
         });
         let invalid = attendanceList.some(x => !x.attendanceStatus);
@@ -479,7 +481,6 @@
             alert("Please select attendance for all students.");
             return;
         }
-
         try {
 
             const response = await fetch(
@@ -493,7 +494,6 @@
                 });
 
             const result = await response.json();
-
             if (response.ok) {
                 alert(result.message || "Attendance saved successfully");
                 setTimeout(() => {
@@ -503,7 +503,6 @@
             else {
                 alert(result.message || "Error while saving attendance");
             }
-
         }
         catch (error) {
 
@@ -511,28 +510,21 @@
             alert("Server Error");
         }
     }
-
-           function printTable() {
-
+  function printTable() {
         let table = $('#studentTable').DataTable();
         let allRows = table.rows().nodes();
-
         let sessionName = $('#sessionId option:selected').text().trim();
         let programName = $('#programId option:selected').text().trim();
         let courseName = $('#courseId option:selected').text().trim();
         let semesterName = $('#semester option:selected').text().trim();
         let subjectName = $('#subjectId option:selected').text().trim();
-
         let rowsHTML = '';
-
         $(allRows).each(function (index) {
-
             let roll = $(this).find('td:eq(1)').text().trim();
             let name = $(this).find('td:eq(2)').text().trim();
             let father = $(this).find('td:eq(3)').text().trim();
             let mobile = $(this).find('td:eq(4)').text().trim();
             let attendance = $(this).find('.attendance').val() || '';
-
             rowsHTML += '<tr>'
                 + '<td>' + (index + 1) + '</td>'
                 + '<td>' + roll + '</td>'
@@ -547,16 +539,11 @@
 
         let iframe = document.createElement('iframe');
         iframe.id = 'printIframe';
-        iframe.style.cssText =
-            'position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
-
+        iframe.style.cssText ='position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
         document.body.appendChild(iframe);
-
         let doc = iframe.contentWindow.document;
         doc.open();
-
         let parts = [];
-
         parts.push('<!DOCTYPE html>');
         parts.push('<' + 'html' + '>');
         parts.push('<' + 'head' + '>');
@@ -575,7 +562,6 @@
         parts.push('</' + 'style' + '>');
         parts.push('</' + 'head' + '>');
         parts.push('<' + 'body' + '>');
-
         parts.push('<div style="width:100%;text-align:center;margin-bottom:10px;">');
         parts.push('<h2 style="margin:0;font-size:22px;font-weight:bold;color:#065f46;">');
         parts.push('राष्ट्रीय आयुर्वेद संस्थान');
@@ -587,33 +573,24 @@
         parts.push('National Institute of Ayurveda (Deemed to be University)');
         parts.push('</' + 'p' + '>');
         parts.push('</' + 'div' + '>');
-
         parts.push('<hr class="divider">');
-
         parts.push('<h3>');
         parts.push('Practical Attendance Sheet');
         parts.push('</' + 'h3' + '>');
-
         parts.push('<hr class="divider">');
-
         parts.push('<' + 'table' + ' class="info-box">');
-
         parts.push('<tr>');
         parts.push('<td><span class="label">Session : </span><span class="value">' + sessionName + '</span></td>');
         parts.push('<td><span class="label">Program : </span><span class="value">' + programName + '</span></td>');
         parts.push('<td><span class="label">Course : </span><span class="value">' + courseName + '</span></td>');
         parts.push('</tr>');
-
         parts.push('<tr>');
         parts.push('<td><span class="label">Semester : </span><span class="value">' + semesterName + '</span></td>');
         parts.push('<td><span class="label">Subject : </span><span class="value">' + subjectName + '</span></td>');
         parts.push('<td></td>');
         parts.push('</tr>');
-
         parts.push('</' + 'table' + '>');
-
         parts.push('<hr class="divider">');
-
         parts.push('<' + 'table' + '>');
         parts.push('<' + 'thead' + '>');
         parts.push('<tr>');

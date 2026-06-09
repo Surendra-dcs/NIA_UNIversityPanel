@@ -416,7 +416,7 @@
                                class="form-control viva"
                                value=""
                                min="0"
-                               max="${student.totalMarks}">
+                               max="${student.totalMarks}" oninput="calculateRow(this)">
                         <input type="hidden"
                                class="studentId"
                                value="${student.studentId}">
@@ -491,15 +491,18 @@
        async function saveAllMarks() {
            debugger
         let marksList = [];
+        let hasValidMarks = false;
         let table = $('#studentTable').DataTable();
+       let examinerEmailId='@Context.Session.GetString("Email")';
         table.rows().every(function () {
             let row = this.node();
             let vivaMarks = parseFloat($(row).find('.viva').val()) || 0;
-            let totalMarks = parseFloat(
-                $(row).find('td:eq(4)').text()
-            ) || 0;
-
+            let totalMarks = parseFloat($(row).find('td:eq(4)').text()) || 0;
             let rollNumber = $(row).find('td:eq(0)').text().trim();
+                if (vivaMarks > 0) {
+                  hasValidMarks = true;
+                }
+
             if (vivaMarks > totalMarks) {
                 alert(`Roll No ${rollNumber}: Viva Marks cannot be greater than Total Marks.`);
                 marksList = [];
@@ -512,10 +515,15 @@
                 courseId: $('#courseId').val(),
                 subjectId: $('#subjectId').val(),
                 semester: $('#semester').val(),
+                ExaminerEmail: examinerEmailId,
                 viveMarks: vivaMarks,
                 totalMarks: totalMarks
             });
         });
+        if (!hasValidMarks) {
+            alert("Please enter marks for at least one student.");
+            return;
+        }
         if (marksList.length === 0) {
             return;
         }

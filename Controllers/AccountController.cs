@@ -47,7 +47,13 @@ namespace NIAUNIVERSITYPANEL.Controllers
                     return View("Login");
             }
         }
-
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear();
+            TempData.Remove("LoginSuccess");
+            TempData.Remove("UserRole");
+            return RedirectToAction("Login", "Account");
+        }
         //[HttpPost]
         //public async Task<IActionResult> VerifyOtp(string mobile, string otp)
         //{

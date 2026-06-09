@@ -16,8 +16,6 @@ builder.Services.AddHttpClient<ApiAuthService>(client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]);
 });
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -29,9 +27,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseSession();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");
