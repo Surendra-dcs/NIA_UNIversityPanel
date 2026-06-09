@@ -1,9 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace NIAUNIVERSITYPANEL.Controllers
-{
+{   
     public class ExamController : Controller
     {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            int? role = HttpContext.Session.GetInt32("Role");
+            if (role == null)
+            {
+                context.Result = new RedirectToActionResult(
+                    "Login",
+                    "Account",
+                    null);
+
+                return;
+            }
+            if (role != 1)
+            {
+                context.Result = new RedirectToActionResult(
+                    "Logout",
+                    "Account",
+                    null);
+
+                return;
+            }
+
+            base.OnActionExecuting(context);
+        }
+
         public IActionResult rolllist()
         {
             return View();

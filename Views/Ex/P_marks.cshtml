@@ -195,7 +195,6 @@
                 🖨 Print
             </button>
         </div>
-
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-3">
@@ -237,9 +236,7 @@
                 </div> 
                 </div>
             </div>
-
         </div>
-
 
         <div class="card shadow-lg border-0 mt-4">
             <div class="card-header bg-success text-white">
@@ -255,12 +252,7 @@
                             <th>Mobile Number</th>
                             <th>Total Marks</th>
                             <th>Practical Marks<br />
-                            <input type="number"
-                                   id="allMarks"
-                                   class="mt-1"
-                                   placeholder="All"
-                                   onkeyup="applyMarksToAll()" style="height:28px">
-                            </th>   
+                            <input type="number" id="allMarks"  class="mt-1" placeholder="All" onkeyup="applyMarksToAll()" style="height:28px"></th>   
                         </tr>
                     </thead>
                     <tbody id="studentTableBody"></tbody>
@@ -345,7 +337,7 @@
                      courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
                 });
             });
-     });
+     }); 
 
         async function loadStudents() {
         let sessionId = document.getElementById('sessionId').value;
@@ -367,24 +359,20 @@
         }
 
         try {
-
             const response = await fetch(
                 ApiBaseUrl + `PracticalMarks/GetStudents?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
             );
-
             const students = await response.json();
-
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().destroy();
             }
-
             let tbody = document.getElementById('studentTableBody');
             tbody.innerHTML = '';
-               const alreadySubmitted = students.some(
-        x => x.practicalMarks != null &&
+             const alreadySubmitted = students.some(
+             x => x.practicalMarks != null &&
              x.practicalMarks !== "" &&
              parseFloat(x.practicalMarks) > 0
-    );
+             );
             if (alreadySubmitted) {
                 tbody.innerHTML = `
                 <tr>
@@ -393,9 +381,7 @@
                         This subject marks have already been submitted.
                     </td>
                 </tr>`;
-
                 document.getElementById("btnSaveMarks").style.display = "none";
-
                 return;
             }
             document.getElementById("btnSaveMarks").style.display = "inline-block";
@@ -429,18 +415,12 @@
                 ordering: true,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
             });
-
             $('#studentTable').on('draw.dt', function () {
-
                 if (globalMarks !== '') {
-
                     let table = $('#studentTable').DataTable();
-
                     table.$('.practical').each(function () {
-
                         let row = $(this).closest('tr');
                         let totalMarks = parseFloat(row.find('td:eq(4)').text()) || 0;
-
                         if (parseFloat(globalMarks) <= totalMarks) {
                             $(this).val(globalMarks);
                         }
@@ -456,15 +436,7 @@
         }
     }
 
-        function calculateRow(element)
-        {
-            let row = element.closest('tr');
-            let viva = parseFloat(row.querySelector('.viva').value) || 0;
-            let file = parseFloat(row.querySelector('.file').value) || 0;
-            let practical = parseFloat(row.querySelector('.practical').value) || 0;
-            let totalObtained = viva + file + practical;
-            row.querySelector('.obtained').value = totalObtained;
-        }
+      
 
         function calculateRow(input) {
             let row = $(input).closest('tr');
@@ -501,31 +473,38 @@
 
        async function saveAllMarks() {
         let marksList = [];
+        let hasValidMarks = false;
         let table = $('#studentTable').DataTable();
-        table.rows().every(function () {
-            let row = this.node();
-            let practicalMarks = parseFloat($(row).find('.practical').val()) || 0;
-            let totalMarks = parseFloat(
-                $(row).find('td:eq(4)').text()
-            ) || 0;
-
-            let rollNumber = $(row).find('td:eq(0)').text().trim();
-            if (practicalMarks > totalMarks) {
-                alert(`Roll No ${rollNumber}: Practical Marks cannot be greater than Total Marks.`);
-                marksList = [];
-                return false;
-            }
-            marksList.push({
-                studentId: $(row).find('.studentId').val(),
-                rollNumber: rollNumber,
-                sessionId: $('#sessionId').val(),
-                courseId: $('#courseId').val(),
-                subjectId: $('#subjectId').val(),
-                semester: $('#semester').val(),
-                practicalMarks: practicalMarks,
-                totalMarks: totalMarks
-            });
-        });
+        let examinerEmailId='@Context.Session.GetString("Email")';
+           table.rows().every(function () {
+               let row = this.node();
+               let practicalMarks = parseFloat($(row).find('.practical').val()) || 0;
+               let totalMarks = parseFloat($(row).find('td:eq(4)').text()) || 0;           
+               let rollNumber = $(row).find('td:eq(0)').text().trim();
+                if (practicalMarks > 0) {
+                  hasValidMarks = true;
+               }
+               if (practicalMarks > totalMarks) {
+                   alert(`Roll No ${rollNumber}: Practical Marks cannot be greater than Total Marks.`);
+                   marksList = [];
+                   return false;
+               }
+               marksList.push({
+                   studentId: $(row).find('.studentId').val(),
+                   rollNumber: rollNumber,
+                   sessionId: $('#sessionId').val(),
+                   courseId: $('#courseId').val(),
+                   subjectId: $('#subjectId').val(),
+                   semester: $('#semester').val(),
+                   ExaminerEmail: examinerEmailId,
+                   practicalMarks: practicalMarks,
+                   totalMarks: totalMarks
+               });
+           });
+         if (!hasValidMarks) {
+            alert("Please enter marks for at least one student.");
+            return;
+         }
         if (marksList.length === 0) {
             return;
         }
@@ -563,7 +542,6 @@
         let courseName   = $('#courseId option:selected').text().trim();
         let semesterName = $('#semester option:selected').text().trim();
         let subjectName  = $('#subjectId option:selected').text().trim();
-
         let rowsHTML = '';
         $(allRows).each(function () {
             let roll      = $(this).find('td:eq(0)').text().trim();
@@ -573,7 +551,7 @@
             let total     = $(this).find('td:eq(4)').text().trim();
             let practical = $(this).find('.practical').val();
 
-            rowsHTML += '<tr>'
+                    rowsHTML += '<tr>'
                       + '<td>' + roll + '</td>'
                       + '<td>' + name + '</td>'
                       + '<td>' + father + '</td>'
@@ -584,15 +562,12 @@
         });
 
         $('#printIframe').remove();
-
         let iframe = document.createElement('iframe');
         iframe.id = 'printIframe';
         iframe.style.cssText = 'position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
         document.body.appendChild(iframe);
-
         let doc = iframe.contentWindow.document;
         doc.open();
-
         let parts = [];
         parts.push('<!DOCTYPE html>');
         parts.push('<' + 'html' + '>');
@@ -656,10 +631,8 @@
         parts.push('</' + 'table' + '>');
         parts.push('</' + 'body' + '>');
         parts.push('</' + 'html' + '>');
-
         doc.write(parts.join(''));
         doc.close();
-
         iframe.contentWindow.focus();
         setTimeout(function () {
             iframe.contentWindow.print();
