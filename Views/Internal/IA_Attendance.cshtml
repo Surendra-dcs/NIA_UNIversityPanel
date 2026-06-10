@@ -379,8 +379,12 @@
              if (selectedSubject != sessionSubject) {
                  alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
                  $("#subjectId").val('');
-                 return;
-             }
+                 if ($.fn.DataTable.isDataTable('#studentTable')) {
+                 $('#studentTable').DataTable().clear().draw();
+                 }
+                 $("#studentTableBody").empty();
+                     return;
+                 }
 
              try {
 
