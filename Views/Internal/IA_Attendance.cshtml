@@ -3,7 +3,7 @@
     ViewData["Title"] = "IA_Attendance";
     Layout = "~/Views/Shared/_InternalExaminerLayout.cshtml";
 }
-
+<script src="~/PrintIA.js"></script>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -509,125 +509,6 @@
               alert("Server Error");
           }
       }
-    function printTable() {
-          let table = $('#studentTable').DataTable();
-          let allRows = table.rows().nodes();
-          let sessionName = $('#sessionId option:selected').text().trim();
-          let programName = $('#programId option:selected').text().trim();
-          let courseName = $('#courseId option:selected').text().trim();
-          let semesterName = $('#semester option:selected').text().trim();
-          let subjectName = $('#subjectId option:selected').text().trim();
-          let rowsHTML = '';
-          $(allRows).each(function (index) {
-              let roll = $(this).find('td:eq(1)').text().trim();
-              let name = $(this).find('td:eq(2)').text().trim();
-              let father = $(this).find('td:eq(3)').text().trim();
-              let mobile = $(this).find('td:eq(4)').text().trim();
-              let attendance = $(this).find('.attendance').val() || '';
-              rowsHTML += '<tr>'
-                  + '<td>' + (index + 1) + '</td>'
-                  + '<td>' + roll + '</td>'
-                  + '<td>' + name + '</td>'
-                  + '<td>' + father + '</td>'
-                  + '<td>' + mobile + '</td>'
-                  + '<td>' + attendance + '</td>'
-                  + '</tr>';
-          });
-
-          $('#printIframe').remove();
-
-          let iframe = document.createElement('iframe');
-          iframe.id = 'printIframe';
-          iframe.style.cssText ='position:absolute;width:0;height:0;border:0;left:-9999px;top:-9999px;';
-          document.body.appendChild(iframe);
-          let doc = iframe.contentWindow.document;
-          doc.open();
-          let parts = [];
-          parts.push('<!DOCTYPE html>');
-          parts.push('<' + 'html' + '>');
-          parts.push('<' + 'head' + '>');
-          parts.push('<title>Practical Attendance</' + 'title' + '>');
-          parts.push('<' + 'style' + '>');
-          parts.push('body{font-family:Arial,sans-serif;margin:20px;}');
-          parts.push('h3{text-align:center;margin-bottom:5px;color:#1a3a5c;}');
-          parts.push('.info-box{width:100%;border-collapse:collapse;margin-bottom:15px;}');
-          parts.push('.info-box td{padding:5px 12px;font-size:13px;width:33%;}');
-          parts.push('.info-box .label{font-weight:bold;color:#555;}');
-          parts.push('.info-box .value{color:#1a3a5c;font-weight:bold;}');
-          parts.push('.divider{border:none;border-top:2px solid #1a3a5c;margin-bottom:15px;}');
-          parts.push('table{width:100%;border-collapse:collapse;}');
-          parts.push('th,td{border:1px solid #333;padding:8px;text-align:center;font-size:13px;}');
-          parts.push('thead{background:#1a3a5c;color:white;-webkit-print-color-adjust:exact;}');
-          parts.push('</' + 'style' + '>');
-          parts.push('</' + 'head' + '>');
-          parts.push('<' + 'body' + '>');
-          parts.push('<div style="width:100%;text-align:center;margin-bottom:10px;">');
-          parts.push('<h2 style="margin:0;font-size:22px;font-weight:bold;color:#065f46;">');
-          parts.push('राष्ट्रीय आयुर्वेद संस्थान');
-          parts.push('</' + 'h2' + '>');
-          parts.push('<p style="margin:3px 0;font-size:12px;color:#555;">');
-          parts.push('मानद विश्वविद्यालय (डी. नोवो) | आयुष मंत्रालय, भारत सरकार');
-          parts.push('</' + 'p' + '>');
-          parts.push('<p style="margin:3px 0;font-size:11px;font-weight:600;color:#0f766e;">');
-          parts.push('National Institute of Ayurveda (Deemed to be University)');
-          parts.push('</' + 'p' + '>');
-          parts.push('</' + 'div' + '>');
-          parts.push('<hr class="divider">');
-          parts.push('<h3>');
-          parts.push('Practical Attendance Sheet');
-          parts.push('</' + 'h3' + '>');
-          parts.push('<hr class="divider">');
-          parts.push('<' + 'table' + ' class="info-box">');
-          parts.push('<tr>');
-          parts.push('<td><span class="label">Session : </span><span class="value">' + sessionName + '</span></td>');
-          parts.push('<td><span class="label">Program : </span><span class="value">' + programName + '</span></td>');
-          parts.push('<td><span class="label">Course : </span><span class="value">' + courseName + '</span></td>');
-          parts.push('</tr>');
-          parts.push('<tr>');
-          parts.push('<td><span class="label">Semester : </span><span class="value">' + semesterName + '</span></td>');
-          parts.push('<td><span class="label">Subject : </span><span class="value">' + subjectName + '</span></td>');
-          parts.push('<td></td>');
-          parts.push('</tr>');
-          parts.push('</' + 'table' + '>');
-          parts.push('<hr class="divider">');
-          parts.push('<' + 'table' + '>');
-          parts.push('<' + 'thead' + '>');
-          parts.push('<tr>');
-          parts.push('<th>Sr.No.</' + 'th' + '>');
-          parts.push('<th>Roll Number</' + 'th' + '>');
-          parts.push('<th>Student Name</' + 'th' + '>');
-          parts.push('<th>Father Name</' + 'th' + '>');
-          parts.push('<th>Mobile Number</' + 'th' + '>');
-          parts.push('<th>Attendance</' + 'th' + '>');
-          parts.push('</' + 'tr' + '>');
-          parts.push('</' + 'thead' + '>');
-          parts.push('<' + 'tbody' + '>');
-          parts.push(rowsHTML);
-          parts.push('</' + 'tbody' + '>');
-          parts.push('</' + 'table' + '>');
-          parts.push('<br><br><br>');
-          parts.push('<div style="width:100%;margin-top:40px;">');
-          parts.push('<div style="float:right;text-align:center;">');
-          parts.push('<p style="margin:0;">______________________</p>');
-          parts.push('<p style="margin-top:5px;">Examiner Signature</p>');
-          parts.push('</' + 'div' + '>');
-          parts.push('</' + 'div' + '>');
-          parts.push('</' + 'body' + '>');
-          parts.push('</' + 'html' + '>');
-
-          doc.write(parts.join(''));
-          doc.close();
-
-          iframe.contentWindow.focus();
-
-          setTimeout(function () {
-              iframe.contentWindow.print();
-
-              setTimeout(function () {
-                  $('#printIframe').remove();
-              }, 1000);
-
-          }, 600);
-      }
+  
 </script>
 
