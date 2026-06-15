@@ -4,5 +4,64 @@
     Layout = "~/Views/Shared/_InternalExaminerLayout.cshtml";
 }
 
-<h1>Dashboard</h1>
+<div class="container mt-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Examiner Bill Download</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-info">
+                <strong>Important Notice:</strong><br>
+                Dear Examiner, please download and submit the required bill forms for payment processing. Ensure that all details are filled correctly before submission.
+            </div>
+
+            <div class="row">
+                <!-- TA Bill -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-primary">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">TA Bill Form</h5>
+                            <p class="card-text">
+                                Download the Travelling Allowance (TA) Bill.
+                                </p>
+                            <a href="~/billpdf/approvedtabill.pdf"
+                               target="_blank"
+                               class="btn btn-primary">
+                                <i class="fa fa-download"></i> Download TA Bill
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remuneration Bill -->
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-success">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Remuneration Bill Form</h5>
+                            <p class="card-text">
+                                Download the Remuniration Bill form for examiner payment claim.
+							</p>
+                            <a href="~/billpdf/approvedremuniration_bill.pdf"
+                               target="_blank"
+                               class="btn btn-success">
+                                <i class="fa fa-download"></i> Download Remuniration Bill
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mt-3 mb-0">
+                <strong>Instructions:</strong>
+                <ul class="mb-0">
+                    <li>Download both forms as applicable.</li>
+                    <li>Fill all required details carefully.</li>
+                    <li>Attach supporting documents wherever required.</li>
+                    <li>Submit the completed forms to the examination department.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 

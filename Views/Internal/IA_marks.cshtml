@@ -198,11 +198,6 @@
     <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">IA Marks Entry</h4>
-            <button type="button"
-                    class="btn btn-light btn-sm"
-                    onclick="printTable()" style="float:right;margin-top:-2%;">
-                🖨 Print
-            </button>
         </div>
         <div class="card-body">
             <div class="row">
@@ -243,6 +238,9 @@
                         Search here...
                     </button>
                 </div>
+            </div>
+            <div>
+                <h4>Exam Name : <strong><span id="examId" style="color:red"></span></strong></h4>
             </div>
         </div>
     </div>
@@ -310,6 +308,11 @@
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
                 courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                if (data.length > 0) {
+                      $("#examId").text(data[0].examname || '');
+                      } else {
+                          $("#examId").text('');
+                      }
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
