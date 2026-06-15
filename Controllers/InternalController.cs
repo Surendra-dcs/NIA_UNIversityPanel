@@ -17,5 +17,9 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult IAReport()
+        {
+            return View();
+        }
     }
 }

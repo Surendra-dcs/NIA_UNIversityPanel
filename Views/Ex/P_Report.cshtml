@@ -1,10 +1,10 @@
 ﻿
 @{
-    ViewData["Title"] = "P_Attendance";
+    ViewData["Title"] = "P_Report";
     Layout = "~/Views/Shared/_ExaminerLayout.cshtml";
 }
-<script src="~/printattendanceshhet.js"></script>
 
+<script src="~/printtablepractical.js"></script>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -121,15 +121,15 @@
         width: 100%;
         border-collapse: collapse;
     }
-        
+
+        .table th,
         .table td {
             border: 1px solid #dee2e6;
             padding: 10px;
-            text-align: center;
         }
 
     .table-dark {
-        background: #212529;
+        background: #1a3a5c;
         color: white;
     }
 
@@ -145,8 +145,6 @@
     .mb-0 {
         margin-bottom: 0;
     }
-
-    
 
     @@media(max - width: 992px) {
         .col-md-3 {
@@ -201,14 +199,13 @@
 <div class="container mt-5">
     <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Practical / Viva Attendance Sheet</h4>
+            <h4 class="mb-0">Award list for Practical and Viva</h4>			
             <button type="button"
                     class="btn btn-light btn-sm"
                     onclick="printTable()" style="float:right;margin-top:-2.2%;background:red;font-weight:800;">
                 🖨 Print
             </button>
         </div>
-
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3">
@@ -242,6 +239,7 @@
                         <option value="">Select Subject</option>
                     </select>
                 </div>
+
                 <div class="col-md-3">
                     <label class="form-label"> </label>
                     <button class="btn btn-primary" onclick="loadStudents()" style="margin-top:7%;">
@@ -253,31 +251,29 @@
                 <h4>Exam Name : <strong><span id="examId" style="color:red"></span></strong></h4>
             </div>
         </div>
-
     </div>
-
 
     <div class="card shadow-lg border-0 mt-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Practical / Viva Attendance Sheet</h5>
-        </div>      
-
-
+            <h5 class="mb-0">Award list for Practical and Viva</h5>
+        </div>
         <div class="card-body table-responsive">
             <table class="table table-bordered table-hover align-middle" id="studentTable">
                 <thead class="table-dark">
                     <tr>
-                        <th style="text-align: center;">Sr.No.</th>
+                        <th>S.No.</th>
                         <th>Student Name</th>
-                        <th style="text-align:center;">Enrollment No.</th>
-                        <th style="text-align:center;">Roll Number</th>
-                        <th style="text-align:center;">Candidate Signature</th>
-                        <th style="text-align:center;">Remark</th>                        
+                        <th>Enrollment No.</th>
+                        <th>Roll Number</th>
+                        <th>Attendance</th>
+                        <th>Practical Marks<br /><span id="p_maxmarks"></span></th>
+                        <th>Viva Marks<br /><span id="V_maxmarks"></span></th>
+
                     </tr>
                 </thead>
                 <tbody id="studentTableBody"></tbody>
             </table>
-          
+           
         </div>
     </div>
 </div>
@@ -286,6 +282,7 @@
     loadPrograms();
     loadSession();
     });
+    let globalMarks = '';
     function loadSession() {
         $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
             let session = '<option value="">Select Session</option>';
@@ -304,7 +301,7 @@
             $('#programId').html(opt);
         });
     }
-     document.getElementById("programId").addEventListener("change", function () {
+    document.getElementById("programId").addEventListener("change", function () {
         let programId = this.value;
         $("#courseId").val('');
         $("#semester").val('');
@@ -314,17 +311,17 @@
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
                 courseDropdown.innerHTML = '<option value="">Select Course</option>';
-                  if (data.length > 0) {
-                      $("#examId").text(data[0].examname || '');
-                      } else {
-                          $("#examId").text('');
-                      }
+                    if (data.length > 0) {
+                    $("#examId").text(data[0].examname || '');
+                    } else {
+                        $("#examId").text('');
+                    }
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
             });
      });
-     document.getElementById("courseId").addEventListener("change", function () {
+    document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
         var selectedCourse = $("#courseId option:selected").text().trim();
         var sessionCourse = '@Context.Session.GetString("course_name")';
@@ -334,7 +331,7 @@
         }
         $("#semester").val('');
         $("#subjectId").val('');
-     fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
             .then(data => {
                 let courseDropdown = document.getElementById("semester");
@@ -357,72 +354,94 @@
                      courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
                 });
             });
-       });
+     });
 
-    async function loadStudents() {
-           let sessionId = document.getElementById('sessionId').value;
-           let courseId = document.getElementById('courseId').value;
-           let subjectId = document.getElementById('subjectId').value;
-           let semester = document.getElementById('semester').value;
-           var selectedSubject = $("#subjectId option:selected").text().trim();
-           var sessionSubject = '@Context.Session.GetString("subject_name")';
-           if (!sessionSubject) {
-               alert("Your session has expired. Please logout and login again.");
-               window.location.href = '/Ex_Account/Logout';
-               return;
-           }
+        async function loadStudents() {
+        let sessionId = $("#sessionId").val();
+        let courseId = $("#courseId").val();
+        let subjectId = $("#subjectId").val();
+        let semester = $("#semester").val();
+        let selectedSubject = $("#subjectId option:selected").text().trim();
+        let sessionSubject = '@Context.Session.GetString("subject_name")';
+        if (!sessionSubject) {
+            alert("Your session has expired. Please logout and login again.");
+            window.location.href = '/Ex_Account/Logout';
+            return;
+        }
 
-           if (selectedSubject != sessionSubject) {
-               alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-               $("#subjectId").val('');
-               if ($.fn.DataTable.isDataTable('#studentTable')) {
-               $('#studentTable').DataTable().clear().draw();
-               }
-               $("#studentTableBody").empty();
-               return;
-           }
+        if (selectedSubject !== sessionSubject) {
+            alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+            $("#subjectId").val('');
+            if ($.fn.DataTable.isDataTable('#studentTable')) {
+                $('#studentTable').DataTable().clear().destroy();
+            }
+            $("#studentTableBody").empty();
+            $("#p_maxmarks").text('');
+            $("#V_maxmarks").text('');
+            $("#btnSaveMarks").hide();
+            return;
+        }
 
-           try {
+        try {
+            const response = await fetch(
+                ApiBaseUrl +
+                `PracticalMarks/GetPracticalVivaReport?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
+            );
 
-               const response = await fetch(
-                   ApiBaseUrl + `PracticalMarks/GetStudentsforAttendance?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
-               );
-
-               const students = await response.json();
-               if ($.fn.DataTable.isDataTable('#studentTable')) {
-                   $('#studentTable').DataTable().destroy();
-               }
-               let tbody = document.getElementById('studentTableBody');
-               tbody.innerHTML = '';                  
-                  
-                   students.forEach((student, index) => {
-                   tbody.innerHTML += `
-                               <tr>
-                                   <td>${index + 1}</td>                                  
-                                   <td>${student.studentName}</td>
-                                   <td>${student.enrollmentNo}</td>
-                                   <td>${student.rollNumber}</td>
-                                   <td></td>
-                                   <td></td>                                 
-                                   
-                               </tr>`;
-                  });
-
-               $('#studentTable').DataTable({
-                 pageLength: 10,
-                 responsive: true,
-                 searching: true,
-                 ordering: true,
-                 lengthMenu: [[10,25,50,100],[10,25,50,100]]
-               });          
-
-               }
-           catch (error) {
-
-               console.error(error);
-               alert("Error loading students.");
-           }
-       }
-
+            const students = await response.json();
+            if ($.fn.DataTable.isDataTable('#studentTable')) {
+                $('#studentTable').DataTable().clear().destroy();
+            }
+            let tbody = $("#studentTableBody");
+            tbody.empty();
+            if (!students || students.length === 0) {
+                tbody.html(`
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            No Record Found
+                        </td>
+                    </tr>
+                `);
+                $("#btnSaveMarks").hide();
+                return;
+            }
+           
+            let first = students[0];
+          $("#p_maxmarks").text(`( Max ${first.ptotalMarks || 0} )`);
+          $("#V_maxmarks").text(`( Max ${first.vivatotalMarks || 0} )`);
+            let rows = [];
+           students.forEach((student, index) => {
+                rows.push(`
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${student.studentName || ''}</td>
+                        <td>${student.enrollmentNo || ''}</td>
+                        <td>${student.rollNumber || ''}</td>
+                        <td>${student.attendanceStatus || ''}</td>                        
+                        <td>${student.practicalMarks || ''}</td>
+                        <td>${student.vivaMarks || ''}</td>                        
+                    </tr>
+                `);
+            });
+            tbody.html(rows.join(''));
+            $('#studentTable').DataTable({
+                destroy: true,
+                pageLength: 25,
+                responsive: true,
+                searching: true,
+                ordering: true,
+                lengthMenu: [
+                    [10, 25, 50, 100],
+                    [10, 25, 50, 100]
+                ]
+            });
+        }
+        catch (error) {
+            console.error(error);
+            alert("Error loading students.");
+        }
+    }
 </script>
+
+
 

@@ -3,381 +3,382 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 
-<link href="~/css/programandcourse.css" rel="stylesheet" />
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link href="~/css/tabularresult.css" rel="stylesheet" />
+<script src="~/js/printtr.js"></script>
 <style>
-    .Filters {
+    .search-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .search-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0d3b66;
+        margin-bottom: 15px;
+    }
+
+    .search-row {
         display: flex;
-        justify-content: space-evenly;
-        padding: 10px 0 0;
         flex-wrap: wrap;
         gap: 15px;
+        align-items: end;
     }
 
-    select#examFilter,
-    input#rollFilter {
-        padding: 8px;
-        background: #dfdfdf;
-        border-radius: 3px;
-        width: 100%;
-    }
-
-    .page {
-        width: 297mm;
-        min-height: 210mm;
-        margin: 10mm auto;
-        background: #fff;
-        padding: 5mm 6mm;
-        box-shadow: 0 0 8px rgba(0,0,0,0.3);
-    }
-
-    .top-bar {
-        display: flex;
-        justify-content: center;
-        font-size: 12px;
-        margin-bottom: 15px;
-        font-weight: bold;
-    }
-
-    .header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 3px;
-        padding: 5px;
-    }
-
-    .logo-img {
-        width: 60px;
-        height: 60px;
-        object-fit: contain;
-        margin-left: 30px;
-    }
-
-    .header-center {
+    .search-group {
+        min-width: 220px;
         flex: 1;
-        text-align: center;
     }
 
-        .header-center .h1 {
-            font-size: 17px;
-            font-weight: bold;
+        .search-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
         }
 
-        .header-center .h2,
-        .header-center .h3,
-        .header-center .h4 {
-            font-size: 11px;
+        .search-group select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
         }
 
-        .header-center .exam-title,
-        .header-center .tab-title {
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 4px;
+    .btn-group {
+        flex: 0;
+    }
+
+        .btn-group button {
+            height: 38px;
+            padding: 0 25px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
-    .page-box {
-        border: 1.5px solid #000;
-        padding: 2px 20px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .date-issue {
-        font-size: 11px;
-        font-weight: bold;
-        margin-top: 20px;
-    }
-
-    .header-right {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 20px;
-    }
-
-    .main-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 10px;
-        margin-top: 4px;
-        border: 1.5px solid #000;
-    }
-
-        .main-table th,
-        .main-table td {
-            border: 1px solid #000;
-            padding: 2px 3px;
-            /* text-align: center; */
-            vertical-align: middle;
-        }
-
-    .rotated {
-        writing-mode: vertical-rl;
-        transform: rotate(180deg);
-        white-space: nowrap;
-        font-size: 9px;
-        font-weight: bold;
-    }
-
-    .info-cell {
-        text-align: center;
-        line-height: 1.6;
-        padding: 4px;
-    }
-
-    .subj-cell {
-        text-align: left !important;
-        padding-left: 5px;
-    }
-
-    .notes-content {
-        text-align: left;
-    }
-
-    .note-title {
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-
-    .note-item {
-        margin-bottom: 2px;
-        font-size: 10px;
-    }
-
-    .note-item1 {
-        margin: 1px 0;
-        font-size: 10px;
-        line-height: 1.4;
-    }
-
-    .sign-row {
-        display: flex;
-        justify-content: space-between;
-        font-weight: bold;
-        padding-top: 41px;
-    }
-
-    .sign-col {
-        vertical-align: bottom;
-        padding: 5px 10px;
-    }
+            .btn-group button:hover {
+                background: #0b5ed7;
+            }
 </style>
+<div class="search-panel">
 
-<div class="table-card">
-    <div class="table-header">
-        <h3 class="table-title">Re Reval TR</h3>
-        <div class="table-actions">
-            <button class="btn btn-success mb-3" onclick="window.print()">Bulk Print Re Reval TR</button>
-        </div>
+    <div class="search-title">
+        🔍 Tabulation Register Search
     </div>
 
-    <div class="card shadow-sm p-3 rounded-4">
-        <div class="row g-3 align-items-end Filters">
-            <div class="col-lg-4 col-md-6">
-                <label class="form-label fw-semibold">Exam Name</label>
-                <select id="examFilter" class="form-select">
-                    <option value="">-- Select Exam --</option>
-                </select>
-            </div>
+    <div class="search-row">
 
-            <div class="col-lg-4 col-md-6">
-                <label class="form-label fw-semibold">Roll Number</label>
-                <input type="text" id="rollFilter" class="form-control onlyNumber" placeholder="Enter Roll Number">
-            </div>
-
-            <div class="col-lg-2 col-md-6">
-                <button id="searchBtn" class="btn btn-primary w-100" style="margin-top:16%;">🔍 Search</button>
-            </div>
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option value="">Select Session</option>
+            </select>
         </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option value="">Select Program</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-group btn-group">
+            <button type="button" onclick="loadResult()">
+                Search Report
+            </button>
+        </div>
+        <button type="button" class="btn btn-success" onclick="printTable()" style="width: 98px; height: 38px; font-weight: 800; background: red; color: white;">
+            🖨 Print
+        </button>       
+       
     </div>
 </div>
 
-<div class="page">
-    <div class="top-bar">
-        <span>NATIONAL INSTITUTE OF AYURVEDA</span>
-    </div>
 
-    <div style="border:1px solid black;">
-        <div class="header">
-            <img class="logo-img" src="/Logo/nia_logo_tR.png" alt="NIA Logo">
-
-            <div class="header-center">
-                <div class="h1">NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</div>
-                <div class="h2">Deemed to be University</div>
-                <div class="h3">(Ministry of AYUSH, Govt. of India)</div>
-                <div class="h4">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
-                <div class="exam-title">Exam Name</div>
-                <div class="tab-title">TABULATION REGISTER/LEDGER</div>
+ <div class="page">
+        <div class="top">
+            <div class="logo">
+            <img src="~/Logo/nia_logo.png" />
+            </div>
+            <div class="heading">
+                <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
+                <p>Deemed to be University</p>
+                <p>(Ministry of AYUSH, Govt. of India)</p>
+                <p>Jorawar Singh Gate, Amer Road, Jaipur-302002</p>
+                <h4>
+                    <span id="ExamnameId"></span>
+                </h4>
+                <h3>TABULATION REGISTER/LEDGER</h3>
             </div>
 
-            <div class="header-right">
-                <div class="page-box">Page:1</div>
-                <div class="date-issue">Date of Issue : @DateTime.Now.ToString("dd-MM-yyyy")</div>
-            </div>
+            <div class="page-no">Page: 1</div>
         </div>
 
-        <table class="main-table" id="tbl_result">
+        <div class="issue-date">Date of Issue : .....................</div>
+
+        <table class="ledger">
             <thead>
                 <tr>
-                    <th rowspan="3">S.<br>No.</th>
-                    <th rowspan="3">Roll NO<br>Enrollment No.<br>Candidate Name<br>Father's Name</th>
-                    <th rowspan="3"><div class="rotated">Attempt</div></th>
-                    <th rowspan="3">Name of Subjects<br>in which appearing</th>
-                    <th rowspan="3">Unique Code</th>
-                    <th colspan="3">Marks Scheme</th>
-                    <th colspan="4">OBTAINED MARKS</th>
-                    <th rowspan="3">Grace</th>
-                    <th rowspan="3"><div class="rotated">Required to appear</div></th>
-                    <th rowspan="3"><div class="rotated">Distinction</div></th>
-                    <th rowspan="3">Grand<br>Total</th>
-                    <th rowspan="3">Result</th>
-                </tr>
-                <tr>
-                    <th colspan="2">Theory / Practical</th>
-                    <th rowspan="2">Total</th>
-                    <th rowspan="2">Theory</th>
-                    <th rowspan="2">Practical</th>
-                    <th rowspan="2" colspan="2">Total</th>
+                    <th rowspan="2">S.<br />No.</th>
+                    <th rowspan="2">
+                        Roll NO<br />Enrollment No.<br />Candidate Name<br />Father`s Name
+                    </th>
+                    <th rowspan="2" class="vertical vertical-col">Attempt</th>
+                    <th rowspan="2" class="subject-head" style="font-size:13px">
+                        Name of Subjects<br /><small>In which appearing</small>
+                    </th>
+                <th rowspan="2" class="unique-code" style="font-size:13px">Unique Code</th>
+                <th colspan="2" class="group-head" style="font-size:13px">Marks Scheme</th>
+                <th colspan="5" class="group-head" style="font-size:13px">Theory</th>
+                <th colspan="4" class="group-head" style="font-size:13px">OBTAINED MARKS</th>
+                    <th rowspan="2" class="vertical vertical-col no-side">
+                        Required to appear at the<br />Attempt Examinations
+                    </th>
+                    <th rowspan="2" class="vertical vertical-col no-side">
+                        Distinction-D / First Class : I
+                    </th>
+                    <th rowspan="2" >Grand<br />Total</th>
+                    <th rowspan="2">Result</th>
                 </tr>
                 <tr>
                     <th>MAX</th>
                     <th>MIN</th>
+                    <th class="vertical vertical-col">Marks of Evaluator I</th>
+                    <th class="vertical vertical-col">Marks of Evaluator II</th>
+                    <th class="vertical vertical-col">
+                        Difference between Evaluator I & II
+                    </th>
+                    <th class="vertical vertical-col">Marks of Evaluator III</th>
+                    <th class="vertical vertical-col">
+                        Average of Two Higher marks among<br />three evaluator Theory I Total
+                    </th>
+                <th style="font-size:13px">Theory</th>
+                <th style="font-size:13px">Total</th>
+                    <th>Subject<br />Total</th>
+                    <th>Grace</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+
+        <tbody id="resultBody"></tbody>
         </table>
+
+        <div class="footer">
+            <div class="notes">
+                <b>Note.</b><br />
+                1. For candidate to pass, he/she shall require to obtain a minimum of
+                50% marks in each of Theory examination.<br />
+                2. The candidate securing 65% marks or above in a subject shall be
+                declared to have obtained First Class(Denoted by I) in that
+                Subject.<br />
+                3. The candidate securing 75% marks or above in a subject shall be
+                declared to have obtained distinction(Denoted by D)in that Subject.<br />
+                4. A candidate failing in the Theory part of a paper will be
+                considered fail in Theory.
+            </div>
+
+            <div class="sign">Tabulator</div>
+            <div class="sign1">DCOE</div>
+            <div class="sign">Controller of Examinations</div>
+            <div class="sign2">Registrar</div>
+            <div class="sign2">Vice Chancellor</div>
+        </div>
     </div>
-</div>
-
-<script>
-    $(document).ready(function () {
-
+    <script>
+        $(document).ready(function () {
         loadPrograms();
-        loadResultSheet();
-
-        $('#searchBtn').click(function () {
-            loadResultSheet();
-            var examIddd = $('#examFilter option:selected').text();
-            $(".exam-title").text(examIddd);
+        loadSession();
         });
-
-        function loadResultSheet() {
-             var examId = $('#examFilter').val();
-    var rollNo = $('#rollFilter').val().trim();
-
-    let requestData = {};
-    if (examId && examId !== "") {
-        requestData.examId = parseInt(examId);
-    }
-    if (rollNo && rollNo !== "") {
-        requestData.rollNo = rollNo;
-    }
-
-            $.ajax({
-                url: ApiBaseUrl + 'Exam/resultsheet',
-                type: 'GET',
-              data: requestData,
-                success: function (data) {
-                    let subjectRows = '';
-                    if (data.length > 0) {
-                        $('.exam-title').text(data[0].exam_name);
-                        let grandTotal = data[0].grandTotal;
-                        let result = data[0].result;
-                        $.each(data, function (index, item) {
-                            subjectRows += `
-                                <tr style="text-align:center;">
-                                    ${index === 0 ? `<td rowspan="${data.length}">1</td>` : ''}
-                                    ${index === 0 ? `
-                                    <td rowspan="${data.length}" class="info-cell">
-                                        <div><b>${item.rollNumber}</b></div>
-                                        <div>${item.enrollmentNo ?? ''}</div>
-                                        <div><b>${item.studentName}</b></div>
-                                        <div>${item.fatherName}</div>
-                                    </td>` : ''}
-
-                                    ${index === 0 ? `<td rowspan="${data.length}">1st</td>` : ''}
-                                    <td class="subj-cell">${item.subject_name}</td>
-                                    <td>${item.scriptId}</td>
-                                    <td>${item.maxValue}</td>
-                                    <td>${item.minValue}</td>
-                                    <td>${item.maxValue}</td>
-                                    <td>${item.theory}</td>
-                                    <td>${item.practical}</td>
-                                    <td colspan="2">${item.theory}</td>
-                                    <td>${item.grace ?? ''}</td>
-                                    <td>${item.requiredtoappear ?? ''}</td>
-                                    <td>${item.distinction ?? ''}</td>
-                                    ${index === 0 ? `<td rowspan="${data.length}"><b>${grandTotal}</b></td>` : ''}
-                                    ${index === 0 ? `<td rowspan="${data.length}"><b>${result}</b></td>` : ''}
-                                </tr>`;
-                        });
-
-                        subjectRows += `
-                            <tr>
-                                <td colspan="4" class="note-item1">
-                                    <div class="note-title">Note.</div>
-                                    <div class="note-item">1. For candidate to pass, minimum 50% marks are required in Theory and Practical.</div>
-                                    <div class="note-item">2. 75% or above marks indicate Distinction (D).</div>
-                                    <div class="note-item">3. Failing Theory means fail in both Theory and Practical.</div>
-                                </td>
-                                <td colspan="3">
-                                    <div class="sign-row">
-                                        <div class="sign-col">Tabulator</div>
-                                        <div class="sign-col">DCOE</div>
-                                    </div>
-                                </td>
-                                <td colspan="11">
-                                    <div class="sign-row">
-                                        <div class="sign-col">Controller of Examinations</div>
-                                        <div class="sign-col">Registrar</div>
-                                        <div class="sign-col">Vice Chancellor</div>
-                                    </div>
-                                </td>
-                            </tr>`;
-                    }
-                    else {
-                        subjectRows = `
-                            <tr>
-                                <td colspan="17" style="padding:20px; font-weight:bold;">
-                                    No Record Found
-                                </td>
-                            </tr>`;
-                    }
-
-                    $('#tbl_result tbody').html(subjectRows);
-                },
-                    error: function (xhr, status, error) {
-
-        console.log("XHR:", xhr);
-        console.log("Status:", status);
-        console.log("Error:", error);
-        console.log("Response Text:", xhr.responseText);
-
-        let errorMessage = "Error loading result sheet.";
-
-        if (xhr.responseText) {
-            errorMessage += "\n\nServer Response:\n" + xhr.responseText;
-        }
-
-        alert(errorMessage);
-    }
-            });
-        }
-    });
-
-
-    function loadPrograms() {
-        fetch(ApiBaseUrl + 'Course/GetExamDetails')
+         function loadSession() {
+           $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+               let session = '<option value="">Select Session</option>';
+               res.forEach(x => {
+                   session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+               });
+               $('#sessionId').html(session);
+           });
+         }
+         function loadPrograms() {
+           $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+               let opt = '<option value="">Select Program</option>';
+               res.forEach(x => {
+                   opt += `<option value="${x.programId}">${x.programName}</option>`;
+               });
+               $('#programId').html(opt);
+           });
+         }
+         document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
             .then(res => res.json())
             .then(data => {
-                let ddl = document.getElementById("examFilter");
-                ddl.innerHTML = '<option value="">Select Exam</option>';
-                data.forEach(x => {
-                    ddl.innerHTML += `<option value="${x.examId}">${x.examName}</option>`;
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';                   
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
             });
+     });
+       document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+
+        async function loadResult() {
+        const courseId = $("#courseId").val();
+        const semester = $("#semester").val();
+        const sessionId = $("#sessionId").val();
+
+        const response = await fetch(
+            ApiBaseUrl + `Result/GetTabulationRegisterResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}`
+        );
+
+       const data = await response.json();
+           if (!data || data.length === 0) {
+              $("#ExamnameId").text('');
+              $("#resultBody").html('');
+              alert("No records found for the selected Session, Course and Semester.");
+              return;
+           }
+       if (data && data.length > 0) {
+       $("#ExamnameId").text(data[0].examname || '');
+       } else {
+           $("#ExamnameId").text('');
+       }
+        let grouped = {};
+        data.forEach(item => {
+            let key = item.rollNumber;
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+            grouped[key].push(item);
+        });
+
+        let html = '';
+        let sno = 1;
+
+        Object.keys(grouped).forEach(key => {
+            let student = grouped[key];
+            let first = student[0];
+            html += `
+            <tr>
+                <td>${sno++}</td>
+                <td>
+                    ${first.rollNumber}
+                    <hr/>
+                    ${first.enrollmentNumber}
+                    <hr/>
+                    ${first.candidateName}
+                    <hr/>
+                    ${first.fatherName}
+                </td>
+                <td>${first.attempt}</td>
+
+                <td class="s1">
+                ${student.map(x => `${x.subject_code} - ${x.subject_name}`).join('<br>')}
+               </td>
+
+                <td>
+                    ${student.map(x => x.scriptId).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.maxMarks).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.minMarks).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.evaluator1).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.evaluator2).join('<br>')}
+                </td>
+                <td>
+                   ${student.map(x =>
+                       x.difference12 != null
+                           ? Number(x.difference12).toFixed(2)
+                           : '0.00'
+                   ).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.evaluator3).join('<br>')}
+                </td>
+                 <td>
+                 ${student.map(x =>
+                     x.averageOfTwoHigherMarks != null
+                         ? Number(x.averageOfTwoHigherMarks).toFixed(2)
+                         : '0.00'
+                 ).join('<br>')}
+               </td>
+                    <td>
+                    ${student.map(x => x.total).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.total).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.subjectTotal).join('<br>')}
+                </td>
+                <td>
+                    ${student.map(x => x.graceMarks).join('<br>')}
+                </td>
+                <td>
+                    ${student
+                        .filter(x => x.required_To_Appear)
+                        .map(x => x.required_To_Appear)
+                        .join('<br>')}
+                </td>
+
+                <td>
+                    ${student
+                        .filter(x => x.distinction)
+                        .map(x => x.distinction)
+                        .join('<br>')}
+                </td>
+
+                <td>${first.grandTotal}</td>
+
+                <td>${first.result}</td>
+            </tr>`;
+        });
+
+        $("#resultBody").html(html);
     }
+      
 
 </script>
 

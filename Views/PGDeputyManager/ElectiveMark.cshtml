@@ -246,6 +246,9 @@
                     </button>
                 </div>
             </div>
+            <div>
+                <h4>Exam Name : <strong><span id="examId" style="color:red"></span></strong></h4>
+            </div>
         </div>
     </div>
 
@@ -312,6 +315,11 @@
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
                 courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                 if (data.length > 0) {
+                    $("#examId").text(data[0].examname || '');
+                    } else {
+                        $("#examId").text('');
+                    }
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
@@ -353,18 +361,7 @@
         let subjectId = document.getElementById('subjectId').value;
         let semester = document.getElementById('semester').value;
         var selectedSubject = $("#subjectId option:selected").text().trim();
-        var sessionSubject = '@Context.Session.GetString("subject_name")';
-        // if (!sessionSubject) {
-        //     alert("Your session has expired. Please logout and login again.");
-        //     window.location.href = '/Ex_Account/Logout';
-        //     return;
-        // }
-
-        // if (selectedSubject != sessionSubject) {
-        //     alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-        //     $("#subjectId").val('');
-        //     return;
-        // }
+        var sessionSubject = '@Context.Session.GetString("subject_name")';    
 
         try {
             const response = await fetch(
