@@ -623,7 +623,7 @@
                 <div class="section-head"><div class="dot"></div><h2>Examiner Details</h2></div>
                 <div class="form-body">
                     <div class="field mb-20">
-                        <label asp-for="ExaminerName"></label>
+                        <label>Examiner Name</label>
                         <input asp-for="ExaminerName" placeholder="Dr. Full Name" value="@Context.Session.GetString("UserName")" readonly/>
                         <span asp-validation-for="ExaminerName" class="field-error"></span>
                     </div>
@@ -651,48 +651,48 @@
                 <div class="section-head"><div class="dot"></div><h2>College Address</h2></div>
                 <div class="form-body">
                     <div class="field mb-20">
-                        <label asp-for="CollegeAddress"></label>
+                        <label>College Address</label>
                         <input asp-for="CollegeAddress" placeholder="Building, Street, Area" />
                     </div>
                     <div class="grid-4">
                         <div class="field">
-                            <label asp-for="CollegeState"></label>
+                            <label>College State</label>
                             <select asp-for="CollegeState" class="form-control">
                                 <option value="">-- Select State --</option>                                
                             </select>
 
                         </div>
                         <div class="field">
-                            <label asp-for="CollegeDistrict"></label>
+                            <label>College District</label>
                             <select asp-for="CollegeDistrict" class="form-control">
                                 <option value="">-- Select District --</option>
                             </select>
 
                         </div>
-                        <div class="field"><label asp-for="CollegeCity"></label><input asp-for="CollegeCity" placeholder="City" /></div>
+                        <div class="field"><label>College City</label><input asp-for="CollegeCity" placeholder="City" /></div>
                         <div class="field"><label asp-for="CollegePinCode"></label><input asp-for="CollegePinCode" placeholder="000000" class="onlyNumber" maxlength="6" /></div>
                     </div>
 
                     <div class="divider"></div>
                     <div class="inner-section"><div class="dot"></div><h2 style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:var(--green);">Residential Address</h2></div>
                     <div class="field mb-20">
-                        <label asp-for="ResidentialAddress"></label>
+                        <label>Residential Address</label>
                         <input asp-for="ResidentialAddress" placeholder="House No., Street, Area" />
                     </div>
                     <div class="grid-4">
                         <div class="field">
-                            <label asp-for="ResidentialState"></label>
+                            <label>Residential State</label>
                             <select asp-for="ResidentialState" class="form-control">
                                 <option value="">-- Select State --</option>                              
                             </select>
                         </div>
                         <div class="field">
-                            <label asp-for="ResidentialDistrict"></label>
+                            <label>Residential District</label>
                             <select asp-for="ResidentialDistrict" class="form-control">
                                 <option value="">-- Select District --</option>
                             </select>
                         </div>
-                        <div class="field"><label asp-for="ResidentialCity"></label><input asp-for="ResidentialCity" placeholder="City" /></div>
+                        <div class="field"><label>Residential City</label><input asp-for="ResidentialCity" placeholder="City" /></div>
                         <div class="field"><label asp-for="ResidentialPinCode"></label><input asp-for="ResidentialPinCode" placeholder="000000" class="onlyNumber" maxlength="6" /></div>
                     </div>
                 </div>
@@ -716,7 +716,7 @@
                         <input asp-for="SubjectCode" type="hidden" id="SubjectCode" readonly />
                     </div><br />
                     <div class="field ">                       
-                        <label asp-for="ExaminnerSignature"></label>
+                        <label>Examinner Signature</label>
                         <input asp-for="ExaminnerSignature" type="file" placeholder="Upload Signature" />
                     </div>
                 </div>
