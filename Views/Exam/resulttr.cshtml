@@ -4,8 +4,11 @@
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+<link href="~/css/TabularResult.css" rel="stylesheet" />
 <link href="~/css/TabularResult.css" rel="stylesheet" />
 <script src="~/js/Printtr.js"></script>
+<script src="~/js/downloadPDFTR.js"></script>
 <style>
     .search-panel {
         background: #fff;
@@ -67,7 +70,13 @@
             .btn-group button:hover {
                 background: #0b5ed7;
             }
+
+    .download-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
 </style>
+
 <div class="search-panel">
 
     <div class="search-title">
@@ -109,15 +118,16 @@
                 Search Report
             </button>
         </div>
-        <button type="button" class="btn btn-success" onclick="printTable()" style="width: 98px; height: 38px; font-weight: 800; background: red; color: white;">
-            🖨 Print
-        </button>       
-       
+        <button class="download-btn"
+                onclick="downloadPDF()"
+                style="width:98px; height:38px; font-weight:800; background:red; color:white; cursor:pointer;">
+            Download
+        </button>
     </div>
 </div>
 
 
- <div class="page">
+<div class="page" id="ledgerPage">
         <div class="top">
             <div class="logo">
             <img src="~/Logo/nia_logo.png" />
