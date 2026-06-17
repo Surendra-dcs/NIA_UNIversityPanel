@@ -1154,54 +1154,55 @@
                 }
             });
         });
-        function bindVoucher(data) {
+         function bindVoucher(data) {
+            debugger
+            $("#VoucherNo").text(data.voucherNo || '');
+            $("#BankName").text(data.bankName || '');
+            $("#MobileNo").text(data.mobileNo || '');
+            $("#BankAccountNo").text(data.bankAccountNo || '');
+            $("#Email").text(data.email || '');
+            $("#IFSCCode").text(data.ifscCode || '');
+            $("#PANNo").text(data.panNo || '');
 
-            $("#VoucherNo").text(data.VoucherNo || '');
-            $("#BankName").text(data.BankName || '');
-            $("#MobileNo").text(data.MobileNo || '');
-            $("#BankAccountNo").text(data.BankAccountNo || '');
-            $("#Email").text(data.Email || '');
-            $("#IFSCCode").text(data.IFSCCode || '');
-            $("#PANNo").text(data.PANNo || '');
+            $("#ExaminerName").text(data.examinerName || '');
+            $("#Qualification").text(data.qualification || '');
+            $("#Specialization").text(data.specialization || '');
+            $("#TeachingUG").text(data.teachingUG || '');
+            $("#TeachingPG").text(data.teachingPG || '');
 
-            $("#ExaminerName").text(data.ExaminerName || '');
-            $("#Qualification").text(data.Qualification || '');
-            $("#Specialization").text(data.Specialization || '');
-            $("#TeachingUG").text(data.TeachingUG || '');
-            $("#TeachingPG").text(data.TeachingPG || '');
+            $("#CollegeAddress").text(data.collegeAddress || '');
+            $("#CollegeCity").text(data.collegeCity || '');
+            $("#CollegeDistrict").text(data.collegeDistrict || '');
+            $("#CollegeState").text(data.collegeState || '');
+            $("#CollegePinCode").text(data.collegePinCode || '');
 
-            $("#CollegeAddress").text(data.CollegeAddress || '');
-            $("#CollegeCity").text(data.CollegeCity || '');
-            $("#CollegeDistrict").text(data.CollegeDistrict || '');
-            $("#CollegeState").text(data.CollegeState || '');
-            $("#CollegePinCode").text(data.CollegePinCode || '');
+            $("#ResidentialAddress").text(data.residentialAddress || '');
+            $("#ResidentialCity").text(data.residentialCity || '');
+            $("#ResidentialDistrict").text(data.residentialDistrict || '');
+            $("#ResidentialState").text(data.residentialState || '');
+            $("#ResidentialPinCode").text(data.residentialPinCode || '');
 
-            $("#ResidentialAddress").text(data.ResidentialAddress || '');
-            $("#ResidentialCity").text(data.ResidentialCity || '');
-            $("#ResidentialDistrict").text(data.ResidentialDistrict || '');
-            $("#ResidentialState").text(data.ResidentialState || '');
-            $("#ResidentialPinCode").text(data.ResidentialPinCode || '');
-
-            $("#ExamName").text(data.ExamName || '');
-            $("#SubjectName").text(data.SubjectName || '');
-
+            $("#ExamName").text(data.examName || '');
+            $("#SubjectName").text(data.subjectName || '');
             $("#TotalStudent").text(data.totalStudent || 0);
-            $("#TotalAmount").text(data.TotalAmount || 0);
-            $("#NetPayable").text(data.NetPayable || 0);
+            $("#TotalAmount").text(data.totalAmount || 0);
+            $("#NetPayable").text(data.netPayable || 0);
+            $("#FooterTotalAmount").text(data.totalAmount || 0);
+            $("#FooterNetPayable").text(data.netPayable || 0);
 
             let rate = 0;
 
             if ((data.totalStudent || 0) > 0) {
-                rate = (data.TotalAmount / data.totalStudent).toFixed(2);
+                rate = (data.totalAmount / data.totalStudent).toFixed(2);
             }
 
             $("#Rate").text(rate);
 
-            if (data.ExaminnerSignature) {
-                $("#ExaminnerSignature").attr("src", data.ExaminnerSignature);
+            if (data.examinnerSignature) {
+                $("#ExaminnerSignature").attr("src", data.examinnerSignature);
             }
 
-            $("#AmountInWords").text(data.AmountInWords || '');
+            $("#AmountInWords").text(data.amountInWords || '');
         }
     </script>
 </body>
