@@ -11,5 +11,6 @@ namespace NIAUNIVERSITYPANEL.Controllers
             var model = new DashboardViewModel();
             return View(model);
         }
+
     }
 }

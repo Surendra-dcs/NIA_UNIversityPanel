@@ -54,7 +54,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         public IActionResult C_file(ExaminerProfile model)
         {
             return View();
-        }    
-       
+        }
+
+        public IActionResult ExBillDetails()
+        {
+            return View();
+        }
     }
 }

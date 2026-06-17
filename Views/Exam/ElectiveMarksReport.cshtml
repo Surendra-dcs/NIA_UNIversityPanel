@@ -1,7 +1,7 @@
 ﻿
 @{
     ViewData["Title"] = "ElectiveMarksReport";
-    Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <script src="~/PrintElectivereport.js"></script>
 <style>
@@ -319,7 +319,7 @@
      });
     document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
-       
+   
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
             .then(data => {
@@ -350,9 +350,8 @@
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
         let semester = $("#semester").val();
-        let selectedSubject = $("#subjectId option:selected").text().trim();
-        let sessionSubject = '@Context.Session.GetString("subject_name")';
        
+
 
         try {
             const response = await fetch(

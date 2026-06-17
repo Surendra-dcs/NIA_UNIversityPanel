@@ -1,9 +1,10 @@
 ﻿
 @{
-    ViewData["Title"] = "ElectiveMarksReport";
-    Layout = "~/Views/Shared/_PGManagerLayout.cshtml";
+    ViewData["Title"] = "IAReport";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
-<script src="~/PrintElectivereport.js"></script>
+
+<script src="~/printIA.js"></script>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -198,7 +199,7 @@
 <div class="container mt-5">
     <div class="card shadow-lg border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">Elective Marks</h4>
+            <h4 class="mb-0">Internal Assessment</h4>
             <button type="button"
                     class="btn btn-light btn-sm"
                     onclick="printTable()" style="float:right;margin-top:-2.2%;background:red;font-weight:800;">
@@ -254,7 +255,7 @@
 
     <div class="card shadow-lg border-0 mt-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Elective Marks</h5>
+            <h5 class="mb-0">Internal Assessment</h5>
         </div>
         <div class="card-body table-responsive">
             <table class="table table-bordered table-hover align-middle" id="studentTable">
@@ -264,7 +265,7 @@
                         <th>Student Name</th>
                         <th>Enrollment No.</th>
                         <th>Roll Number</th>
-                        <th>Elective Marks<br /><span id="Elective_maxmarks"></span></th>
+                        <th>Practical IA Marks<br /><span id="IA_maxmarks"></span></th>
                     </tr>
                 </thead>
                 <tbody id="studentTableBody"></tbody>
@@ -350,14 +351,11 @@
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
         let semester = $("#semester").val();
-        let selectedSubject = $("#subjectId option:selected").text().trim();
-        let sessionSubject = '@Context.Session.GetString("subject_name")';
-       
 
         try {
             const response = await fetch(
                 ApiBaseUrl +
-                `PracticalMarks/GetElectiveMarksReport?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
+                `PracticalMarks/GetPracticalIAReport?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
             );
 
             const students = await response.json();
@@ -374,11 +372,12 @@
                         </td>
                     </tr>
                 `);
+                $("#btnSaveMarks").hide();
                 return;
             }
 
             let first = students[0];
-          $("#Elective_maxmarks").text(`( Max ${first.eltotalMarks || 0} )`);
+          $("#IA_maxmarks").text(`( Max ${first.iatotalMarks || 0} )`);
             let rows = [];
            students.forEach((student, index) => {
                 rows.push(`
@@ -387,7 +386,7 @@
                         <td>${student.studentName || ''}</td>
                         <td>${student.enrollmentNo || ''}</td>
                         <td>${student.rollNumber || ''}</td>
-                        <td>${student.elativeMarks || ''}</td>
+                        <td>${student.iamarks || ''}</td>
                     </tr>
                 `);
             });
@@ -410,5 +409,4 @@
         }
     }
 </script>
-
 
