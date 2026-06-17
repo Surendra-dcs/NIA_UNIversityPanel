@@ -3,11 +3,11 @@
     width: 1400px;
     margin: auto;
     background: white;
-    padding: 18px 20px 10px;
+    padding: 18px 10px 10px;
     position: relative;
 }
 
-.download-btn {
+/*.download-btn {
     position: absolute;
     top: 5px;
     right: 10px;
@@ -15,7 +15,7 @@
     font-size: 11px;
     cursor: pointer;
     z-index: 1000;
-}
+}*/
 
 #ledgerPage {
     background: white;
@@ -39,7 +39,11 @@
     margin-top: 20px;
     margin-left: 60px;
 }
-
+#ledgerPage {
+    zoom: 1;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
     .logo img {
         width: 90px;
         height: 90px;
@@ -95,12 +99,14 @@
     overflow: hidden;
     page-break-inside: avoid;
     break-inside: avoid;
+    font-weight: 700;
 }
 
     .ledger th,
     .ledger td {
         border: 1px solid #111;
-        font-size: 10px;
+        font-size: 9px;
+        font-weight: 700;
     }
 
     .ledger thead th {
