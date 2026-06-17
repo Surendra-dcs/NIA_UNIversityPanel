@@ -96,6 +96,18 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult P_Report()
+        {
+            return View();
+        }
+        public IActionResult IAReport()
+        {
+            return View();
+        }
+        public IActionResult ElectiveMarksReport()
+        {
+            return View();
+        }
 
     }
 }

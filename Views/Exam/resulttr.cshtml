@@ -84,7 +84,16 @@
         display: flex;
         gap: 10px;
     }
-   
+
+    .print-page {
+        position: relative;
+        page-break-after: always;
+        min-height: 190mm;
+    }
+
+        .print-page:last-child {
+            page-break-after: auto;
+        }
 
 </style>
 

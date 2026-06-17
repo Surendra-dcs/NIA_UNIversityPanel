@@ -21,5 +21,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult IntBillDetails()
+        {
+            return View();
+        }
     }
 }

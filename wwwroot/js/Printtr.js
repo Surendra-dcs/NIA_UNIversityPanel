@@ -114,7 +114,7 @@
     var CSS = [
         '@page { size: A4 landscape; margin: 5mm 5mm; }',
         '* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
-        'html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }',
+        'html, body { margin: 0; padding: 6px; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #000; }',
 
         // Header
         '.top { display: grid; grid-template-columns: 100px 1fr 130px; align-items: center; text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 3px; page-break-inside: avoid; break-inside: avoid; }',
