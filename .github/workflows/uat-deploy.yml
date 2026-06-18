@@ -52,6 +52,21 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
+
+            echo "💾 Taking backup"
+
+            BACKUP_DIR="/var/www/NIA_BACKUP/NIA_UNIVERSITY/NIA_UNIVERSITY_MASTER/$(date +%Y%m%d_%H%M%S)"
+
+            mkdir -p "$BACKUP_DIR"
+
+            if [ -d "/var/www/UAT_NIA_university/NIA_UNIversityPanel/publish" ] && \
+              [ "$(ls -A /var/www/UAT_NIA_university/NIA_UNIversityPanel/publish 2>/dev/null)" ]; then
+              cp -a /var/www/UAT_NIA_university/NIA_UNIversityPanel/publish/. "$BACKUP_DIR/"
+              echo "✅ Backup created at $BACKUP_DIR"
+            else
+              echo "ℹ️ No existing files to back up"
+            fi
+
             echo "🧹 Cleaning old build"
             rm -rf /var/www/UAT_NIA_university/NIA_UNIversityPanel/publish/*
 
