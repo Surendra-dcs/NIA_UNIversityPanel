@@ -105,13 +105,13 @@
     // Signature
     parts.push('<div class="sign-section">');
     parts.push('<div class="sign-box">');
-    parts.push('<div class="sign-box-title">Full Signature Of External Examiner.</div>');
+    parts.push('<div class="sign-box-title">Full Signature Of HoD With Seal.</div>');
     parts.push('<div class="sign-line"></div>');
     parts.push('<div class="with-name"><span>With Name</span><span class="name-line"></span></div>');
     parts.push('<div class="date-row"><span>Date</span><span class="date-line"></span></div>');
     parts.push('</div>');
     parts.push('<div class="sign-box">');
-    parts.push('<div class="sign-box-title">Full Signature Of Internal Examiner.</div>');
+    parts.push('<div class="sign-box-title">Full Signature Of CoE.</div>');
     parts.push('<div class="sign-line"></div>');
     parts.push('<div class="with-name"><span>With Name</span><span class="name-line"></span></div>');
     parts.push('<div class="date-row"><span>Date</span><span class="date-line"></span></div>');
