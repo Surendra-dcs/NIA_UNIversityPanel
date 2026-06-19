@@ -264,8 +264,8 @@
                             Attendance
                            
                         </td>
-                        <th>Practical Marks<br />Max<span id="p_maxmarks">0</span></th>
-                        <th>Viva Marks<br />Max<span id="V_maxmarks">0</span></th>
+                        <th>Practical Viva Marks<br />Max  <span id="p_maxmarks">0</span></th>
+                        <th>Viva Marks<br />Max <span id="V_maxmarks">0</span></th>
 
                     </tr>
                 </thead>
@@ -405,7 +405,7 @@
         async function loadStudents() {
         let sessionId = $("#sessionId").val();
         let courseId = $("#courseId").val();
-        let subjectId = parseInt(("#subjectId").val());
+        let subjectId = parseInt($("#subjectId").val());
         let semester = $("#semester").val();
         let selectedSubject = $("#subjectId option:selected").text().trim();
         let sessionSubject = '@Context.Session.GetString("subject_name")';
@@ -430,17 +430,17 @@
             if(subjectId==11)
             {
                 $("#p_maxmarks").text(45);
-                $("#V_maxmarks").text(45);
+              
             }
              if(subjectId==9)
             {
                 $("#p_maxmarks").text(90);
-                $("#V_maxmarks").text(90);
+                
             }
-             if(subjectId==11)
+             if(subjectId==13)
             {
                 $("#p_maxmarks").text(90);
-                $("#V_maxmarks").text(90);
+               
             }
            $("#btnSaveMarks").show();
             $("#studentTableBody").show()
