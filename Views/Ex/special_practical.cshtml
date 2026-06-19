@@ -1,0 +1,608 @@
+﻿
+@{
+    ViewData["Title"] = "special_practical";
+    Layout = "~/Views/Shared/_ExaminerLayout.cshtml";
+}
+
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 95%;
+        margin: 30px auto;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 15px 20px;
+    }
+
+    .bg-primary {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .bg-success {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .col-md-3 {
+        width: 25%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+    }
+
+    .form-select,
+    .form-control {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #0d6efd;
+        }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .mt-3 {
+        margin-top: 15px;
+    }
+
+    .text-end {
+        text-align: right;
+    }
+
+    .btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .btn-success {
+        background: #198754;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .table th,
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+        }
+
+    .table-dark {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f1f1f1;
+    }
+
+    .align-middle td,
+    .align-middle th {
+        vertical-align: middle;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    @@media(max - width: 992px) {
+        .col-md-3 {
+            width: 50%;
+        }
+    }
+
+    @@media(max - width: 576px) {
+        .col-md-3 {
+            width: 100%;
+        }
+
+        .text-end {
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @@media print {
+
+        body * {
+            visibility: hidden;
+        }
+
+        #studentTable,
+        #studentTable * {
+            visibility: visible;
+        }
+
+        #studentTable {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+            #studentTable input {
+                border: none;
+            }
+
+        .dataTables_paginate,
+        .dataTables_filter,
+        .dataTables_length,
+        .dataTables_info {
+            display: none !important;
+        }
+    }
+</style>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Practical Marks Entry</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Session</label>
+                    <select class="form-select" id="sessionId">
+                        <option value="">Select Session</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Program </label>
+                    <select class="form-select" id="programId">
+                        <option value="">Select Program</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Course </label>
+                    <select class="form-select" id="courseId">
+                        <option value="">Select Course</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Semester </label>
+                    <select class="form-select" id="semester">
+                        <option value="">Select Semester</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject </label>
+                    <select class="form-select" id="subjectId">
+                        <option value="">Select Subject</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label"> </label>
+                    <button class="btn btn-primary" onclick="loadStudents()" style="margin-top:7%;">
+                        Search here...
+                    </button>
+                </div>
+            </div>
+            <div>
+                <h4>Exam Name : <strong><span id="examId" style="color:red"></span></strong></h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-lg border-0 mt-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Students Practical Marks</h5>
+        </div>
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover align-middle" id="studentTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Student Name</th>
+                        <th>Enrollment No.</th>
+                        <th>Roll Number</th>
+                        <td>
+                            Attendance
+                           
+                        </td>
+                        <th>Practical Marks<br />Max<span id="p_maxmarks">0</span></th>
+                        <th>Viva Marks<br />Max<span id="V_maxmarks">0</span></th>
+
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody" style="display:none">
+                    <tr>
+                        <td>1</td>
+                        <td>Diksha saini</td>
+                        <td>NIA20010090</td>
+                        <td>2001024</td>
+                        <td>
+                            <select class="form-control attendance">
+                                <option value="">-Select-</option>
+                                <option value="P">P</option>
+                                <option value="A">A</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text"
+                                   class="form-control practical"
+                                   value=""
+                                   min="0"
+                                   max="45"
+                                   data-max="45"
+                                    />
+                            <input type="hidden"
+                                   class="studentId"
+                                   value="54321" />
+                        </td>
+                        <td>
+                            <input type="text"
+                                   class="form-control viva"
+                                   value=""
+                                   min="0"
+                                   max="45"
+                                   data-max="45"
+                                   />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-end mt-3">
+                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()">
+                    Save All Marks
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+    loadPrograms();
+    loadSession();
+    });
+    let globalMarks = '';
+    function loadSession() {
+        $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+            let session = '<option value="">Select Session</option>';
+            res.forEach(x => {
+                session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+            });
+            $('#sessionId').html(session);
+        });
+    }
+    function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programId').html(opt);
+        });
+    }
+    document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                    if (data.length > 0) {
+                    $("#examId").text(data[0].examname || '');
+                    } else {
+                        $("#examId").text('');
+                    }
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+    document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        var selectedCourse = $("#courseId option:selected").text().trim();
+        var sessionCourse = '@Context.Session.GetString("course_name")';
+        if (selectedCourse !== sessionCourse) {
+            alert(`You are registered for "${sessionCourse}". Please select the same course.`);
+            return false;
+        }
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+    document.getElementById("semester").addEventListener("change", function () {
+        let semId = this.value;
+        let courseId=$("#courseId").val();
+         $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/getsubject/${semId}/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("subjectId");
+                courseDropdown.innerHTML = '<option value="">Select subject</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                });
+            });
+     });
+
+
+     function applyAttendanceToAll() {
+        let attendance = $("#allAttendance").val();
+        let table = $('#studentTable').DataTable();
+        table.$('.attendance').each(function () {
+            $(this).val(attendance);
+        });
+    }
+
+        async function loadStudents() {
+        let sessionId = $("#sessionId").val();
+        let courseId = $("#courseId").val();
+        let subjectId = parseInt(("#subjectId").val());
+        let semester = $("#semester").val();
+        let selectedSubject = $("#subjectId option:selected").text().trim();
+        let sessionSubject = '@Context.Session.GetString("subject_name")';
+        if (!sessionSubject) {
+            alert("Your session has expired. Please logout and login again.");
+            window.location.href = '/Ex_Account/Logout';
+            return;
+        }
+
+        if (selectedSubject !== sessionSubject) {
+            alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+            $("#subjectId").val('');
+            if ($.fn.DataTable.isDataTable('#studentTable')) {
+                $('#studentTable').DataTable().clear().destroy();
+            }            
+            $("#btnSaveMarks").hide();
+            $("#studentTableBody").hide()
+            return;
+        }
+        if(subjectId==9||subjectId==11||subjectId==13)
+        {
+            if(subjectId==11)
+            {
+                $("#p_maxmarks").text(45);
+                $("#V_maxmarks").text(45);
+            }
+             if(subjectId==9)
+            {
+                $("#p_maxmarks").text(90);
+                $("#V_maxmarks").text(90);
+            }
+             if(subjectId==11)
+            {
+                $("#p_maxmarks").text(90);
+                $("#V_maxmarks").text(90);
+            }
+           $("#btnSaveMarks").show();
+            $("#studentTableBody").show()
+        }
+        else{
+            $("#btnSaveMarks").hide();
+            $("#studentTableBody").hide()
+        }
+    }
+
+
+    function calculatePractical(input) {
+        let maxMarks = parseFloat($(input).data("max")) || 0;
+        let entered = parseFloat($(input).val()) || 0;
+        if (entered > maxMarks) {
+            alert(`Maximum Practical Marks Allowed: ${maxMarks}`);
+            $(input).val(maxMarks);
+        }
+    }
+    function calculateViva(input) {
+        let maxMarks = parseFloat($(input).data("max")) || 0;
+        let entered = parseFloat($(input).val()) || 0;
+        if (entered > maxMarks) {
+            alert(`Maximum Viva Marks Allowed: ${maxMarks}`);
+            $(input).val(maxMarks);
+        }
+    }
+
+
+        function applyMarksToAll() {
+        let marks = parseFloat($("#allMarks").val());
+        let table = $('#studentTable').DataTable();
+        let allInputs = table.$('.practical');
+        let isInvalid = false;
+        allInputs.each(function () {
+            let row = $(this).closest('tr');
+            let totalMarks = parseFloat(row.find('td:eq(4)').text());
+            if (marks > totalMarks) {
+                isInvalid = true;
+                return false;
+            }
+        });
+
+        if (isInvalid) {
+            alert("Entered marks cannot be greater than Total Marks.");
+            globalMarks = '';
+            $("#allMarks").val('');
+            allInputs.val('');
+            return;
+        }
+        globalMarks = marks;
+        allInputs.val(marks);
+    }
+
+             async function saveAllMarks() {
+
+        let marksList = [];
+        let hasValidMarks = false;
+        let examinerEmailId = '@Context.Session.GetString("Email")';
+        let isValid = true;
+
+        $('#studentTableBody tr').each(function () {
+
+            let row = $(this);
+
+            let practicalValue = row.find('.practical').val().trim();
+            let vivaValue = row.find('.viva').val().trim();
+
+            let practicalMarks = parseFloat(practicalValue) || 0;
+            let vivaMarks = parseFloat(vivaValue) || 0;
+
+            let practicalMax = parseFloat(row.find('.practical').data('max')) || 0;
+            let vivaMax = parseFloat(row.find('.viva').data('max')) || 0;
+
+            let rollNumber = row.find('td:eq(3)').text().trim();
+            let attendance = row.find('.attendance').val();
+
+            if (!attendance) {
+                alert(`Roll No ${rollNumber}: Please select Attendance.`);
+                isValid = false;
+                return false;
+            }
+
+            if (attendance === "A") {
+                practicalMarks = 0;
+                vivaMarks = 0;
+            }
+            else {
+               
+
+                if (vivaValue === '') {
+                    alert(`Roll No ${rollNumber}: Please enter Viva Marks.`);
+                    isValid = false;
+                    return false;
+                }
+
+
+                if (vivaMarks > vivaMax) {
+                    alert(`Roll No ${rollNumber}: Viva Marks cannot be greater than ${vivaMax}.`);
+                    isValid = false;
+                    return false;
+                }
+                hasValidMarks = true;
+            }
+
+            marksList.push({
+                studentId: row.find('.studentId').val(),
+                rollNumber: rollNumber,
+                sessionId: $('#sessionId').val(),
+                courseId: $('#courseId').val(),
+                subjectId: $('#subjectId').val(),
+                semester: $('#semester').val(),
+                ExaminerEmail: examinerEmailId,
+                attendance: attendance,
+                practicalMarks: practicalMarks,
+                vivaMarks: vivaMarks,
+                totalMarks: practicalMax,
+                vivaTotalMarks: vivaMax
+            });
+        });
+
+        if (!isValid) return;
+
+        if (!hasValidMarks) {
+            alert("Please enter marks for at least one student.");
+            return;
+        }
+
+        try {
+
+            const response = await fetch(ApiBaseUrl + 'PracticalMarks/SaveMarks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(marksList)
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert(result.message || 'Marks saved successfully.');
+
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            }
+            else {
+                alert(result.message || 'Error while saving marks.');
+            }
+
+        }
+        catch (error) {
+            console.error(error);
+            alert('Server Error.');
+        }
+    }
+
+
+
+</script>
+
+
+
+

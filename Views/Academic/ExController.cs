@@ -23,6 +23,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult special_practical()
+        {
+            return View();
+        }
         public IActionResult P_Report()
         {
             return View();
