@@ -293,7 +293,7 @@
 <div class="search-panel">
 
     <div class="search-title">
-        🔍 Result Reports
+        🔍 All & Department  Wise Result Sheet
         <div class="action-buttons">
             <button type="button"
                     onclick="printTable()"
@@ -354,13 +354,11 @@
 
         <div class="heading">
             <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
-
             <p>Deemed to be University</p>
             <p>(Ministry of AYUSH, Govt. of India)</p>
             <p>Jorawar Singh Gate, Amer Road, Jaipur - 302002</p>
-
             <h4>
-                <span id="ExamnameId"></span>
+                <span id="ExamnameId">MD/MS Semester-I (Batch-2025) Summative Assessment (May 2026) </span>
             </h4>            
         </div>
 
@@ -399,6 +397,7 @@
         $(document).ready(function () {
         loadPrograms();
         loadSession();
+        loadResult();
         });
          function loadSession() {
            $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
@@ -448,33 +447,27 @@
             });
      });
 
-        async function loadResult() {
-        const courseId = $("#courseId").val();
-        const semester = $("#semester").val();
-        const sessionId = $("#sessionId").val();
+           async function loadResult() {
+        const courseId = $("#courseId").val() || '0';
+        const semester = $("#semester").val() || '0';
+        const sessionId = $("#sessionId").val() || '0';
 
         const response = await fetch(
             ApiBaseUrl + `Result/GetDepartmentWiseResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}`
         );
 
-       const data = await response.json();
-           if (!data || data.length === 0) {
-              $("#ExamnameId").text('');
-              $("#resultBody").html('');
-              alert("No records found for the selected Session, Course and Semester.");
-              return;
-           }
-       if (data && data.length > 0) {
-       $("#ExamnameId").text(data[0].examname || '');
-       } else {
-           $("#ExamnameId").text('');
-       }
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
+            $("#resultBody").html('');
+            alert("No records found for the selected Session, Course and Semester.");
+            return;
+        }
+
         let grouped = {};
         data.forEach(item => {
             let key = item.rollNumber;
-            if (!grouped[key]) {
-                grouped[key] = [];
-            }
+            if (!grouped[key]) grouped[key] = [];
             grouped[key].push(item);
         });
 
@@ -484,17 +477,18 @@
         Object.keys(grouped).forEach(key => {
             let student = grouped[key];
             let first = student[0];
+
             html += `
             <tr>
                 <td>${sno++}</td>
-                <td>${first.rollNumber}</td>
-                <td>${first.enrollmentNumber}</td>
-                <td>${first.candidateName}</td>
-                <td> ${first.fatherName}</td>
-                <td> ${first.course_name}</td>
-                <td> ${first.attempt}</td>
-                <td> ${first.result}</td>
-                <td> ${first.required_To_Appear}</td>              
+                <td>${first.rollNumber || ''}</td>
+                <td>${first.enrollmentNumber || ''}</td>
+                <td>${first.candidateName || ''}</td>
+                <td>${first.fatherName || ''}</td>
+                <td>${first.course_name || ''}</td>
+                <td>${first.attempt || ''}</td>
+                <td>${first.result || ''}</td>
+                <td>${first.required_To_Appear || ''}</td>
             </tr>`;
         });
 

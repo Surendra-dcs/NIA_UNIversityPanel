@@ -8,17 +8,13 @@ function printTable() {
         return;
     }
 
-    var examName = document.getElementById('ExamnameId')
-        ? document.getElementById('ExamnameId').innerText
-        : '';
-
     var tableHTML = pageEl.querySelector('.ledger').outerHTML;
 
     var printHTML=`
     <!DOCTYPE html>
         <html>
             <head>
-                <title>Tabulation Register</title>
+                <title>All & Department  Wise Result Sheet</title>
 
                 <style>
 
@@ -142,7 +138,7 @@ function printTable() {
 
                         <p>Jorawar Singh Gate, Amer Road, Jaipur - 302002</p>
 
-                        <h4>${examName}</h4>                      
+                        <h4>MD/MS Semester-I (Batch-2025) Summative Assessment (May 2026)</h4>                      
 
                     </div>
 
