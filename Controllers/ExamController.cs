@@ -50,6 +50,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult resultReports()
+        {
+            return View();
+        }
         public IActionResult revaltr()
         {
             return View();

@@ -307,7 +307,7 @@
                 </tbody>
             </table>
             <div class="text-end mt-3">
-                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()">
+                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()" style="display:none">
                     Save All Marks
                 </button>
             </div>
@@ -425,25 +425,17 @@
             $("#studentTableBody").hide()
             return;
         }
-        if(subjectId==9||subjectId==11||subjectId==13)
+        if(subjectId==19)
         {
-            if(subjectId==11)
-            {
-                $("#p_maxmarks").text(45);
-              
-            }
-             if(subjectId==9)
+           
+             if(subjectId==19)
             {
                 $("#p_maxmarks").text(90);
                 
-            }
-             if(subjectId==13)
-            {
-                $("#p_maxmarks").text(90);
-               
-            }
+            }          
            $("#btnSaveMarks").show();
-            $("#studentTableBody").show()
+           $("#studentTableBody").show()
+           
         }
         else{
             $("#btnSaveMarks").hide();
