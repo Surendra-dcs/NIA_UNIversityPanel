@@ -1,0 +1,506 @@
+﻿@{
+    ViewData["Title"] = "Result";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+
+
+<script src="~/js/printdepartmentwisereports.js"></script>
+<style>
+    .search-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .search-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0d3b66;
+        margin-bottom: 15px;
+    }
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-group {
+        min-width: 220px;
+        flex: 1;
+    }
+
+        .search-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .search-group select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+
+    .btn-group {
+        flex: 0;
+    }
+
+        .btn-group button {
+            height: 38px;
+            padding: 0 25px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .btn-group button:hover {
+                background: #0b5ed7;
+            }
+
+    .download-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .search-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .print-page {
+        position: relative;
+        page-break-after: always;
+        min-height: 190mm;
+    }
+
+        .print-page:last-child {
+            page-break-after: auto;
+        }
+
+</style>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background: #f4f6f9;
+        padding: 20px;
+        color: #222;
+    }
+
+    .page {
+        width: 100%;
+        max-width: 1400px;
+        margin: auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    /* ================= HEADER ================= */
+
+    .top {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 3px solid #0d6efd;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+
+    .logo img {
+        width: 90px;
+        height: 90px;
+        object-fit: contain;
+    }
+
+    .heading {
+        flex: 1;
+        text-align: center;
+    }
+
+        .heading h2 {
+            font-size: 28px;
+            color: #0d3b66;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .heading p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 2px;
+        }
+
+        .heading h4 {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #c1121f;
+            font-weight: 700;
+        }
+
+        .heading h3 {
+            margin-top: 8px;
+            font-size: 20px;
+            background: #0d6efd;
+            color: white;
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 5px;
+            letter-spacing: 1px;
+        }
+
+    /* ================= TABLE ================= */
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .ledger {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+
+        .ledger thead th {
+            background: #0d3b66;
+            color: #fff;
+            padding: 12px 10px;
+            font-size: 14px;
+            border: 1px solid #dcdcdc;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .ledger tbody td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .ledger tbody tr:nth-child(even) {
+            background: #f8fbff;
+        }
+
+        .ledger tbody tr:hover {
+            background: #eef5ff;
+            transition: 0.3s;
+        }
+
+    /* Result Badge */
+
+    .pass {
+        color: #198754;
+        font-weight: bold;
+    }
+
+    .fail {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    /* ================= MOBILE ================= */
+
+    @@media(max-width:768px) {
+        body
+
+    {
+        padding: 10px;
+    }
+
+    .page {
+        padding: 15px;
+    }
+
+    .top {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .heading h2 {
+        font-size: 20px;
+    }
+
+    .heading h3 {
+        font-size: 16px;
+        padding: 6px 12px;
+    }
+
+    .heading h4 {
+        font-size: 15px;
+    }
+
+    .ledger thead th,
+    .ledger tbody td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    }
+
+    /* ================= PRINT ================= */
+
+    @@media print {
+
+        body {
+            background: white;
+            padding: 0;
+        }
+
+        .page {
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        .ledger thead th {
+            background: #d9d9d9 !important;
+            color: black !important;
+        }
+    }
+</style>
+
+<div class="search-panel">
+
+    <div class="search-title">
+        🔍 Result Reports
+        <div class="action-buttons">
+            <button type="button"
+                    onclick="printTable()"
+                    style="width:98px; height:38px; font-weight:800; background:#3b8508; color:white; cursor:pointer;">
+                Print
+            </button>
+        </div>
+    </div>
+
+    <div class="search-row">
+
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option value="">Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option value="">Select Program</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-group btn-group">
+            <button type="button" onclick="loadResult()">
+                Search Report
+            </button>           
+        </div>
+    
+       
+    </div>
+</div>
+
+<div class="page" id="ledgerPage">
+
+    <!-- Header -->
+    <div class="top">
+
+        <div class="logo">
+            <img src="~/Logo/nia_logo.png" />
+        </div>
+
+        <div class="heading">
+            <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
+
+            <p>Deemed to be University</p>
+            <p>(Ministry of AYUSH, Govt. of India)</p>
+            <p>Jorawar Singh Gate, Amer Road, Jaipur - 302002</p>
+
+            <h4>
+                <span id="ExamnameId"></span>
+            </h4>            
+        </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive">
+
+        <table class="ledger">
+
+            <thead>
+                <tr>
+                    <th>S.No.</th>
+                    <th>Roll No.</th>
+                    <th>Enrollment No.</th>
+                    <th>Candidate Name</th>
+                    <th>Father's Name</th>
+                    <th>Department</th>
+                    <th>Attempt</th>
+                    <th>Result</th>
+                    <th>Fail in Paper</th>
+                </tr>
+            </thead>
+
+            <tbody id="resultBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+    <script>
+        $(document).ready(function () {
+        loadPrograms();
+        loadSession();
+        });
+         function loadSession() {
+           $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+               let session = '<option value="">Select Session</option>';
+               res.forEach(x => {
+                   session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+               });
+               $('#sessionId').html(session);
+           });
+         }
+         function loadPrograms() {
+           $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+               let opt = '<option value="">Select Program</option>';
+               res.forEach(x => {
+                   opt += `<option value="${x.programId}">${x.programName}</option>`;
+               });
+               $('#programId').html(opt);
+           });
+         }
+         document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';                   
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+       document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+
+        async function loadResult() {
+        const courseId = $("#courseId").val();
+        const semester = $("#semester").val();
+        const sessionId = $("#sessionId").val();
+
+        const response = await fetch(
+            ApiBaseUrl + `Result/GetDepartmentWiseResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}`
+        );
+
+       const data = await response.json();
+           if (!data || data.length === 0) {
+              $("#ExamnameId").text('');
+              $("#resultBody").html('');
+              alert("No records found for the selected Session, Course and Semester.");
+              return;
+           }
+       if (data && data.length > 0) {
+       $("#ExamnameId").text(data[0].examname || '');
+       } else {
+           $("#ExamnameId").text('');
+       }
+        let grouped = {};
+        data.forEach(item => {
+            let key = item.rollNumber;
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+            grouped[key].push(item);
+        });
+
+        let html = '';
+        let sno = 1;
+
+        Object.keys(grouped).forEach(key => {
+            let student = grouped[key];
+            let first = student[0];
+            html += `
+            <tr>
+                <td>${sno++}</td>
+                <td>${first.rollNumber}</td>
+                <td>${first.enrollmentNumber}</td>
+                <td>${first.candidateName}</td>
+                <td> ${first.fatherName}</td>
+                <td> ${first.course_name}</td>
+                <td> ${first.attempt}</td>
+                <td> ${first.result}</td>
+                <td> ${first.required_To_Appear}</td>              
+            </tr>`;
+        });
+
+        $("#resultBody").html(html);
+    }
+      
+
+</script>
+

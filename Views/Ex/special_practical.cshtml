@@ -307,7 +307,7 @@
                 </tbody>
             </table>
             <div class="text-end mt-3">
-                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()">
+                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()" style="display:none">
                     Save All Marks
                 </button>
             </div>
@@ -435,7 +435,8 @@
             }
            
            $("#btnSaveMarks").show();
-            $("#studentTableBody").show()
+           $("#studentTableBody").show()
+           
         }
         else{
             $("#btnSaveMarks").hide();
