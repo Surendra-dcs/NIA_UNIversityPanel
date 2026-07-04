@@ -308,11 +308,7 @@
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
                 courseDropdown.innerHTML = '<option value="">Select Course</option>';
-                    if (data.length > 0) {
-                    $("#examId").text(data[0].examname || '');
-                    } else {
-                        $("#examId").text('');
-                    }
+                   
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
@@ -362,6 +358,7 @@
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().clear().destroy();
             }
+            $("#examId").text(students[0].examname)
             let tbody = $("#studentTableBody");
             tbody.empty();
             if (!students || students.length === 0) {

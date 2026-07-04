@@ -307,12 +307,7 @@
             .then(res => res.json())
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
-                courseDropdown.innerHTML = '<option value="">Select Course</option>';
-                if (data.length > 0) {
-                      $("#examId").text(data[0].examname || '');
-                      } else {
-                          $("#examId").text('');
-                      }
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';              
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
@@ -321,11 +316,11 @@
     document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
         var selectedCourse = $("#courseId option:selected").text().trim();
-        var sessionCourse = '@Context.Session.GetString("course_name")';
-        if (selectedCourse !== sessionCourse) {
-            alert(`You are registered for "${sessionCourse}". Please select the same course.`);
-            return false;
-        }
+        // var sessionCourse = '@Context.Session.GetString("course_name")';
+        // if (selectedCourse !== sessionCourse) {
+        //     alert(`You are registered for "${sessionCourse}". Please select the same course.`);
+        //     return false;
+        // }
         $("#semester").val('');
         $("#subjectId").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
@@ -358,23 +353,23 @@
         let courseId = document.getElementById('courseId').value;
         let subjectId = document.getElementById('subjectId').value;
         let semester = document.getElementById('semester').value;
-        var selectedSubject = $("#subjectId option:selected").text().trim();
-        var sessionSubject = '@Context.Session.GetString("subject_name")';
-        if (!sessionSubject) {
-            alert("Your session has expired. Please logout and login again.");
-            window.location.href = '/Ex_Account/Logout';
-            return;
-        }
+        // var selectedSubject = $("#subjectId option:selected").text().trim();
+        // var sessionSubject = '@Context.Session.GetString("subject_name")';
+        // if (!sessionSubject) {
+        //     alert("Your session has expired. Please logout and login again.");
+        //     window.location.href = '/Ex_Account/Logout';
+        //     return;
+        // }
 
-        if (selectedSubject != sessionSubject) {
-            alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-            $("#subjectId").val('');
-             if ($.fn.DataTable.isDataTable('#studentTable')) {
-             $('#studentTable').DataTable().clear().draw();
-             }
-             $("#studentTableBody").empty();
-            return;
-        }
+        // if (selectedSubject != sessionSubject) {
+        //     alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+        //     $("#subjectId").val('');
+        //      if ($.fn.DataTable.isDataTable('#studentTable')) {
+        //      $('#studentTable').DataTable().clear().draw();
+        //      }
+        //      $("#studentTableBody").empty();
+        //     return;
+        // }
 
         try {
             const response = await fetch(
@@ -384,6 +379,7 @@
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().destroy();
             }
+            $("#examId").text(students[0].examname)
             let tbody = document.getElementById('studentTableBody');
             tbody.innerHTML = '';
              const alreadySubmitted = students.some(

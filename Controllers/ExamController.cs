@@ -112,6 +112,9 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-
+        public IActionResult ExcelDataResultForDG()
+        {
+            return View();
+        }
     }
 }
