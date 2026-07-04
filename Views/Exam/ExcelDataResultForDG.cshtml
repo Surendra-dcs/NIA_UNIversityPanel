@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Result";
+    ViewData["Title"] = "Result For CSV&Excel";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <script src="~/js/printdepartmentwisereports.js"></script>
@@ -291,18 +291,10 @@
 <div class="search-panel">
 
     <div class="search-title">
-        🔍 All & Department  Wise Result Sheet
-        <div class="action-buttons">
-            <button type="button"
-                    onclick="printTable()"
-                    style="width:98px; height:38px; font-weight:800; background:#3b8508; color:white; cursor:pointer;">
-                Print
-            </button>
-        </div>
+        🔍 Result Sheet Download (CSV & Excel)        
     </div>
 
     <div class="search-row">
-
         <div class="search-group">
             <label>Session</label>
             <select id="sessionId">
@@ -331,9 +323,20 @@
             </select>
         </div>
 
+        <div class="search-group">
+            <label>Download Type</label>
+            <select id="downloadType">
+                <option value="">Select Type</option>
+                <option value="excel">Excel</option>
+                <option value="csv">CSV</option>
+            </select>
+        </div>
+
+        
+
         <div class="search-group btn-group">
-            <button type="button" onclick="loadResult()">
-                Search Report
+            <button type="button" onclick="downloadResult()">
+                Download
             </button>           
         </div>
     
@@ -341,61 +344,10 @@
     </div>
 </div>
 
-<div class="page" id="ledgerPage">
-
-    <!-- Header -->
-    <div class="top">
-
-        <div class="logo">
-            <img src="~/Logo/nia_logo.png" />
-        </div>
-
-        <div class="heading">
-            <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
-            <p>Deemed to be University</p>
-            <p>(Ministry of AYUSH, Govt. of India)</p>
-            <p>Jorawar Singh Gate, Amer Road, Jaipur - 302002</p>
-            <h4>
-                <span id="ExamnameId">MD/MS Semester-I (Batch-2025) Summative Assessment (May 2026) </span>
-            </h4>            
-        </div>
-
-    </div>
-
-    <!-- Table -->
-    <div class="table-responsive">
-
-        <table class="ledger">
-
-            <thead>
-                <tr>
-                    <th>S.No.</th>
-                    <th>Roll No.</th>
-                    <th>Enrollment No.</th>
-                    <th>Candidate Name</th>
-                    <th>Father's Name</th>
-                    <th>Department</th>
-                    <th>Attempt</th>
-                    <th>Result</th>
-                    <th>Fail in Paper</th>
-                </tr>
-            </thead>
-
-            <tbody id="resultBody">
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
     <script>
         $(document).ready(function () {
         loadPrograms();
-        loadSession();
-        loadResult();
+        loadSession();       
         });
          function loadSession() {
            $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
@@ -445,54 +397,35 @@
             });
      });
 
-           async function loadResult() {
-        const courseId = $("#courseId").val() || '0';
-        const semester = $("#semester").val() || '0';
-        const sessionId = $("#sessionId").val() || '0';
-
-        const response = await fetch(
-            ApiBaseUrl + `Result/GetDepartmentWiseResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}`
-        );
-
-        const data = await response.json();
-
-        if (!data || data.length === 0) {
-            $("#resultBody").html('');
-            alert("No records found for the selected Session, Course and Semester.");
+       function downloadResult() {
+           if($("#courseId").val()=="")
+           {
+            alert("Please select Course.");
             return;
-        }
+           }
+           if($("#semester").val()=="")
+           {
+            alert("Please select Semester.");
+            return;
+           }
+           if($("#sessionId").val()=="")
+           {
+            alert("Please select Session.");
+            return;
+           }
+           if($("#downloadType").val()=="")
+           {
+            alert("Please select Session.");
+            return;
+           }          
 
-        let grouped = {};
-        data.forEach(item => {
-            let key = item.rollNumber;
-            if (!grouped[key]) grouped[key] = [];
-            grouped[key].push(item);
-        });
-
-        let html = '';
-        let sno = 1;
-
-        Object.keys(grouped).forEach(key => {
-            let student = grouped[key];
-            let first = student[0];
-
-            html += `
-            <tr>
-                <td>${sno++}</td>
-                <td>${first.rollNumber || ''}</td>
-                <td>${first.enrollmentNumber || ''}</td>
-                <td>${first.candidateName || ''}</td>
-                <td>${first.fatherName || ''}</td>
-                <td>${first.course_name || ''}</td>
-                <td>${first.attempt || ''}</td>
-                <td>${first.result || ''}</td>
-                <td>${first.required_To_Appear || ''}</td>
-            </tr>`;
-        });
-
-        $("#resultBody").html(html);
-    }
-      
+        const courseId = parseInt($("#courseId").val())
+        const semester = parseInt($("#semester").val())
+        const sessionId = parseInt($("#sessionId").val())
+        const downloadType = $("#downloadType").val();       
+        window.location =
+            ApiBaseUrl +`Result/DownloadResult?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&downloadType=${downloadType}`;
+    }      
 
 </script>
 
