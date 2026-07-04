@@ -153,7 +153,7 @@ function printTable() {
     <div class="sign-box" style="text-align:center;">
 
         <img src="/Logo/AdminSignatur.jpg"
-             style="height:35px;width:200px;" />
+             style="height:30px;width:200px;" />
 
         <div class="sign-line"
              style="border-top:1px solid #000;
