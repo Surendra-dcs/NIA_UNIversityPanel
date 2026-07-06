@@ -358,23 +358,23 @@
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
         let semester = $("#semester").val();
-         var selectedSubject = $("#subjectId option:selected").text().trim();
-        var sessionSubject = '@Context.Session.GetString("subject_name")';
-        if (!sessionSubject) {
-           alert("Your session has expired. Please logout and login again.");
-           window.location.href = '/Ex_Account/Logout';
-           return;
-        }
-        
-        if (selectedSubject != sessionSubject) {
-           alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-           $("#subjectId").val('');
-            if ($.fn.DataTable.isDataTable('#studentTable')) {
-            $('#studentTable').DataTable().clear().draw();
-            }
-            $("#studentTableBody").empty();
-           return;
-        }
+         //var selectedSubject = $("#subjectId option:selected").text().trim();
+        //var sessionSubject = '@Context.Session.GetString("subject_name")';
+        //if (!sessionSubject) {
+        //   alert("Your session has expired. Please logout and login again.");
+        //   window.location.href = '/Ex_Account/Logout';
+        //   return;
+        //}
+        //
+        //if (selectedSubject != sessionSubject) {
+        //   alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+        //   $("#subjectId").val('');
+        //    if ($.fn.DataTable.isDataTable('#studentTable')) {
+        //    $('#studentTable').DataTable().clear().draw();
+        //    }
+        //    $("#studentTableBody").empty();
+        //   return;
+        //}
         try {
 
             const response = await fetch(
@@ -484,21 +484,14 @@
                     if (parseFloat(globalMarks) <= maxMarks) {
                         $(this).val(globalMarks);
                     }
-
                 });
-
             });
-
             $("#btnSaveMarks").show();
-
         }
         catch (e) {
-
             console.log(e);
             alert("Error loading students.");
-
         }
-
     }
 
         function calculateRowThI(input) {
