@@ -356,23 +356,23 @@
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
         let semester = $("#semester").val();
-        let selectedSubject = $("#subjectId option:selected").text().trim();
-        let sessionSubject = '@Context.Session.GetString("subject_name")';
-        if (!sessionSubject) {
-           alert("Your session has expired. Please logout and login again.");
-           window.location.href = '/Ex_Account/Logout';
-           return;
-        }
+        // let selectedSubject = $("#subjectId option:selected").text().trim();
+        // let sessionSubject = '@Context.Session.GetString("subject_name")';
+        // if (!sessionSubject) {
+        //    alert("Your session has expired. Please logout and login again.");
+        //    window.location.href = '/Ex_Account/Logout';
+        //    return;
+        // }
         
-        if (selectedSubject !== sessionSubject) {
-           alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-           $("#subjectId").val('');
-           if ($.fn.DataTable.isDataTable('#studentTable')) {
-               $('#studentTable').DataTable().clear().destroy();
-           }
-           $("#studentTableBody").empty();
-           return;
-        }
+        // if (selectedSubject !== sessionSubject) {
+        //    alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+        //    $("#subjectId").val('');
+        //    if ($.fn.DataTable.isDataTable('#studentTable')) {
+        //        $('#studentTable').DataTable().clear().destroy();
+        //    }
+        //    $("#studentTableBody").empty();
+        //    return;
+        // }
 
         try {
             const response = await fetch(
