@@ -132,6 +132,47 @@
         z-index: 100000;
     }
 </style>
+
+
+<div class="search-panel">
+    <div class="search-row">
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option value="">Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option value="">Select Program</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-group btn-group">
+            <button type="button" onclick="GetStudentDataForExamForm()">
+                Filter
+            </button>
+        </div>
+
+
+    </div>
+</div>
 <div style="display:flex; gap:10px; margin-bottom:10px;">
     <select id="sortOrder" class="form-control" style="width:200px;">
         <option value="">-- Sort By --</option>
@@ -313,6 +354,7 @@
             );
         });
     });
+
        function verifyForm(id) {
         let checkbox = $(`.rowCheckbox[value="${id}"]`);
         if (!checkbox.prop('checked')) {

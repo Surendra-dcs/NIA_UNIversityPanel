@@ -4,22 +4,58 @@
 
     var subjectName = $('#subjectId option:selected').text().trim();
     var examName = $('#examId').text().trim();
-    var iaMaxMarks = $('#IA_maxmarks').text().trim();
 
+    // ---- Same condition as main table (TheoryI / TheoryII / Practical IA) ----
+    var showTheoryI = $('#TheoryI').is(':visible');
+    var showTheoryII = $('#TheoryII').is(':visible');
+    var showIA = $('#IA_Marks').is(':visible');
+
+    var theoryIMax = $('#theoryIIaMarks').text().trim();
+    var theoryIIMax = $('#theoryIIIaMarks').text().trim();
+    var iaMaxMarks = $('#IAmaxmarks').text().trim();
+
+    // ---- Build table header dynamically based on visible columns ----
+    var headerHTML = '<th style="width:6%;">S.No</th>';
+    headerHTML += '<th style="width:26%;">Student Name</th>';
+    headerHTML += '<th style="width:18%;">Enrollment No.</th>';
+    headerHTML += '<th style="width:13%;">Roll Number</th>';
+
+    if (showTheoryI) {
+        headerHTML += '<th style="width:' + (showTheoryII || showIA ? '13%' : '37%') + ';">Theory I IA Marks<span class="sub-label">(MAX ' + theoryIMax + ')</span></th>';
+    }
+    if (showTheoryII) {
+        headerHTML += '<th style="width:' + (showTheoryI || showIA ? '13%' : '37%') + ';">Theory II IA Marks<span class="sub-label">(MAX ' + theoryIIMax + ')</span></th>';
+    }
+    if (showIA) {
+        headerHTML += '<th style="width:' + (showTheoryI || showTheoryII ? '13%' : '37%') + ';">Practical IA Marks<span class="sub-label">(MAX ' + iaMaxMarks + ')</span></th>';
+    }
+
+    // ---- Build rows dynamically, matching only the columns that are visible ----
     var rowsHTML = '';
     $(allRows).each(function (index) {
         var studentName = $(this).find('td:eq(1)').text().trim();
         var enrollmentNo = $(this).find('td:eq(2)').text().trim();
         var rollNumber = $(this).find('td:eq(3)').text().trim();
-        var iaMarks = $(this).find('td:eq(4)').text().trim();
 
-        rowsHTML += '<tr>'
-            + '<td style="text-align:center;">' + (index + 1) + '</td>'
+        var rowCells = '<td style="text-align:center;">' + (index + 1) + '</td>'
             + '<td style="text-align:left;font-weight:bold;">' + studentName + '</td>'
             + '<td style="text-align:center;">' + enrollmentNo + '</td>'
-            + '<td style="text-align:center;">' + rollNumber + '</td>'
-            + '<td style="text-align:center;">' + iaMarks + '</td>'
-            + '</tr>';
+            + '<td style="text-align:center;">' + rollNumber + '</td>';
+
+        if (showTheoryI) {
+            var theoryIVal = $(this).find('td:eq(4)').text().trim();
+            rowCells += '<td style="text-align:center;">' + theoryIVal + '</td>';
+        }
+        if (showTheoryII) {
+            var theoryIIVal = $(this).find('td:eq(5)').text().trim();
+            rowCells += '<td style="text-align:center;">' + theoryIIVal + '</td>';
+        }
+        if (showIA) {
+            var iaVal = $(this).find('td:eq(6)').text().trim();
+            rowCells += '<td style="text-align:center;">' + iaVal + '</td>';
+        }
+
+        rowsHTML += '<tr>' + rowCells + '</tr>';
     });
 
     $('#printIframe').remove();
@@ -88,16 +124,10 @@
     parts.push('</div>');
     parts.push('</div>');
 
-    // Table
+    // Table (header/rows built dynamically as per visible columns)
     parts.push('<table class="main-table">');
     parts.push('<thead>');
-    parts.push('<tr>');
-    parts.push('<th style="width:6%;">S.No</th>');
-    parts.push('<th style="width:32%;">Student Name</th>');
-    parts.push('<th style="width:22%;">Enrollment No.</th>');
-    parts.push('<th style="width:15%;">Roll Number</th>');
-    parts.push('<th style="width:25%;">Practical IA Marks<span class="sub-label">' + iaMaxMarks + '</span></th>');
-    parts.push('</tr>');
+    parts.push('<tr>' + headerHTML + '</tr>');
     parts.push('</thead>');
     parts.push('<tbody>' + rowsHTML + '</tbody>');
     parts.push('</table>');

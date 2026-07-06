@@ -55,10 +55,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
                 HttpContext.Session.SetString("semyearcode", response.semyearcode ?? "");
                 HttpContext.Session.SetString("subject_name", response.subject_name ?? "");
                 HttpContext.Session.SetString("Examname", response.Examname ?? "");
-                if (!response2.success)
-                {
-                    return RedirectToAction("C_file", "Ex");
-                }
+                //if (!response2.success)
+                //{
+                //    return RedirectToAction("C_file", "Ex");
+                //}
                 return RedirectToAction("Dashboard", "Internal");
             }
             ViewBag.Error = "Invalid Email or Password";
