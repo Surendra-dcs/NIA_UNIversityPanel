@@ -265,7 +265,11 @@
                         <th>Student Name</th>
                         <th>Enrollment No.</th>
                         <th>Roll Number</th>
-                        <th>Practical IA Marks<br /><span id="IA_maxmarks"></span></th>
+                        <th id="TheoryI">Theory I IA Marks <br />(MAX <span id="theoryIIaMarks">0</span>)<br /></th>
+                        <th id="TheoryII">Theory II IA Marks <br />(MAX <span id="theoryIIIaMarks">0</span>)<br /></th>
+                        <th id="IA_Marks">
+                            Practical IA Marks <br />(MAX <span id="IAmaxmarks">0</span>)<br />
+                        </th>
                     </tr>
                 </thead>
                 <tbody id="studentTableBody"></tbody>
@@ -342,12 +346,11 @@
             });
      });
 
-        async function loadStudents() {
+       async function loadStudents() {
         let sessionId = $("#sessionId").val();
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
-        let semester = $("#semester").val();
-
+        let semester = $("#semester").val();       
         try {
             const response = await fetch(
                 ApiBaseUrl +
@@ -355,10 +358,10 @@
             );
 
             const students = await response.json();
+
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().clear().destroy();
             }
-            $("#examId").text(students[0].examname)
             let tbody = $("#studentTableBody");
             tbody.empty();
             if (!students || students.length === 0) {
@@ -372,9 +375,14 @@
                 $("#btnSaveMarks").hide();
                 return;
             }
-
+             $("#examId").text(students[0].examname ?? '');
             let first = students[0];
-          $("#IA_maxmarks").text(`( Max ${first.iatotalMarks || 0} )`);
+            $("#theoryIIaMarks").text(first.totaltheoryfristMarks);
+            $("#theoryIIIaMarks").text(first.totaltheorysecondMarks);
+            $("#IAmaxmarks").text(first.iatotalMarks);
+            $("#TheoryI").toggle(first.totaltheoryfristMarks > 0);
+            $("#TheoryII").toggle(first.totaltheorysecondMarks > 0);
+            $("#IA_Marks").toggle(first.iatotalMarks > 0);
             let rows = [];
            students.forEach((student, index) => {
                 rows.push(`
@@ -383,7 +391,10 @@
                         <td>${student.studentName || ''}</td>
                         <td>${student.enrollmentNo || ''}</td>
                         <td>${student.rollNumber || ''}</td>
-                        <td>${student.iamarks || ''}</td>
+                        <td ${first.totaltheoryfristMarks == 0 ? 'style="display:none"' : ''}>${student.theoryfristIAMarks || ''}</td>
+                        <td ${first.totaltheorysecondMarks == 0 ? 'style="display:none"' : ''}>${student.theorysecondIAMArks || ''}</td>
+                        <td ${first.iatotalMarks == 0 ? 'style="display:none"' : ''}>${student.iamarks || ''}</td>
+
                     </tr>
                 `);
             });
