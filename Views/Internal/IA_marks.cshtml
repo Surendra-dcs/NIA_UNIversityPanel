@@ -137,6 +137,9 @@
         background: #f1f1f1;
     }
 
+    .table-dark tr th{
+        text-align:center
+    }
     .align-middle td,
     .align-middle th {
         vertical-align: middle;
@@ -253,21 +256,22 @@
             <table class="table table-bordered table-hover align-middle" id="studentTable">
                 <thead class="table-dark">
                     <tr>
+                        <th>Sr.No.</th>
+                        <th style="text-align:left">Student Name</th>
                         <th>Roll Number</th>
-                        <th>Student Name</th>
-                        <th>Father Name</th>
-                        <th>Mobile Number</th>
-                        <th>Total Marks</th>
-                        <th>
-                            IA Marks<br />
+                        <th>Enrollment No.</th>                       
+                        <th id="TheoryI">Theory I IA Marks <br />(MAX <span id="theoryIIaMarks">0</span>)<br /></th>
+                        <th id="TheoryII">Theory II IA Marks <br />(MAX <span id="theoryIIIaMarks">0</span>)<br /></th>
+                        <th id="IA_Marks">Practical IA Marks <br />(MAX <span id="IAmaxmarks">0</span>)<br />
                             <input type="number" id="allMarks" class="mt-1" placeholder="All" onkeyup="applyMarksToAll()" style="height:28px">
                         </th>
+                       
                     </tr>
                 </thead>
                 <tbody id="studentTableBody"></tbody>
             </table>
             <div class="text-end mt-3">
-                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()">
+                <button class="btn btn-success" id="btnSaveMarks" onclick="saveAllMarks()" style="display:none">
                     Save All Marks
                 </button>
             </div>
@@ -316,11 +320,11 @@
     document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
         var selectedCourse = $("#courseId option:selected").text().trim();
-        // var sessionCourse = '@Context.Session.GetString("course_name")';
-        // if (selectedCourse !== sessionCourse) {
-        //     alert(`You are registered for "${sessionCourse}". Please select the same course.`);
-        //     return false;
-        // }
+        var sessionCourse = '@Context.Session.GetString("course_name")';
+        if (selectedCourse !== sessionCourse) {
+           alert(`You are registered for "${sessionCourse}". Please select the same course.`);
+           return false;
+        }
         $("#semester").val('');
         $("#subjectId").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
@@ -348,113 +352,164 @@
             });
      });
 
+
         async function loadStudents() {
-        let sessionId = document.getElementById('sessionId').value;
-        let courseId = document.getElementById('courseId').value;
-        let subjectId = document.getElementById('subjectId').value;
-        let semester = document.getElementById('semester').value;
-        // var selectedSubject = $("#subjectId option:selected").text().trim();
-        // var sessionSubject = '@Context.Session.GetString("subject_name")';
-        // if (!sessionSubject) {
-        //     alert("Your session has expired. Please logout and login again.");
-        //     window.location.href = '/Ex_Account/Logout';
-        //     return;
-        // }
-
-        // if (selectedSubject != sessionSubject) {
-        //     alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
-        //     $("#subjectId").val('');
-        //      if ($.fn.DataTable.isDataTable('#studentTable')) {
-        //      $('#studentTable').DataTable().clear().draw();
-        //      }
-        //      $("#studentTableBody").empty();
-        //     return;
-        // }
-
+        let sessionId = $("#sessionId").val();
+        let courseId = $("#courseId").val();
+        let subjectId = $("#subjectId").val();
+        let semester = $("#semester").val();
+         //var selectedSubject = $("#subjectId option:selected").text().trim();
+        //var sessionSubject = '@Context.Session.GetString("subject_name")';
+        //if (!sessionSubject) {
+        //   alert("Your session has expired. Please logout and login again.");
+        //   window.location.href = '/Ex_Account/Logout';
+        //   return;
+        //}
+        //
+        //if (selectedSubject != sessionSubject) {
+        //   alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+        //   $("#subjectId").val('');
+        //    if ($.fn.DataTable.isDataTable('#studentTable')) {
+        //    $('#studentTable').DataTable().clear().draw();
+        //    }
+        //    $("#studentTableBody").empty();
+        //   return;
+        //}
         try {
+
             const response = await fetch(
                 ApiBaseUrl + `PracticalMarks/GetIAStudents?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
             );
+
             const students = await response.json();
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().destroy();
             }
-            $("#examId").text(students[0].examname)
-            let tbody = document.getElementById('studentTableBody');
-            tbody.innerHTML = '';
-             const alreadySubmitted = students.some(
-             x => x.iamarks != null &&
-             x.iamarks !== "" &&
-             parseFloat(x.iamarks) > 0
-             );
-            if (alreadySubmitted) {
-                tbody.innerHTML = `
-                <tr>
-                    <td colspan="6"
-                        style="color:red;font-weight:bold;text-align:center;font-size:20px;">
-                        This subject marks have already been submitted.
-                    </td>
-                </tr>`;
-                document.getElementById("btnSaveMarks").style.display = "none";
+            $("#studentTableBody").empty();
+            if (students.length == 0) {
                 return;
             }
-            document.getElementById("btnSaveMarks").style.display = "inline-block";
-            students.forEach(student => {
-                tbody.innerHTML += `
+            $("#examId").text(students[0].examname);
+             const alreadySubmitted = students.some(x =>
+                  x.roll !== null &&
+                  x.roll !== ""
+                  );
+
+             if (alreadySubmitted) {
+                 $("#studentTableBody").html(`
+                     <tr>
+                         <td colspan="7"
+                             style="color:red;font-weight:bold;text-align:center;font-size:20px;">
+                             This subject marks have already been submitted.
+                         </td>
+                     </tr>
+                 `);
+             
+                 $("#btnSaveMarks").hide();
+                 return;
+             }
+            let first = students[0];
+            $("#theoryIIaMarks").text(first.theoryIIaMarks);
+            $("#theoryIIIaMarks").text(first.theoryIIIaMarks);
+            $("#IAmaxmarks").text(first.totalMarks);
+
+            $("#TheoryI").toggle(first.theoryIIaMarks > 0);
+            $("#TheoryII").toggle(first.theoryIIIaMarks > 0);
+            $("#IA_Marks").toggle(first.totalMarks > 0);
+            students.forEach((student, index) => {
+                let row = `
                 <tr>
+                    <td>${index + 1}</td>
+                    <td style="text-align:left">
+                        ${student.studentName}
+                    </td>
                     <td>${student.rollNumber}</td>
-                    <td>${student.studentName}</td>
-                    <td>${student.fatherName}</td>
-                    <td>${student.mobileNumber}</td>
-                    <td>${student.totalMarks}</td>
-                    <td>
+                    <td>${student.enrollmentNo}</td>
+                    <td ${first.theoryIIaMarks == 0 ? 'style="display:none"' : ''}>
                         <input type="number"
-                               class="form-control practical"
-                               value=""
+                               class="form-control thIpractical"
                                min="0"
-                               max="${student.totalMarks}"
-                               oninput="calculateRow(this)">
+                               max="${student.theoryIIaMarks}"
+                               oninput="calculateRowThI(this)">
 
                         <input type="hidden"
                                class="studentId"
                                value="${student.studentId}">
+
                     </td>
+
+                    <td ${first.theoryIIIaMarks == 0 ? 'style="display:none"' : ''}>
+
+                        <input type="number"
+                               class="form-control ThIIpractical"
+                               min="0"
+                               max="${student.theoryIIIaMarks}"
+                               oninput="calculateRowThII(this)">
+
+                    </td>
+
+                    <td ${first.totalMarks == 0 ? 'style="display:none"' : ''}>
+
+                        <input type="number"
+                               class="form-control practical"
+                               min="0"
+                               max="${student.totalMarks}"
+                               oninput="calculateRow(this)">
+
+                    </td>
+
                 </tr>`;
+
+                $("#studentTableBody").append(row);
+
             });
 
-            $('#studentTable').DataTable({
+            let table = $('#studentTable').DataTable({
+
                 pageLength: 10,
                 responsive: true,
                 searching: true,
                 ordering: true,
                 lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
-            });
-            $('#studentTable').on('draw.dt', function () {
-                if (globalMarks !== '') {
-                    let table = $('#studentTable').DataTable();
-                    table.$('.practical').each(function () {
-                        let row = $(this).closest('tr');
-                        let totalMarks = parseFloat(row.find('td:eq(4)').text()) || 0;
-                        if (parseFloat(globalMarks) <= totalMarks) {
-                            $(this).val(globalMarks);
-                        }
-                    });
-                }
+
             });
 
+            $('#studentTable').off('draw.dt').on('draw.dt', function () {
+
+                if (globalMarks === "" || globalMarks == null)
+                    return;
+
+                table.$(".practical").each(function () {
+                    let maxMarks = parseFloat($(this).attr("max"));
+                    if (parseFloat(globalMarks) <= maxMarks) {
+                        $(this).val(globalMarks);
+                    }
+                });
+            });
+            $("#btnSaveMarks").show();
         }
-        catch (error) {
-
-            console.error(error);
+        catch (e) {
+            console.log(e);
             alert("Error loading students.");
         }
     }
 
-
-
+        function calculateRowThI(input) {
+            let totalMarks = parseFloat($("#theoryIIaMarks").text()) || 0;
+            if (parseFloat(input.value) > totalMarks) {
+                input.value = totalMarks;
+                alert(`Maximum allowed marks: ${totalMarks}`);
+            }
+        }
+        function calculateRowThII(input) {
+            let totalMarks = parseFloat($("#theoryIIIaMarks").text()) || 0;
+            if (parseFloat(input.value) > totalMarks) {
+                input.value = totalMarks;
+                alert(`Maximum allowed marks: ${totalMarks}`);
+            }
+        }
         function calculateRow(input) {
-            let row = $(input).closest('tr');
-            let totalMarks = parseFloat(row.find('td:eq(4)').text()) || 0;
+            let totalMarks = parseFloat($("#IAmaxmarks").text()) || 0;
             if (parseFloat(input.value) > totalMarks) {
                 input.value = totalMarks;
                 alert(`Maximum allowed marks: ${totalMarks}`);
@@ -465,9 +520,9 @@
         let table = $('#studentTable').DataTable();
         let allInputs = table.$('.practical');
         let isInvalid = false;
-        allInputs.each(function () {
-            let row = $(this).closest('tr');
-            let totalMarks = parseFloat(row.find('td:eq(4)').text());
+         let totalMarks = parseFloat($("#IAmaxmarks").text());
+            alert(totalMarks);
+        allInputs.each(function () {           
             if (marks > totalMarks) {
                 isInvalid = true;
                 return false;
@@ -492,10 +547,14 @@
         let examinerEmailId='@Context.Session.GetString("Email")';
            table.rows().every(function () {
                let row = this.node();
+               let practicalIMarks = parseFloat($(row).find('.thIpractical').val()) || 0;
+               let practicaIIlMarks = parseFloat($(row).find('.ThIIpractical').val()) || 0;
                let practicalMarks = parseFloat($(row).find('.practical').val()) || 0;
-               let totalMarks = parseFloat($(row).find('td:eq(4)').text()) || 0;
-               let rollNumber = $(row).find('td:eq(0)').text().trim();
-                if (practicalMarks > 0) {
+               let totalIMarks = parseFloat($("#theoryIIaMarks").text()) || 0;
+               let totalIIMarks = parseFloat($("#theoryIIIaMarks").text()) || 0;
+               let totalMarks = parseFloat($("#IAmaxmarks").text()) || 0;
+               let rollNumber = $(row).find('td:eq(2)').text().trim();
+                if (practicalMarks > 0||practicalIMarks>0||practicaIIlMarks>0) {
                   hasValidMarks = true;
                }
                if (practicalMarks > totalMarks) {
@@ -511,6 +570,10 @@
                    subjectId: $('#subjectId').val(),
                    semester: $('#semester').val(),
                    ExaminerEmail: examinerEmailId,
+                   thyeoryIMarks:practicalIMarks,
+                   thyeoryIIMarks:practicaIIlMarks,
+                   totalMarksI:totalIMarks,
+                   totalMarksII:totalIIMarks,
                    iaMarks: practicalMarks,
                    totalMarks: totalMarks
                });
