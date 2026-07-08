@@ -594,7 +594,7 @@
         var courseid = $("#courseId").val();
         //$("#semester").val('');
         //$("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/getsubject/${semester}/${courseid}`)
+        fetch(ApiBaseUrl + `Subject/getsubjectbycourse/${semester}/${courseid}`)
             .then(res => res.json())
             .then(data => {
                 let courseDropdown = document.getElementById("subjectiddropdown");
@@ -649,11 +649,15 @@
             success: function (response) {
 
                 if (!response || response.length == 0) {
-                    alert("No data found");
+                 
+                    
+                    $(".candidate-row").html("No Record Found");
                     return;
+                }else{
+                  bindAttendanceSheet(response);
                 }
 
-                bindAttendanceSheet(response);
+                
 
             },
 
