@@ -25,6 +25,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
             }
             HttpContext.Session.SetString("Mobile", mobile);
             HttpContext.Session.SetInt32("Role", response.role);
+            HttpContext.Session.SetInt32("CourseId", response.CourseId);
             switch (response.role)
             {
                 case 1:
@@ -41,6 +42,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
                     return RedirectToAction(
                         "Dashboard",
                         "PGDeputyManager");
+                case 4:
+                    return RedirectToAction(
+                        "Dashboard",
+                        "University");
 
                 default:
                     ViewBag.Error = "Invalid Role!";

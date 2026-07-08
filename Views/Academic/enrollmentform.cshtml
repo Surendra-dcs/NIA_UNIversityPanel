@@ -347,8 +347,7 @@
     document.getElementById("programId").addEventListener("change", function () {
         let programId = this.value;
         $("#courseId").val('');
-        $("#semester").val('');
-        $("#subjectId").val('');
+        $("#semester").val('');       
         fetch(ApiBaseUrl + `Subject/courses/${programId}`)
             .then(res => res.json())
             .then(data => {
@@ -361,6 +360,12 @@
      });
     document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
+         let sessionCourseId = '@Context.Session.GetInt32("CourseId")';
+          if (sessionCourseId && sessionCourseId != "0" && sessionCourseId != courseId) {
+            alert("Please select assigned course.");
+            this.value = sessionCourseId;
+            return false;
+        }
         $("#semester").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())

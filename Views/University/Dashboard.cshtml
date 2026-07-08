@@ -127,154 +127,166 @@
 
 </style>
 
-<div class="section-card">
-
-    <div class="section-header">
-        <h2 class="section-title">
-            MD/MS (Ay.) Exam Form Filling Details
-            <span class="badge badge-primary">May 2026</span>
-        </h2>
+@{
+    var courseId = Context.Session.GetInt32("CourseId") ?? 0;
+    var rollId = Context.Session.GetInt32("Role") ?? 0;
+}
+@if (courseId == 5||courseId == 32 && rollId==4)
+{
+    <div class="section-card">
+        <div class="section-header">
+            <h2 class="section-title">
+                Welcome
+            </h2>
+        </div>
     </div>
+}
+else
+{
+    <div class="section-card">
 
-    <div class="stats-grid">
-
-        <div class="stat-card">
-            <div class="stat-icon-wrap">👨‍🎓</div>
-
-            <div>
-                <div class="stat-label">Total Enrolled Students</div>
-                <div class="stat-number" id="totalActiveStudents">—</div>
-                <div class="stat-badge">Verified Enrollments</div>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">
+                MD/MS (Ay.) Exam Form Filling Details
+                <span class="badge badge-primary">May 2026</span>
+            </h2>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-icon-wrap">📝</div>
+        <div class="stats-grid">
 
-            <div>
-                <div class="stat-label">Total Exam Forms</div>
-                <div class="stat-number" id="totalStudents">—</div>
-                <div class="stat-badge">Enrolled in Exams</div>
+            <div class="stat-card">
+                <div class="stat-icon-wrap">👨‍🎓</div>
+
+                <div>
+                    <div class="stat-label">Total Enrolled Students</div>
+                    <div class="stat-number" id="totalActiveStudents">—</div>
+                    <div class="stat-badge">Verified Enrollments</div>
+                </div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrap">📝</div>
+
+                <div>
+                    <div class="stat-label">Total Exam Forms</div>
+                    <div class="stat-number" id="totalStudents">—</div>
+                    <div class="stat-badge">Enrolled in Exams</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrap">📚</div>
+
+                <div>
+                    <div class="stat-label">Total Courses</div>
+                    <div class="stat-number" id="totalCourses">—</div>
+                    <div class="stat-badge">Active Courses</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon-wrap">📖</div>
+
+                <div>
+                    <div class="stat-label">Total Subjects</div>
+                    <div class="stat-number" id="totalSubjects">—</div>
+                    <div class="stat-badge">Across All Courses</div>
+                </div>
+            </div>
+
         </div>
 
-        <div class="stat-card">
-            <div class="stat-icon-wrap">📚</div>
+    </div>
+    <!-- ================= BAMS ================= -->
+    <div class="section-card">
 
-            <div>
-                <div class="stat-label">Total Courses</div>
-                <div class="stat-number" id="totalCourses">—</div>
-                <div class="stat-badge">Active Courses</div>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">
+                BAMS Exam Form Filling Details
+                <span class="badge badge-success">July–August 2026</span>
+            </h2>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-icon-wrap">📖</div>
+        <div class="table-wrap">
 
-            <div>
-                <div class="stat-label">Total Subjects</div>
-                <div class="stat-number" id="totalSubjects">—</div>
-                <div class="stat-badge">Across All Courses</div>
-            </div>
+            <table class="data-table" id="dashboardTable">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Course</th>
+                        <th>Semester / Year</th>
+                        <th>Total Students</th>
+                        <th>Forms Filled</th>
+                        <th>Pending Forms</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="dashboardTbody">
+
+                    <tr>
+
+                        <td colspan="6">
+                            Loading...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+    <!-- ================= BAMS ================= -->
+    <div class="section-card">
+
+        <div class="section-header">
+            <h2 class="section-title">
+                New Exam Form Filling Details
+                <span class="badge badge-success">July–August 2026</span>
+            </h2>
+        </div>
+
+        <div class="table-wrap">
+
+            <table class="data-table" id="dashboardTable">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Course</th>
+                        <th>Semester / Year</th>
+                        <th>Total Students</th>
+                        <th>Total Enrolled</th>
+                        <th>Total Exam Form</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="dashboardNewDT">
+
+                    <tr>
+
+                        <td colspan="6">
+                            Loading...
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
         </div>
 
     </div>
 
-</div>
-
-
-<!-- ================= BAMS ================= -->
-
-<div class="section-card">
-
-    <div class="section-header">
-        <h2 class="section-title">
-            BAMS Exam Form Filling Details
-            <span class="badge badge-success">July–August 2026</span>
-        </h2>
-    </div>
-
-    <div class="table-wrap">
-
-        <table class="data-table" id="dashboardTable">
-
-            <thead>
-
-                <tr>
-                    <th>#</th>
-                    <th>Course</th>
-                    <th>Semester / Year</th>
-                    <th>Total Students</th>
-                    <th>Forms Filled</th>
-                    <th>Pending Forms</th>
-                </tr>
-
-            </thead>
-
-            <tbody id="dashboardTbody">
-
-                <tr>
-
-                    <td colspan="6">
-                        Loading...
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
-<!-- ================= BAMS ================= -->
-
-<div class="section-card">
-
-    <div class="section-header">
-        <h2 class="section-title">
-            New Exam Form Filling Details
-            <span class="badge badge-success">July–August 2026</span>
-        </h2>
-    </div>
-
-    <div class="table-wrap">
-
-        <table class="data-table" id="dashboardTable">
-
-            <thead>
-
-                <tr>
-                    <th>#</th>
-                    <th>Course</th>
-                    <th>Semester / Year</th>
-                    <th>Total Students</th>
-                    <th>Total Enrolled</th>
-                    <th>Total Exam Form</th>
-                </tr>
-
-            </thead>
-
-            <tbody id="dashboardNewDT">
-
-                <tr>
-
-                    <td colspan="6">
-                        Loading...
-                    </td>
-
-                </tr>
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</div>
+}
 
 <script>
     $(document).ready(function () {

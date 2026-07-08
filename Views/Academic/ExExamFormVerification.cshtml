@@ -361,7 +361,14 @@
      });
     document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;       
+          let sessionCourseId = '@Context.Session.GetInt32("CourseId")';
+          if (sessionCourseId && sessionCourseId != "0" && sessionCourseId != courseId) {
+            alert("Please select assigned course.");
+            this.value = sessionCourseId;
+            return false;
+        }
         $("#semester").val('');
+        $("#BatchId").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
             .then(data => {
@@ -395,6 +402,27 @@
         let courseId = $("#courseId").val();
         let semester = $("#semester").val();
         let batchId=$("#BatchId").val();
+            if (!sessionId) {
+              alert("Please select Session.");
+             return false;
+            }
+
+            if (!courseId) {
+                alert("Please select Course.");
+                return false;
+            }
+            
+            if (!semester) {
+                alert("Please select Semester.");
+                return false;
+            }
+            
+            if (!batchId) {
+                alert("Please select Batch.");
+                return false;
+            }
+
+    // Remaining code...
         table = $('#studentformtbl').DataTable({
 
             ajax: {

@@ -78,24 +78,62 @@
     }
 </style>
 <div class="verification-container">
+    @{
+        var courseId = Context.Session.GetInt32("CourseId") ?? 0;
+        var rollId = Context.Session.GetInt32("Role") ?? 0;
+    }
+    @if (courseId==32&&rollId==4)
+    {
+        <a href="/Academic/ExamformVerification" class="verification-card">
+            <div class="card-icon new">
+                <i class="fa fa-user-plus"></i>
+            </div>
 
-    <a href="/Academic/ExamformVerification" class="verification-card">
-        <div class="card-icon new">
-            <i class="fa fa-user-plus"></i>
-        </div>
-
-        <h4>New Student</h4>
-        <p>Exam Form Verification</p>
-    </a>
+            <h4>New Student</h4>
+            <p>Exam Form Verification</p>
+        </a>
 
 
-    <a href="/Academic/ExExamformVerification" class="verification-card">
-        <div class="card-icon existing">
-            <i class="fa fa-users"></i>
-        </div>
+        <a href="/Academic/ExExamformVerification" class="verification-card">
+            <div class="card-icon existing">
+                <i class="fa fa-users"></i>
+            </div>
 
-        <h4>Existing Student</h4>
-        <p>Exam Form Verification</p>
-    </a>
+            <h4>Existing Student</h4>
+            <p>Exam Form Verification</p>
+        </a>
+    }
+    else if (courseId==5&&rollId==4)
+    {
 
+        <a href="/Academic/ExExamformVerification" class="verification-card">
+            <div class="card-icon existing">
+                <i class="fa fa-users"></i>
+            </div>
+
+            <h4>Existing Student</h4>
+            <p>Exam Form Verification</p>
+        </a>
+    }
+    else    
+    {
+        <a href="/Academic/ExamformVerification" class="verification-card">
+            <div class="card-icon new">
+                <i class="fa fa-user-plus"></i>
+            </div>
+
+            <h4>New Student</h4>
+            <p>Exam Form Verification</p>
+        </a>
+
+
+        <a href="/Academic/ExExamformVerification" class="verification-card">
+            <div class="card-icon existing">
+                <i class="fa fa-users"></i>
+            </div>
+
+            <h4>Existing Student</h4>
+            <p>Exam Form Verification</p>
+        </a>
+    }
 </div>
