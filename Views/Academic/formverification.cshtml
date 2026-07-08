@@ -4,5 +4,98 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 
-<h1>formverification</h1>
+<style>
+    .verification-container {
+        display: flex;
+        gap: 30px;
+        padding: 30px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 
+
+    .verification-card {
+        width: 320px;
+        height: 220px;
+        background: #fff;
+        border-radius: 15px;
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,.12);
+        transition: all .3s ease;
+    }
+
+
+        .verification-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,.20);
+        }
+
+
+    /* Icon */
+
+    .card-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 35px;
+        margin-bottom: 20px;
+    }
+
+
+        .card-icon.new {
+            background: #0d6efd;
+        }
+        .card-icon.existing {
+            background: #198754;
+        }
+
+    .verification-card h4 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .verification-card p {
+        margin-top: 8px;
+        color: blue;
+        font-size: 15px;
+    }
+    @@media(max-width:768px) {
+        .verification-card
+    {
+        width: 90%;
+    }
+
+    }
+</style>
+<div class="verification-container">
+
+    <a href="/Academic/ExamformVerification" class="verification-card">
+        <div class="card-icon new">
+            <i class="fa fa-user-plus"></i>
+        </div>
+
+        <h4>New Student</h4>
+        <p>Exam Form Verification</p>
+    </a>
+
+
+    <a href="/Academic/ExExamformVerification" class="verification-card">
+        <div class="card-icon existing">
+            <i class="fa fa-users"></i>
+        </div>
+
+        <h4>Existing Student</h4>
+        <p>Exam Form Verification</p>
+    </a>
+
+</div>

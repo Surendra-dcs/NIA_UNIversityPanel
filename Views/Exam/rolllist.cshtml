@@ -3,14 +3,155 @@
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
 <link href="~/css/programandcourse.css" rel="stylesheet" />
-<div style="display:flex; gap:10px; margin-bottom:10px;">
+<style>
+    .search-panel {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e5e5e5;
+    }
 
-    <select id="sortOrder" class="form-control" style="width:200px;">
-        <option value="">-- Sort By --</option>
-        <option value="asc">Ascending</option>
-        <option value="desc">Descending</option>
-    </select>
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
 
+    .panel-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 180px;
+        flex: 1;
+    }
+
+        .search-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+        }
+
+        .search-group select {
+            height: 42px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            padding: 0 10px;
+            font-size: 14px;
+            transition: .2s;
+        }
+
+            .search-group select:focus {
+                border-color: #0d6efd;
+                outline: none;
+                box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+            }
+
+    .search-btn button {
+        height: 42px;
+        padding: 0 30px;
+        background: #0d6efd;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: .3s;
+    }
+
+        .search-btn button:hover {
+            background: #0b5ed7;
+        }
+
+    #sortOrder {
+        width: 200px;
+        height: 42px;
+        border-radius: 6px;
+    }
+
+    @@media(max-width:768px) {
+        .panel-header
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .search-group {
+        min-width: 100%;
+    }
+
+    #sortOrder {
+        width: 100%;
+    }
+
+    .search-btn button {
+        width: 100%;
+    }
+
+    }
+</style>
+
+<div class="search-panel">
+
+    <div class="panel-header">
+        <h4 class="panel-title">Roll List</h4>
+        <select id="sortOrder" class="form-control">
+            <option value="">-- Sort By --</option>
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+    </div>
+
+    <div class="search-row">
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option>Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option>Select Program</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option>Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option>Select Semester</option>
+            </select>
+        </div>
+        <div class="search-btn">
+            <button onclick="loadStudentFormList()">
+                <i class="fa fa-search"></i> Filter
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="table-card">
@@ -51,11 +192,58 @@
 <script>
     window._allApiRows = [];
     let table;
-
-    $(document).ready(function () {
-        loadRollList();
+    $(document).ready(function () {     
+    loadPrograms();
+    loadSession();
     });
-         function loadRollList() {
+    function loadSession() {
+        $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+            let session = '<option value="">Select Session</option>';
+            res.forEach(x => {
+                session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+            });
+            $('#sessionId').html(session);
+        });
+    }
+    function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programId').html(opt);
+        });
+    }
+     document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+    document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+
+      function loadRollList() {
         $.ajax({
             url: ApiBaseUrl + 'Exam/rolllist',
             method: 'GET',
@@ -71,14 +259,10 @@
                         item.courseName + "|" +
                         item.semesterName + "|" +
                         item.examName;
-
                     if (!seen[key]) {
-
                         seen[key] = true;
-
                         uniqueRows.push(item);
                     }
-
                 });
 
                 if ($.fn.DataTable.isDataTable('#examTable')) {
@@ -93,57 +277,39 @@
 
                         {
                             data: null,
-
                             render: function (data, type, row, meta) {
-
                                 return meta.row +
                                     meta.settings._iDisplayStart + 1;
                             }
                         },
-
                         {
                             data: 'rollNumber',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: 'userName',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: 'email',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: 'courseName',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: 'semesterName',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: 'examName',
-
                             defaultContent: '-'
                         },
-
                         {
                             data: null,
-
                             orderable: false,
-
                             render: function (data) {
-
                                 return `
                                      <button class="btn btn-edit btn-sm"
                                             onclick='printRollAdmitCardByRoll("${data.rollNumber || ''}")'>

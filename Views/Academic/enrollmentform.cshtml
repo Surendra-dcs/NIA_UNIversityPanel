@@ -130,22 +130,134 @@
         font-size: 16px;
         z-index: 100000;
     }
-</style>
-<div style="display:flex; gap:10px; margin-bottom:10px;">
-    <select id="sortOrder" class="form-control" style="width:200px;">
-        <option value="">-- Sort By --</option>
-        <option value="asc"> Ascending </option>
-        <option value="desc"> Descending </option>
-    </select>
-   
-    <button class="btn btn-success" id="bulkVerifyBtn" style="background:#89e7b5">
-        Bulk Verify
-    </button>
+    .search-panel {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    }
 
-    <button class="btn btn-primary" id="exportExcelBtn" style="background: #1a3a5c;color: white;">
-        Export Excel
-    </button>
+    .panel-title {
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 19px;
+    }
+
+    .search-row {
+        display: flex;
+        align-items: end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .search-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .search-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .search-group select {
+            width: 220px;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+
+    .search-btn {
+        margin-top: 22px;
+    }
+
+        .search-btn button {
+            height: 38px;
+            padding: 0 25px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+    .bottom-row {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        flex-wrap: wrap;
+    }
+
+    #bulkVerifyBtn {
+        height: 40px;
+        padding: 0 25px;
+        background: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="search-panel">
+    <h5 class="panel-title">Student Enrollment Form Verification</h5>
+    <div class="search-row">
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option>Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option>Select Program</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option>Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option>Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-btn">
+            <button onclick="loadStudentEnrollmentList()">
+                Filter
+            </button>
+        </div>
+    </div>
+
+    <div class="bottom-row">
+        <div class="search-group">
+            <label>Sort By</label>
+            <select id="sortOrder">
+                <option>-- Sort By --</option>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
+
+        <button id="bulkVerifyBtn">
+            Bulk Verify
+        </button>
+        <button class="btn btn-primary" id="exportExcelBtn" style="background: #1a3a5c;color: white;">
+            Export Excel
+        </button>
+    </div>
 </div>
+
 <div class="table-card">
     <div class="table-header">
         <h3 class="table-title">Student Enrollment Form</h3>
@@ -199,12 +311,84 @@
 <script src="~/js/enrollmentAdmitCard.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
+
     let table;
     let allData = [];
-       $(document).ready(function () {
+    $(document).ready(function () {
+    loadPrograms();
+    loadSession();
+    $('#selectAll').on('change', function () {
+            $('.rowCheckbox:not(:disabled)').prop(
+                'checked',
+                $(this).prop('checked')
+            );
+
+        });
+    });
+    function loadSession() {
+        $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+            let session = '<option value="">Select Session</option>';
+            res.forEach(x => {
+                session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+            });
+            $('#sessionId').html(session);
+        });
+    }
+    function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programId').html(opt);
+        });
+    }
+
+    document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+    document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+
+    function loadStudentEnrollmentList() {
+      
+        if ($.fn.DataTable.isDataTable('#studentEnrollmenttbl')) {
+            $('#studentEnrollmenttbl').DataTable().destroy();
+            $('#studentEnrollmenttbl tbody').empty();
+        }
+        let sessionId = $("#sessionId").val();
+        let courseId = $("#courseId").val();
+        let semester = $("#semester").val();
         table = $('#studentEnrollmenttbl').DataTable({
+            processing: true,
+            destroy: true,
+            responsive: true,
             ajax: {
-                url: ApiBaseUrl + 'StudentEnrollment/GetStudentEnrollmentList',
+                url: ApiBaseUrl + `StudentEnrollment/GetStudentEnrollmentList?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}`,
+                type: 'POST',
                 dataSrc: function (json) {
                     allData = json;
                     return json;
@@ -213,75 +397,81 @@
             columns: [
                 {
                     data: null,
+                    orderable: false,
                     render: function (data) {
-                        if (data.isVerify)
+                        if (data.isVerify) {
                             return '';
+                        }
                         return `
-                            <div style="text-align:center;">
+                            <div class="text-center">
                                 <input type="checkbox"
                                        class="rowCheckbox"
                                        value="${data.id}">
                             </div>
                         `;
-                    },
-                    orderable: false
+                    }
                 },
+
                 {
                     data: null,
                     render: function (data, type, row, meta) {
                         return meta.row + meta.settings._iDisplayStart + 1;
                     }
                 },
-                { data: 'enrollmentNumber' },
-                { data: 'collegeName' },
-                { data: 'programName' },
-                { data: 'courseName' },
-                { data: 'studentName' },
-                { data: 'email' },
-                { data: 'mobile' },
+
+                { data: 'enrollmentNumber', defaultContent: '-' },
+                { data: 'collegeName', defaultContent: '-' },
+                { data: 'programName', defaultContent: '-' },
+                { data: 'courseName', defaultContent: '-' },
+                { data: 'studentName', defaultContent: '-' },
+                { data: 'email', defaultContent: '-' },
+                { data: 'mobile', defaultContent: '-' },
+
                 {
                     data: null,
+                    orderable: false,
                     render: function (data) {
+
                         return `
-                            <button class="btn btn-info btn-sm" style="background: #05960a; color: white;"  onclick='viewStudent(${JSON.stringify(data)})'>
+                            <button class="btn btn-sm"
+                                    style="background:#05960a;color:#fff;"
+                                    onclick='viewStudent(${JSON.stringify(data)})'>
                                 View
                             </button>
                         `;
                     }
-                },               
+                },
+
                 {
                     data: null,
+                    orderable: false,
                     render: function (data) {
+
                         let isVerified = data.isVerify;
-                        let buttonText = isVerified ? 'Verified' : 'Verify';
-                        let verifyDisabled = isVerified ? 'disabled' : '';
-                        let verifyStyle = isVerified
-                            ? 'background: gray; color: white; opacity: 0.6; cursor: not-allowed;'
-                            : 'background: #2d7dd2; color: white;';
+
                         return `
-                            <button class="btn btn-success btn-sm ms-1"
-                                style="background: #b99e11; color: white;"
-                                onclick='printEnrollment(${JSON.stringify(data)})'>
+                            <button class="btn btn-sm ms-1"
+                                    style="background:#b99e11;color:#fff;"
+                                    onclick='printEnrollment(${JSON.stringify(data)})'>
                                 Print
                             </button>
 
-                            <button class="btn btn-success btn-sm ms-1"
-                                style="${verifyStyle}"
-                                onclick='verifyForm(${data.id})'
-                                ${verifyDisabled}>
-                                ${buttonText}
+                            <button class="btn btn-sm ms-1"
+                                    style="${isVerified
+                                        ? 'background:gray;color:white;opacity:.6;cursor:not-allowed;'
+                                        : 'background:#2d7dd2;color:white;'}"
+                                    onclick="verifyForm(${data.id})"
+                                    ${isVerified ? 'disabled' : ''}>
+                                ${isVerified ? 'Verified' : 'Verify'}
                             </button>
                         `;
                     }
                 }
+
             ]
-        });
-        $('#selectAll').on('change', function () {
-            $('.rowCheckbox').prop('checked', $(this).prop('checked'));
 
         });
-
-    });
+    }
 
     function verifyForm(id) {
         if (!confirm("Are you sure you want to verify this student?"))
@@ -429,17 +619,15 @@
 
                 <div class="card" style="display:flex; gap:20px; align-items:center; flex-wrap:wrap; width:100%;">
                    ${
-                       data.nationality === 'Foreign'
-                           ? `
-                               <img src="${data.passportImagePath}" class="preview-img"  onclick="openImage(this.src)" alt="Passport Image">
-                               <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">
-                             `
-                           : `
-                              <img src="${data.aadhaarFrontImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Front">
-                              <img src="${data.aadhaarBackImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Aadhaar Back Image">
-                              <img src="${data.marksheetImagePath}" class="preview-img"  onclick="openImage(this.src)"  alt="Marksheet Image">                  
-                             `
-                   }
+                   data.nationality === 'Foreign'
+                   ?
+                       renderDocument(data.passportImagePath, "Passport") +
+                       renderDocument(data.marksheetImagePath, "Marksheet")
+                   :
+                       renderDocument(data.aadhaarFrontImagePath, "Aadhaar Front") +
+                       renderDocument(data.aadhaarBackImagePath, "Aadhaar Back") +
+                       renderDocument(data.marksheetImagePath, "Marksheet")
+                  }
                </div>
 
             </div>
@@ -455,6 +643,36 @@
             closeStudentModal();
         }
     });
+        function renderDocument(path, alt) {
+        if (!path) {
+            return `
+                <div class="doc-item">
+                    <span>No Document</span>
+                </div>`;
+        }
+
+        let ext = path.split('.').pop().toLowerCase();
+        if (ext === "pdf") {
+            return `
+                <div class="doc-item">
+                    <embed src="${path}"
+                           type="application/pdf"
+                           class="preview-pdf"
+                           onclick="window.open('${path}','_blank')">
+
+                    <div class="doc-title">${alt}</div>
+                </div>`;
+        }
+        return `
+            <div class="doc-item">
+                <img src="${path}"
+                     class="preview-img"
+                     onclick="openImage(this.src)"
+                     alt="${alt}">
+                <div class="doc-title">${alt}</div>
+            </div>`;
+    }
+
      function closeImage() {
         $('#imageModal').fadeOut();
     }
