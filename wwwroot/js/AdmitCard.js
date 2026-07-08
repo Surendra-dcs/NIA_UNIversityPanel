@@ -242,7 +242,7 @@ function _buildAdmitCardHtml(rows) {
         '<div class="sig-row">' +
         '<div class="sig-col"><div class="sig-line"></div>Full Signature Of Candidate</div>' +
         '<div class="sig-col"><div class="sig-line"></div>Signature of Centre Supdt.</div>' +
-        '<div class="sig-col-right"><div class="prof-name"><img src=".././logo/AdminSignatur.jpg" style="width:150px;height:40px"/><br/>Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
+        '<div class="sig-col-right"><div class="prof-name"><img src=".././Logo/AdminSignatur.jpg" style="width:150px;height:40px"/><br/>Prof. Ashok Kumar</div><div>Controller of Examination</div></div>' +
         '</div>';
 
     return header + titleBand + infoSection + notesRow + examProg + sigRow + _buildImportantNotes();
