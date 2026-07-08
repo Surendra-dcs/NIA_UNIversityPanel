@@ -17,6 +17,7 @@
     <script>
         var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
     </script>
+  
     <style>
         .topbar {
             height: var(--topbar-height);
@@ -50,7 +51,10 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-
+        @{
+            var courseId = Context.Session.GetInt32("CourseId") ?? 0;
+            var rollId = Context.Session.GetInt32("Role") ?? 0;
+        }
         <nav class="sidebar-nav">
             <div class="nav-item" id="nav-dashboard">
                 <a href="/University/Dashboard" class="nav-link">
@@ -58,110 +62,141 @@
                     <span>Dashboard</span>
                 </a>
             </div>
+            @if (courseId == 5 && rollId==4)
+            {
+                <div class="nav-item has-dropdown" id="User">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Academic Menus</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
+                    </ul>
+                </div>
 
-            <div class="nav-item has-dropdown" id="program">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('program', event)">
-                    <i class="fas fa-file-lines"></i>
-                    <span>Programs & Courses</span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+            }
+            else if (courseId == 32 && rollId==4)
+            {
+                <div class="nav-item has-dropdown" id="User">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Academic Menus</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Academic/enrollmentform"><i class="fas fa-circle dot"></i>Enrollment/Registration form</a></li>
+                        <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Pro/programlist"><i class="fas fa-circle dot"></i>Program list</a></li>
-                    <li><a href="/Pro/courselist"><i class="fas fa-circle dot"></i>Course list</a></li>                   
-                    <li><a href="/Pro/subjectlist"><i class="fas fa-circle dot"></i>Subject list</a></li>
-                    <li><a href="/Pro/examlist"><i class="fas fa-circle dot"></i>Exam list</a></li>
-                </ul>
-            </div>
-            <div class="nav-item has-dropdown" id="User">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
-                    <i class="fas fa-file-lines"></i>
-                    <span>Academic Menus</span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+            }
+            else
+            {
+
+                <div class="nav-item has-dropdown" id="program">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('program', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Programs & Courses</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Pro/programlist"><i class="fas fa-circle dot"></i>Program list</a></li>
+                        <li><a href="/Pro/courselist"><i class="fas fa-circle dot"></i>Course list</a></li>                   
+                        <li><a href="/Pro/subjectlist"><i class="fas fa-circle dot"></i>Subject list</a></li>
+                        <li><a href="/Pro/examlist"><i class="fas fa-circle dot"></i>Exam list</a></li>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Academic/enrollmentform"><i class="fas fa-circle dot"></i>Enrollment/Registration form</a></li>
-                    <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
-                    @* <li><a href="/Academic/bulkenrollcard"><i class="fas fa-circle dot"></i>Bulk Enrollment Card</a></li> *@
-                    @* <li><a href="/Academic/studentDetails"><i class="fas fa-circle dot"></i>Uploads Students</a></li> *@
-                    <li><a href="/Academic/studentadmissiondetails"><i class="fas fa-circle dot"></i>Admissions Students</a></li>
-                    @* <li><a href="/Academic/enrolformprint"><i class="fas fa-circle dot"></i>Print Enroll Form</a></li> *@
-                    @* <li><a href="/Academic/examformprint"><i class="fas fa-circle dot"></i>Exam Form Print</a></li> *@
-                    @* <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Form Verification</a></li> *@
-                    @*<li><a href="/Academic/stcorrection"><i class="fas fa-circle dot"></i>Student Correction</a></li>*@
-                    @*<li><a href="/Academic/changemobilerequest"><i class="fas fa-circle dot"></i>Mobile Change Requests</a></li>*@    
-                    @* <li><a href="/Academic/stphotoandsignature"><i class="fas fa-circle dot"></i>Students Photo & Signature Correction</a></li>
+                <div class="nav-item has-dropdown" id="User">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Academic Menus</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Academic/enrollmentform"><i class="fas fa-circle dot"></i>Enrollment/Registration form</a></li>
+                        <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
+                        @* <li><a href="/Academic/bulkenrollcard"><i class="fas fa-circle dot"></i>Bulk Enrollment Card</a></li> *@
+                        @* <li><a href="/Academic/studentDetails"><i class="fas fa-circle dot"></i>Uploads Students</a></li> *@
+                        <li><a href="/Academic/studentadmissiondetails"><i class="fas fa-circle dot"></i>Admissions Students</a></li>
+                        @* <li><a href="/Academic/enrolformprint"><i class="fas fa-circle dot"></i>Print Enroll Form</a></li> *@
+                        @* <li><a href="/Academic/examformprint"><i class="fas fa-circle dot"></i>Exam Form Print</a></li> *@
+                        @* <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Form Verification</a></li> *@
+                        @*<li><a href="/Academic/stcorrection"><i class="fas fa-circle dot"></i>Student Correction</a></li>*@
+                        @*<li><a href="/Academic/changemobilerequest"><i class="fas fa-circle dot"></i>Mobile Change Requests</a></li>*@    
+                        @* <li><a href="/Academic/stphotoandsignature"><i class="fas fa-circle dot"></i>Students Photo & Signature Correction</a></li>
                     <li><a href="/Academic/changemobilenumber"><i class="fas fa-circle dot"></i>Change Mobile Number</a></li> *@
-                </ul>
-            </div>
-
-            <div class="nav-item has-dropdown" id="subject">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('subject', event)">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Examinination</span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Exam/rolllist"><i class="fas fa-circle dot"></i>RollList</a></li>
-                    <li><a href="/Exam/AttendanceSeet"><i class="fas fa-circle dot"></i>Download Attendance Sheet</a></li>
-                    <li><a href="/Exam/StudentAttendance"><i class="fas fa-circle dot"></i>Fill Student Attendance</a></li>
-                  
-                    <!--<li><a href="/Exam/result"><i class="fas fa-circle dot"></i>View Result</a></li>-->
-                    <li><a href="/Exam/examinerlist"><i class="fas fa-circle dot"></i>Examiner Create</a></li>
-                    <li><a href="/Exam/AssignedPaperExaminer"><i class="fas fa-circle dot"></i>Assigned Papers to Examiner</a></li>
 
-                    <!--<li><a href="/Exam/ansbooklist"><i class="fas fa-circle dot"></i>Answer Book List</a></li>-->
+                <div class="nav-item has-dropdown" id="subject">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('subject', event)">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Examinination</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Exam/rolllist"><i class="fas fa-circle dot"></i>RollList</a></li>
+                        <li><a href="/Exam/AttendanceSeet"><i class="fas fa-circle dot"></i>Download Attendance Sheet</a></li>
+                        <li><a href="/Exam/StudentAttendance"><i class="fas fa-circle dot"></i>Fill Student Attendance</a></li>
 
-                    <li><a href="/Exam/ansbooklist"><i class="fas fa-circle dot"></i>Answer Book List</a></li>
-                    <!--<li><a href="/Exam/revallist"><i class="fas fa-circle dot"></i>Reval List</a></li>-->
+                        <!--<li><a href="/Exam/result"><i class="fas fa-circle dot"></i>View Result</a></li>-->
+                        <li><a href="/Exam/examinerlist"><i class="fas fa-circle dot"></i>Examiner Create</a></li>
+                        <li><a href="/Exam/AssignedPaperExaminer"><i class="fas fa-circle dot"></i>Assigned Papers to Examiner</a></li>
 
-                    <li><a href="/Exam/billprint"><i class="fas fa-circle dot"></i>Bulk QP Bill Print</a></li>
-                </ul>
-            </div>
+                        <!--<li><a href="/Exam/ansbooklist"><i class="fas fa-circle dot"></i>Answer Book List</a></li>-->
 
-            <div class="nav-item has-dropdown" id="Practical">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('Practical', event)">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Practical Management </span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+                        <li><a href="/Exam/ansbooklist"><i class="fas fa-circle dot"></i>Answer Book List</a></li>
+                        <!--<li><a href="/Exam/revallist"><i class="fas fa-circle dot"></i>Reval List</a></li>-->
+
+                        <li><a href="/Exam/billprint"><i class="fas fa-circle dot"></i>Bulk QP Bill Print</a></li>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Exam/P_Report"><i class="fas fa-circle dot"></i>Practical And Viva Reports </a></li>
-                    <li><a href="/Exam/IAReport"><i class="fas fa-circle dot"></i>IA Practical Reports </a></li>
-                    <li><a href="/Exam/ElectiveMarksReport"><i class="fas fa-circle dot"></i>Elective Marks Report </a></li>
-                </ul>
-            </div>
 
-            <div class="nav-item has-dropdown" id="Result">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('Result', event)">
-                    <i class="fas fa-qrcode"></i>
-                    <span>Result Management </span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+                <div class="nav-item has-dropdown" id="Practical">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('Practical', event)">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Practical Management </span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Exam/P_Report"><i class="fas fa-circle dot"></i>Practical And Viva Reports </a></li>
+                        <li><a href="/Exam/IAReport"><i class="fas fa-circle dot"></i>IA Practical Reports </a></li>
+                        <li><a href="/Exam/ElectiveMarksReport"><i class="fas fa-circle dot"></i>Elective Marks Report </a></li>
+                    </ul>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Result/ProvisionalMarksheet"><i class="fas fa-circle dot"></i>Provisional Marksheet</a></li>
-                    <li><a href="/Exam/resultsheet"><i class="fas fa-circle dot"></i>Result Sheet</a></li>
-                    <li><a href="/Exam/resulttr"><i class="fas fa-circle dot"></i>Result TR</a></li>
-                    <li><a href="/Exam/resultReports"><i class="fas fa-circle dot"></i>Department Wise Result Repotrs</a></li>
-                    <li><a href="/Exam/ExcelDataResultForDG"><i class="fas fa-circle dot"></i>Download CSV & Excel Result for DG</a></li>
-                  
-                </ul>
-            </div>
-            <div class="nav-item has-dropdown" id="Evaluation">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('Evaluation', event)">
+
+                <div class="nav-item has-dropdown" id="Result">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('Result', event)">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Result Management </span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Result/ProvisionalMarksheet"><i class="fas fa-circle dot"></i>Provisional Marksheet</a></li>
+                        <li><a href="/Exam/resultsheet"><i class="fas fa-circle dot"></i>Result Sheet</a></li>
+                        <li><a href="/Exam/resulttr"><i class="fas fa-circle dot"></i>Result TR</a></li>
+                        <li><a href="/Exam/resultReports"><i class="fas fa-circle dot"></i>Department Wise Result Repotrs</a></li>
+                        <li><a href="/Exam/ExcelDataResultForDG"><i class="fas fa-circle dot"></i>Download CSV & Excel Result for DG</a></li>
+
+                    </ul>
+                </div>
+                <div class="nav-item has-dropdown" id="Evaluation">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('Evaluation', event)">
                     <i class="fas fa-qrcode"></i>
                     <span>Statistics /आंकड़े </span>
                     <i class="fas fa-chevron-right arrow-icon"></i>
-                </div>
-                <ul class="dropdown-menu">
+                    </div>
+                     <ul class="dropdown-menu">
                     <li><a href="/Statistics/paymentstatus"><i class="fas fa-circle dot"></i>Date Wise Payment Statistics</a></li>
                     <li><a href="/Statistics/stexamwisestatistics"><i class="fas fa-circle dot"></i>Student Statistics Exam Wise</a></li>
                     <li><a href="/Statistics/statisticsofresult"><i class="fas fa-circle dot"></i>Statistics Of Result(pass and fail)</a></li>
                     <li><a href="/Statistics/resultreport"><i class="fas fa-circle dot"></i>Result Report</a></li>
-                </ul>
-            </div>
-
+                    </ul>
+                </div>
+            }
+     
+        
         </nav>
-
         <div class="sidebar-footer">
             <button class="logout-btn" onclick="handleLogout()">
                 <i class="fas fa-right-from-bracket"></i>

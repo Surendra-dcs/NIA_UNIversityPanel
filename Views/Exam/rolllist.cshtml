@@ -147,7 +147,7 @@
             </select>
         </div>
         <div class="search-btn">
-            <button onclick="loadStudentFormList()">
+            <button onclick="loadRollList()">
                 <i class="fa fa-search"></i> Filter
             </button>
         </div>
@@ -244,8 +244,11 @@
      });
 
       function loadRollList() {
+        let sessionId = $("#sessionId").val();
+        let courseId = $("#courseId").val();
+        let semester = $("#semester").val();
         $.ajax({
-            url: ApiBaseUrl + 'Exam/rolllist',
+            url: ApiBaseUrl + `Exam/rolllist?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}`,
             method: 'GET',
             success: function (data) {
                 window._allApiRows = data;
@@ -339,9 +342,7 @@
         else if (val === "desc") {
             table.order([2, 'desc']).draw();
         }
-
     });
-
 
     $('#btnBulkrollnoGenerate').click(function () {
         if (!confirm("Generate Roll numbers for all pending records?"))

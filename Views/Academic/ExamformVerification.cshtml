@@ -355,7 +355,13 @@
             });
      });
     document.getElementById("courseId").addEventListener("change", function () {
-        let courseId = this.value;       
+        let courseId = this.value;  
+        let sessionCourseId = '@Context.Session.GetInt32("CourseId")';
+          if (sessionCourseId && sessionCourseId != "0" && sessionCourseId != courseId) {
+            alert("Please select assigned course.");
+            this.value = sessionCourseId;
+            return false;
+        }
         $("#semester").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
@@ -376,6 +382,20 @@
         let sessionId = $("#sessionId").val();
         let courseId = $("#courseId").val();
         let semester = $("#semester").val();
+           if (!sessionId) {
+              alert("Please select Session.");
+             return false;
+            }
+
+            if (!courseId) {
+                alert("Please select Course.");
+                return false;
+            }
+
+            if (!semester) {
+                alert("Please select Semester.");
+                return false;
+            }
         table = $('#studentformtbl').DataTable({
 
             ajax: {

@@ -5,6 +5,7 @@
         public bool success { get; set; }
         public string message { get; set; } = "";
         public int role { get; set; }
+        public int CourseId { get; set; }
         public string stringrole { get; set; } = "";
         public string username { get; set; } = "";
         public string email { get; set; } = "";
