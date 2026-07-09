@@ -129,7 +129,7 @@ function _buildAdmitCardHtml(rows) {
 
     var header =
         '<div class="header">' +
-        '<div class="header-logo"><img src="/logo/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" /></div>' +
+        '<div class="header-logo"><img src="/Logo/nia_logo.png" alt="NIA Logo" onerror="this.style.display=\'none\'" /></div>' +
         '<div class="header-center">' +
         '<div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA</div>' +
         '<div class="inst-sub">Deemed to be University</div>' +
