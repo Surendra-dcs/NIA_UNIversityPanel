@@ -463,30 +463,41 @@
                 $("#studentTableBody").append(row);
 
             });
-
+            $("#btnSaveMarks").hide();
             let table = $('#studentTable').DataTable({
 
-                pageLength: 10,
+                pageLength: 150,
                 responsive: true,
                 searching: true,
                 ordering: true,
-                lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
+                lengthMenu: [[150, 300, 450, 600], [150, 300, 450, 600]]
 
             });
+               checkLastPage();
 
-            $('#studentTable').off('draw.dt').on('draw.dt', function () {
+            table.on('draw', function () {
 
-                if (globalMarks === "" || globalMarks == null)
-                    return;
+                checkLastPage();
 
-                table.$(".practical").each(function () {
-                    let maxMarks = parseFloat($(this).attr("max"));
-                    if (parseFloat(globalMarks) <= maxMarks) {
-                        $(this).val(globalMarks);
-                    }
-                });
-            });
-            $("#btnSaveMarks").show();
+               if (globalMarks === "" || globalMarks == null)
+                   return;
+               
+               table.$(".practical").each(function () {
+                   let maxMarks = parseFloat($(this).attr("max"));
+                   if (parseFloat(globalMarks) <= maxMarks) {
+                       $(this).val(globalMarks);
+                   }
+               });
+
+               });
+                function checkLastPage() {
+              let info = table.page.info();
+              if (info.page === info.pages - 1) {
+                  $("#btnSaveMarks").show();
+              } else {
+                  $("#btnSaveMarks").hide();
+              }
+            }
         }
         catch (e) {
             console.log(e);
