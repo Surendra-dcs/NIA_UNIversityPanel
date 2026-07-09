@@ -232,17 +232,12 @@
 </style>
 
 <div class="container-fluid">
-
     <div class="top-panel">
-
         <h2 style="color:red">Attendance Sheet</h2>
-
         <div class="search-area">
-
             <select id="ddlsubject" class="form-control">
                 <option value="">-- Select Subject --</option>
             </select>
-
             <button type="button"
                     id="btnSearch"
                     class="btn btn-success" style="height: 40px;width:76px;background: green; color: white;">
@@ -347,9 +342,7 @@
     <table id="tblAttendance" class="attendance-table">
 
         <thead>
-
             <tr>
-
                 <th style="width:5%;">S.No</th>
                 <th style="width:25%;">Name of Candidate</th>
                 <th style="width:12%;">Roll No</th>
@@ -359,38 +352,24 @@
                 <th style="width:15%;"> Signature of Candidate
                 </th>
                 <th style="width:10%;">Remark</th>
-
             </tr>
-
         </thead>
-
         <tbody id="attendanceBody">
         </tbody>
-
     </table>
-
     <div class="footer-area">
-
         <div class="footer-grid">
-
             <div>
-
                 <div class="footer-line">
-                    Total Present :
+                    Total Students :
                     <span id="lblPresent"></span>
                 </div>
-
                 <div class="footer-line">
-                    Total Absent :
-                    0
+                    Total Absent :.....                   
                 </div>
-
             </div>
-
             <div class="signature-box">
-
                 Signature & Seal of Centre Supdt.
-
             </div>
 
         </div>
@@ -402,160 +381,86 @@
 <script>
 
     $(document).ready(function () {
-
         loadSubjects();
-
         $("#btnSearch").click(function () {
-
             var subjectName = $("#ddlsubject").val();
-
             if (subjectName == "") {
-
                 alert("Please select subject");
                 return;
             }
-
             getAttendanceSheet(subjectName);
-
         });
-
-        // PRINT BUTTON
         $("#btnPrint").click(function () {
-
             if ($("#printArea").html().trim() == "") {
-
                 alert("Please search attendance first");
                 return;
             }
-
             window.print();
-
         });
-
     });
 
-    // =========================================
-    // LOAD SUBJECTS
-    // =========================================
-
     function loadSubjects() {
-
         $.ajax({
-
             url: ApiBaseUrl + "Exam/GetSubjectList",
-
             type: "GET",
-
             success: function (response) {
-
                 $("#ddlsubject").empty();
-
                 $("#ddlsubject").append(
                     '<option value="">-- Select Subject --</option>'
                 );
-
                 $.each(response, function (i, item) {
-
                     $("#ddlsubject").append(
                         '<option value="' + item + '">' + item + '</option>'
                     );
-
                 });
-
             },
-
             error: function () {
-
                 alert("Failed to load subject list");
-
             }
-
         });
-
     }
-
-    // =========================================
-    // GET ATTENDANCE
-    // =========================================
-
     function getAttendanceSheet(subjectName) {
-
         $.ajax({
-
             url: ApiBaseUrl + "Exam/GetAttendanceSheet?subjectName=" + encodeURIComponent(subjectName),
-
             type: "GET",
-
             success: function (response) {
-
                 if (!response || response.length == 0) {
-
                     alert("No data found");
                     return;
                 }
-
                 bindAttendanceSheet(response);
-
             },
-
             error: function (xhr) {
-
                 console.log(xhr.responseText);
-
                 alert("Error loading attendance sheet");
-
             }
-
         });
-
     }
 
-    // =========================================
-    // BIND ATTENDANCE
-    // =========================================
-
     function bindAttendanceSheet(data) {
-
         $("#printArea").html("");
-
         var totalRecords = data.length;
-
         var recordsPerPage = 20;
-
         var totalPages = Math.ceil(totalRecords / recordsPerPage);
-
         for (var page = 0; page < totalPages; page++) {
-
             var start = page * recordsPerPage;
-
             var end = start + recordsPerPage;
-
             var pageData = data.slice(start, end);
-
             var first = pageData[0];
-
             var rows = "";
-
             $.each(pageData, function (i, item) {
-
                 rows += `
-
                     <tr class="candidate-row">
-
                         <td>
                             ${start + i + 1}
                         </td>
-
                         <td class="candidate-name">
                             ${item.FirstName || ""}
                         </td>
-
                         <td>
                             ${item.RollNumber || ""}
                         </td>
-
                         <td></td>
-
                         <td class="candidate-photo">
 
                             <img src="${item.CandidateImagePath || ''}"
@@ -586,57 +491,34 @@
                 `;
             });
 
-            // ONLY LAST PAGE SHOW TOTAL
             var footerHtml = "";
-
             if (page == totalPages - 1) {
-
                 footerHtml = `
-
                     <div class="footer-area">
-
                         <div class="footer-grid">
-
                             <div>
-
                                 <div class="footer-line">
-
-                                    Total Present :
+                                    Total Student :
                                     ${totalRecords}
-
                                 </div>
 
                                 <div class="footer-line">
-
-                                    Total Absent : 0
-
+                                    Total Absent : ....
                                 </div>
-
                             </div>
-
                             <div class="signature-box">
-
                                 Signature & Seal of Centre Supdt.
-
                             </div>
-
                         </div>
-
                     </div>
-
                 `;
             }
 
             var pageHtml = `
-
                 <div class="a4-page print-page">
-
                     <div class="header">
-
                         <div class="header-top">
-
                             <div class="logo-area">
-
                                 <img src="/Logo/nia_logo.png"
                                      style="
                                         width:60px;
@@ -646,121 +528,69 @@
                             </div>
 
                             <div class="header-center">
-
                                 <div class="inst-name">
-
                                     National Institute of Ayurveda, Jaipur
-
                                 </div>
-
                                 <div class="exam-title">
-
                                     ATTENDANCE SHEET
-
                                 </div>
-
                                 <div class="exam-session">
-                                    (May-2026)
+                                    (July/August-2026)
                                 </div>
-
                             </div>
 
                             <div class="page-badge">
-
                                 Page : ${page + 1}
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="meta-info">
-
                         <div class="meta-row">
-
                             <div>
-
                                 <b>Name of Centre :</b>
-
                                 NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
-
                             </div>
-
                         </div>
-
                         <div class="meta-row">
-
                             <div>
-
                                 <b>Date :</b>
-
                                 ${first.Examdate || ""}
-
                             </div>
-
                             <div>
-
                                 <b>Time :</b>
-
                                 ${first.Examtime || ""}
-
                             </div>
-
                         </div>
-
                         <div class="meta-row">
-
                             <div>
-
                                 <b>Subject :</b>
-
                                 ${first.SubjectName || ""}
-
                             </div>
-
                             <div>
-
                                 <b>Paper Code :</b>
-
                                 ${first.SubjectCode || ""}
-
                             </div>
-
                         </div>
-
                     </div>
-
                     <div class="sheet-title">
-
                         ATTENDANCE-SHEET
-
                     </div>
-
                     <table class="attendance-table">
-
                         <thead>
-
                             <tr>
-
                                 <th style="width:5%;">S.No</th>
-
                                 <th style="width:25%;">
                                     Name of Candidate
                                 </th>
-
                                 <th style="width:12%;">
                                     Roll No
                                 </th>
-
                                 <th style="width:18%;">  Serial No. of Main Answer book
-
                                 </th>
-
                                 <th style="width:15%;">
                                     Photo
                                 </th>
-
                                 <th style="width:15%;">
                                     Signature
                                 </th>
@@ -770,27 +600,16 @@
                                 <th style="width:10%;">
                                     Remark
                                 </th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                             ${rows}
-
                         </tbody>
-
                     </table>
-
                     ${footerHtml}
-
                 </div>
-
             `;
-
             $("#printArea").append(pageHtml);
-
         }
 
     }
