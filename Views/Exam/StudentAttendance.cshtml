@@ -5,94 +5,186 @@
 }
 <style>
 
+    body {
+        background: #f4f6f9;
+        font-family: 'Segoe UI',sans-serif;
+    }
+
+    /* Card */
+
     .attendance-card {
         background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-top: 20px;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 3px 15px rgba(0,0,0,.08);
     }
+
+    /* Header */
+
+    .card-header-custom {
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+    }
+
+        .card-header-custom h3 {
+            margin: 0;
+            color: #198754;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+    /* Top Panel */
 
     .top-panel {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-end;
         gap: 20px;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
     }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        table th {
-            background: #198754;
-            color: #fff;
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-        table td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-
-    .status-select {
-        width: 90px;
-    }
-
-    .lock-select {
-        width: 100px;
-    }
-
-    .btn-save {
-        margin-top: 20px;
-        height: 40px;
-        width: 300px;
-        background: #1e7f06;
-        color: white;
-    }
-
-   
 
     .left-panel {
-        display: flex;
-        gap: 10px;
-        align-items: center;
+        flex: 1;
     }
 
     .right-panel {
         display: flex;
-        gap: 10px;
-        align-items: center;
-        margin-left: auto;
+        gap: 15px;
+        align-items: flex-end;
     }
-    .k{
-        height: 30px;
+
+    /* Search Controls */
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
     }
+
+    .search-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 180px;
+    }
+
+        .search-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+        }
+
+        .search-group .form-control {
+            height: 40px;
+            border-radius: 6px;
+        }
+
+    #btnsearch {
+        height: 40px;
+        min-width: 150px;
+        margin-top: 25px;
+    }
+
+    /* Table */
+
+    .table {
+        margin-bottom: 0;
+        width: 100%;
+    }
+
+        .table thead th {
+            background: #1a3a5c;
+            color: #fff;
+            text-align: center;
+            vertical-align: middle;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            height:40px;           
+        }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #dee2e6;
+    }
+
+        .table th,
+        .table td {
+            border: 1px solid #dee2e6 !important;
+            padding: 8px 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table thead th {
+            background: #1f4468;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+    /* Save Button */
+
+    #btnSave {
+        min-width: 180px;
+        height: 42px;
+        font-weight: 600;
+    }
+
+    /* Responsive */
+
+    @@media(max-width:992px) {
+        .top-panel
+
+    {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .right-panel {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .search-group {
+        min-width: 100%;
+    }
+
+    #btnsearch {
+        width: 100%;
+        margin-top: 0;
+    }
+
+    #btnSave {
+        width: 100%;
+            
+    }
+
+    }
+
+    /* Loader */
 
     #loaderOverlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.4);
-        z-index: 99999;
+        inset: 0;
+        background: rgba(0,0,0,.35);
         display: flex;
         justify-content: center;
         align-items: center;
+        z-index: 9999;
     }
 
     .loader-box {
         background: #fff;
-        padding: 30px 40px;
+        padding: 25px 35px;
         border-radius: 10px;
         text-align: center;
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
 
     .spinner {
@@ -107,64 +199,122 @@
 
     .loader-text {
         margin-top: 15px;
-        font-size: 16px;
-        font-weight: bold;
+        font-weight: 600;
     }
 
     @@keyframes spin {
+        to
 
-        0% {
-            transform: rotate(0deg);
-        }
+    {
+        transform: rotate(360deg);
+    }
 
-        100% {
-            transform: rotate(360deg);
-        }
+    }
+    label{
+        font-weight:600;
     }
 
 </style>
 
 <div class="container-fluid">
     <div class="attendance-card">
-        <h2> Student Attendance </h2>
-        <div class="top-panel">
-            <div class="left-panel">
-                <select id="ddlSubject" class="form-control k" style="width:300px;">
-                    <option value=""> -- Select Subject -- </option>
-                </select>
-                <button type="button" class="btn btn-success" id="btnSearch" style="height: 30px; width: 74px; background:#1a3a5c; color: white;">Search </button>
-            </div>
-
-            <div class="right-panel">
-                <select id="ddlAttendence" class="form-control k" style="width:150px;">
-                    <option value="">Attendance</option>
-                    <option value="P">P</option>
-                    <option value="A">A</option>
-                </select>
-                <select id="ddlStatus" class="form-control k" style="width:150px;"><option value="">Status</option>
-                    <option value="Lock">Lock</option>
-                    <option value="Unlock">Unlock</option>
-                </select>
-            </div>
-
+        <div class="card-header-custom" style="background:#1a3a5c;color:#fff;">
+            <h3 style="color:white;padding: 2px 10px 2px;">Student Attendance</h3>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Sr.No</th>
-                    <th>Roll Number</th>
-                    <th>Candidate Name</th>
-                    <th>Father Name</th>
-                    <th>Subject Name</th>
-                    <th>Subject Code</th>
-                    <th>Attendance</th>
-                    <th>Lock Status</th>
-                </tr>
-            </thead>
+        <div class="top-panel">
+
+            <div class="left-panel">
+                <div class="search-row">
+
+                    <div class="search-group">
+                        <label for="sessionId">Session</label>
+                        <select id="sessionId" class="form-control">
+                            <option value="">Select Session</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="programId">Program</label>
+                        <select id="programId" class="form-control">
+                            <option value="">Select Program</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="courseId">Course</label>
+                        <select id="courseId" class="form-control">
+                            <option value="">Select Course</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="semester">Semester</label>
+                        <select id="semester" class="form-control">
+                            <option value="">Select Semester</option>
+                        </select>
+                    </div>
+                    <div class="search-group">
+                        <label for="Batch">Batch</label>
+                        <select id="BatchId" class="form-control">
+                            <option value="">Select Batch</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group">
+                        <label for="subjectId">Subject</label>
+                        <select id="subjectId" class="form-control">
+                            <option value="">Select Subject</option>
+                        </select>
+                    </div>
+
+                    <div class="search-group btn-group">
+                        <button type="button" id="btnsearch" onclick="loadAttendance()" class="btn btn-primary" style="background:#3c89db;color:white">
+                            Search here...
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+            <br />
+            <div class="right-panel">
+                <div class="search-group">
+                    <label for="ddlAttendence">Attendance</label>
+                    <select id="ddlAttendence" class="form-control">
+                        <option value="">Select</option>
+                        <option value="P">Present</option>
+                        <option value="A">Absent</option>
+                    </select>
+                </div>
+
+                <div class="search-group">
+                    <label for="ddlStatus">Status</label>
+                    <select id="ddlStatus" class="form-control">
+                        <option value="">Select</option>
+                        <option value="Lock">Lock</option>
+                        <option value="Unlock">Unlock</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                 <thead>
+                     <tr>
+                         <th>Sr.No</th>
+                         <th>Roll Number</th>
+                         <th>Candidate Name</th>
+                         <th>Father Name</th>
+                         <th>Subject Name</th>
+                         <th>Subject Code</th>
+                         <th>Attendance</th>
+                         <th>Lock Status</th>
+                     </tr>
+                 </thead>
             <tbody id="tblStudentAtt">
             </tbody>
         </table>
-        <button type="button" class="btn btn-primary btn-save" id="btnSave">
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSave" style="background:rgb(32 146 21);color:white;margin-top:13px;border-radius:20px;outline:none;display:none">
             Save Attendance
         </button>
     </div>
@@ -180,15 +330,8 @@
 <script>
 
     $(document).ready(function () {
-        loadSubjects();
-        $("#btnSearch").click(function () {
-            var subjectName = $("#ddlSubject").val();
-            if (subjectName == "") {
-                alert("Please select subject");
-                return;
-            }
-            loadAttendance(subjectName);
-        });
+         loadPrograms();
+         loadSession();
         $("#ddlAttendence").change(function () {
             var selectedValue = $(this).val();
             $(".attendanceStatus").val(selectedValue);
@@ -200,40 +343,121 @@
         });
     });
 
-    function loadSubjects() {
-        $.ajax({
-            url: ApiBaseUrl + "Exam/GetSubjectList",
-            type: "GET",
-            success: function (response) {
-                $("#ddlSubject").empty();
-                $("#ddlSubject").append(
-                    '<option value="">-- Select Subject --</option>'
-                );
-                $.each(response, function (i, item) {
-                    $("#ddlSubject").append(
-                        '<option value="' + item + '">' + item + '</option>'
-                    );
-                });
-            },
-            error: function () {
-                alert("Failed to load subject list");
-            }
+    function loadSession() {
+      $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+          let session = '<option value="">Select Session</option>';
+          res.forEach(x => {
+              session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+          });
+          $('#sessionId').html(session);
+      });
+    }
+      function loadPrograms() {
+        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+            let opt = '<option value="">Select Program</option>';
+            res.forEach(x => {
+                opt += `<option value="${x.programId}">${x.programName}</option>`;
+            });
+            $('#programId').html(opt);
         });
+      }
+      document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+     document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
+
+    $("#semester").on("change", function () {
+        let semId = this.value;
+        let courseId = $("#courseId").val();
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!semId) return;
+        $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+            let opt = '<option value="">Select Batch</option>';
+            data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+            $("#BatchId").html(opt);
+        });
+    });
+     document.getElementById("BatchId").addEventListener("change", function () {
+        let semester = $("#semester").val();
+        var courseid = $("#courseId").val();
+        var batch = this.value;
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/getsubjectbycourseandBranch/${semester}/${courseid}/${batch}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("subjectId");
+                courseDropdown.innerHTML = '<option value="">Select Subject</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                });
+            });
+     });
+    function loadAttendance() {
+    var sessionId = $("#sessionId").val();
+    var courseId = $("#courseId").val();
+    var semester = $("#semester").val();
+    var BatchId = $("#BatchId").val();
+    var subjectId = $("#subjectId").val();
+
+    if (sessionId == "") {
+        alert("Please select Session.");
+        $("#sessionId").focus();
+        return false;
     }
 
+    if (courseId == "") {
+        alert("Please select Course.");
+        $("#courseId").focus();
+        return false;
+    }
 
-         function loadAttendance(subjectName) {
+    if (semester == "") {
+        alert("Please select Semester.");
+        $("#semester").focus();
+        return false;
+    }
+
+    if (BatchId == "") {
+        alert("Please select Batch.");
+        $("#BatchId").focus();
+        return false;
+    }
+
+    if (subjectId == "") {
+        alert("Please select Subject.");
+        $("#subjectId").focus();
+        return false;
+    }
 
         $.ajax({
-
-            url: ApiBaseUrl +
-                "Exam/GetAttendanceSeetForPersentAndAbsent?subjectName="
-                + encodeURIComponent(subjectName),
-
+            url: ApiBaseUrl +`Exam/GetAttendanceSeetForPersentAndAbsent?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}&subjectId=${subjectId}&batch=${BatchId}`,
             type: "GET",
-
             success: function (response) {
-
                 $("#tblStudentAtt").empty();
                 $("#attendanceMessage").remove();
                 $("#ddlAttendence").prop('disabled', false);
@@ -338,9 +562,8 @@
 
                         + '</td>'
 
-                        + '<input type="hidden" class="userId" value="'
-                        + item.userId
-                        + '" />'
+                        + '<input type="hidden" class="userId" value="'+ item.userId+ '" />'
+                        + '<input type="hidden" class="subId" value="'+ item.subjectId+ '" />'
 
                         + '</tr>';
 
@@ -366,6 +589,7 @@
             var row = $(this);
             var attendanceObj = {
                 UserId: row.find(".userId").val(),
+                SubjectId: row.find(".subId").val(),
                 RollNumber: row.find(".rollNumber").text().trim(),
                 SubjectName: row.find(".subject").text().trim(),
                 AttendanceStatus: row.find(".attendanceStatus").val(),
