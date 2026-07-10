@@ -374,7 +374,7 @@
 
             <div class="search-group btn-group">
                 <button type="button" id="btnsearch">
-                    Search Report
+                    Search here ...
                 </button>
             </div>
 
@@ -406,7 +406,7 @@
                 </div>
 
                 <div class="exam-session">
-                    (July-Aug 026)
+                    (July-Aug 2026)
                 </div>
 
             </div>
@@ -507,12 +507,11 @@
 
       $(document).on("click", "#btnsearch", function () {
 
-        const courseId = $("#courseId").val() || '0';
-        const semester = $("#semester").val() || '0';
-        const sessionId = $("#sessionId").val() || '0';
-         const subjectiddropdown = $("#subjectiddropdown").val() || '0';
-
-        getAttendanceSheet(courseId, semester, sessionId,subjectiddropdown);
+       const sessionId = parseInt($("#sessionId").val()) || 0;
+       const courseId = parseInt($("#courseId").val()) || 0;
+       const semester = parseInt($("#semester").val()) || 0;
+       const subjectiddropdown = parseInt($("#subjectiddropdown").val()) || 0;
+        getAttendanceSheet(sessionId,courseId, semester, subjectiddropdown);
 
     });
 
@@ -575,8 +574,7 @@
 
      document.getElementById("semester").addEventListener("change", function () {
         let semester = this.value;
-        var courseid = $("#courseId").val();
-        //$("#semester").val('');
+        var courseid = $("#courseId").val();        
         //$("#subjectId").val('');
         fetch(ApiBaseUrl + `Subject/getsubjectbycourse/${semester}/${courseid}`)
             .then(res => res.json())
@@ -595,42 +593,21 @@
  
         // PRINT BUTTON
         function printTable() {
-
             if ($("#printArea").html().trim() == "") {
                 alert("Please search attendance first");
                 return;
             }
             window.print();
-
         }
 
-  
-
- 
-    // =========================================
-    // GET ATTENDANCE
-    // =========================================
-
-        function getAttendanceSheet(courseId, semester, sessionId, subjectiddropdown) {
-
+        function getAttendanceSheet(sessionId, courseId, semester, subjectiddropdown) {
+            debugger
         $.ajax({
-
-            url: ApiBaseUrl + "Exam/GetAttendanceSheet",
-
-            type: "POST",
-
-            contentType: "application/json",
-
-            data: JSON.stringify({
-                courseId: courseId,
-                semester: semester,
-                sessionId: sessionId,
-                subjectId: subjectiddropdown
-            }),
+            url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&SubjectId=${subjectiddropdown}`,
+            type: "Get",          
 
             success: function (response) {
-                if (!response || response.length == 0) {
-                 
+                if (!response || response.length == 0) {                 
                     
                     $(".candidate-row").html("No Record Found");
                     return;
