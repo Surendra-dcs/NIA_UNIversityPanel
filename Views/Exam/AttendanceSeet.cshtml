@@ -364,10 +364,16 @@
                     <option value="">Select Semester</option>
                 </select>
             </div>
+            <div class="search-group">
+                <label for="Batch">Batch</label>
+                <select id="BatchId">
+                    <option value="">Select Batch</option>
+                </select>
+            </div>
 
-            <div class="search-group btn-group">
-                <label>Subject</label>
-                <select id="subjectiddropdown">
+            <div class="search-group">
+                <label for="subjectId">Subject</label>
+                <select id="subjectId">
                     <option value="">Select Subject</option>
                 </select>
             </div>
@@ -507,11 +513,30 @@
 
       $(document).on("click", "#btnsearch", function () {
 
-       const sessionId = parseInt($("#sessionId").val()) || 0;
-       const courseId = parseInt($("#courseId").val()) || 0;
-       const semester = parseInt($("#semester").val()) || 0;
-       const subjectiddropdown = parseInt($("#subjectiddropdown").val()) || 0;
-        getAttendanceSheet(sessionId,courseId, semester, subjectiddropdown);
+     const sessionVal = $("#sessionId").val();
+    const courseVal = $("#courseId").val();
+    const semesterVal = $("#semester").val();
+    const batchVal = $("#BatchId").val();
+    const subjectVal = $("#subjectId").val();
+
+    if (
+        sessionVal === "" ||
+        courseVal === "" ||
+        semesterVal === "" ||
+        batchVal === "" ||
+        subjectVal === ""
+    ) {
+        alert("Please select all required fields.");
+        return;
+    }
+
+    const sessionId = parseInt(sessionVal);
+    const courseId = parseInt(courseVal);
+    const semester = parseInt(semesterVal);
+    const BatchId = parseInt(batchVal);
+    const subjectiddropdown = parseInt(subjectVal);
+
+    getAttendanceSheet(sessionId, courseId, semester, BatchId, subjectiddropdown);
 
     });
 
@@ -570,26 +595,32 @@
             });
      });
 
-     
-
-     document.getElementById("semester").addEventListener("change", function () {
-        let semester = this.value;
-        var courseid = $("#courseId").val();        
-        //$("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/getsubjectbycourse/${semester}/${courseid}`)
+     $("#semester").on("change", function () {
+        let semId = this.value;
+        let courseId = $("#courseId").val();
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!semId) return;
+        $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+            let opt = '<option value="">Select Batch</option>';
+            data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+            $("#BatchId").html(opt);
+        });
+    });
+     document.getElementById("BatchId").addEventListener("change", function () {
+        let semester = $("#semester").val();
+        var courseid = $("#courseId").val();
+        var batch = this.value;
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/getsubjectbycourseandBranch/${semester}/${courseid}/${batch}`)
             .then(res => res.json())
             .then(data => {
-                let courseDropdown = document.getElementById("subjectiddropdown");
+                let courseDropdown = document.getElementById("subjectId");
                 courseDropdown.innerHTML = '<option value="">Select Subject</option>';
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
                 });
             });
      });
-   
-
-   
-
  
         // PRINT BUTTON
         function printTable() {
@@ -600,10 +631,10 @@
             window.print();
         }
 
-        function getAttendanceSheet(sessionId, courseId, semester, subjectiddropdown) {
+        function getAttendanceSheet(sessionId, courseId, semester,BatchId, subjectiddropdown) {
             debugger
         $.ajax({
-            url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&SubjectId=${subjectiddropdown}`,
+            url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
             type: "Get",          
 
             success: function (response) {
