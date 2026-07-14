@@ -392,78 +392,54 @@
 </div>
 
 <div id="printArea" class="a4-page">
-
     <div class="header">
-
         <div class="header-top">
-
             <div class="logo-area">
                 <img src="/Logo/nia_logo.png" />
             </div>
-
             <div class="header-center">
-
                 <div class="inst-name">
                     National Institute of Ayurveda, Jaipur
                 </div>
-
                 <div class="exam-title">
                     ATTENDANCE SHEET
                 </div>
-
                 <div class="exam-session">
                     (July-Aug 2026)
                 </div>
-
             </div>
-
             <div class="page-badge">
                 Page:1
             </div>
-
         </div>
-
     </div>
-
     <div class="meta-info">
-
         <div class="meta-row">
-
             <div>
                 <b>Name of Centre :</b>
                 NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
             </div>
-
         </div>
-
         <div class="meta-row">
-
             <div>
                 <b>Date :</b>
                 <span id="lblExamDate"></span>
             </div>
-
             <div>
                 <b>Time :</b>
                 <span id="lblExamTime"></span>
             </div>
-
         </div>
-
         <div class="meta-row">
-
             <div>
                 <b>Subject :</b>
                 <span id="lblSubject"></span>
             </div>
-
             <div>
                 <b>Paper Code :</b>
                 <span id="lblSubjectCode"></span>
             </div>
-
         </div>
-
     </div>
 
     <div class="sheet-title">
@@ -511,9 +487,9 @@
 
 <script>
 
-      $(document).on("click", "#btnsearch", function () {
+    $(document).on("click", "#btnsearch", function () {
 
-     const sessionVal = $("#sessionId").val();
+    const sessionVal = $("#sessionId").val();
     const courseVal = $("#courseId").val();
     const semesterVal = $("#semester").val();
     const batchVal = $("#BatchId").val();
@@ -622,7 +598,6 @@
             });
      });
  
-        // PRINT BUTTON
         function printTable() {
             if ($("#printArea").html().trim() == "") {
                 alert("Please search attendance first");
