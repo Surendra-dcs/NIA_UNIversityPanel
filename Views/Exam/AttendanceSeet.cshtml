@@ -79,6 +79,9 @@
         font-weight: bold;
         margin-top: 5px;
     }
+    h5{
+    font-weight:700;
+    }
 
     .exam-session {
         margin-top: 4px;
@@ -178,8 +181,18 @@
     }
 
     .signature-box {
-        margin-top: 40px;
+        margin-top: 20px;
         text-align: right;
+        font-weight: bold;
+    }
+
+    .signature-box1 {
+        margin-top: 5px;        
+        font-weight: bold;
+    }
+
+    .signature-box2 {
+        margin-top: 5px;
         font-weight: bold;
     }
 
@@ -402,11 +415,9 @@
                     National Institute of Ayurveda, Jaipur
                 </div>
                 <div class="exam-title">
-                    ATTENDANCE SHEET
+                    <h6><span id="examId"></span></h6>
                 </div>
-                <div class="exam-session">
-                    (July-Aug 2026)
-                </div>
+                             
             </div>
             <div class="page-badge">
                 Page:1
@@ -431,6 +442,10 @@
             </div>
         </div>
         <div class="meta-row">
+            <div>
+                <b>Room/Hall No. :</b>...
+                
+            </div>
             <div>
                 <b>Subject :</b>
                 <span id="lblSubject"></span>
@@ -468,20 +483,29 @@
         <div class="footer-grid">
             <div>
                 <div class="footer-line">
-                    Total Students :
-                    <span id="lblPresent"></span>
-                </div>
+                    Total Number of Candidate Present : ...
+                </div><br />
                 <div class="footer-line">
-                    Total Absent :.....                   
+                    Total Number of Candidate Absent : ....
+                </div><br /><br />
+                <div class="footer-line">
+                    Signature & Seal of Centre Supdt.
                 </div>
             </div>
+            <div>
             <div class="signature-box">
-                Signature & Seal of Centre Supdt.
+                Name & Signature of the Invigilator
+            </div><br />
+            <div class="signature-box1">
+                (1)
+            </div><br />
+            <div class="signature-box2">
+                (2)
             </div>
-
+            </div>
         </div>
-
     </div>
+
 
 </div>
 
@@ -692,17 +716,26 @@
                         <div class="footer-grid">
                             <div>
                                 <div class="footer-line">
-                                    Total Student :
-                                    ${totalRecords}
-                                </div>
-
+                                    Total Number of Candidate Present : ...                                   
+                                </div><br/>
                                 <div class="footer-line">
-                                    Total Absent : ....
+                                    Total Number of Candidate Absent : ....
+                                </div><br/><br />
+                                <div class="footer-line">
+                                    Signature & Seal of Centre Supdt.
                                 </div>
                             </div>
+                            <div>
                             <div class="signature-box">
-                                Signature & Seal of Centre Supdt.
+                                Name & Signature of the Invigilator
+                            </div><br/>
+                             <div class="signature-box1">
+                               (1)
+                            </div><br/>
+                             <div class="signature-box2">
+                               (2)
                             </div>
+                             </div>
                         </div>
                     </div>
                 `;
@@ -725,12 +758,10 @@
                                 <div class="inst-name">
                                     National Institute of Ayurveda, Jaipur
                                 </div>
-                                <div class="exam-title">
-                                    ATTENDANCE SHEET
+                                 <div class="exam-title">
+                                    <h6>${first.Examname || ""}</h6>
                                 </div>
-                                <div class="exam-session">
-                                    (July/August-2026)
-                                </div>
+                                
                             </div>
 
                             <div class="page-badge">
@@ -747,6 +778,9 @@
                             </div>
                         </div>
                         <div class="meta-row">
+                          <div>
+                           <b>Room/Hall No. :</b>...
+                           </div>
                             <div>
                                 <b>Date :</b>
                                 ${first.Examdate || ""}
