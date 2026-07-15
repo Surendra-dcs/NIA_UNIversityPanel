@@ -509,7 +509,7 @@
     const sessionId = parseInt(sessionVal);
     const courseId = parseInt(courseVal);
     const semester = parseInt(semesterVal);
-    const BatchId = parseInt(batchVal);
+    const BatchId = batchVal;
     const subjectiddropdown = parseInt(subjectVal);
 
     getAttendanceSheet(sessionId, courseId, semester, BatchId, subjectiddropdown);
@@ -607,7 +607,7 @@
         }
 
         function getAttendanceSheet(sessionId, courseId, semester,BatchId, subjectiddropdown) {
-            debugger
+           
         $.ajax({
             url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
             type: "Get",          
