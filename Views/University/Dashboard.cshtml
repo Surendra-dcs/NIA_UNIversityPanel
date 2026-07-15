@@ -316,15 +316,7 @@ else
                 });
 
             })
-            .catch(function (error) {
-                console.error(error);
-                document.getElementById('dashboardTbody').innerHTML = `
-                    <tr>
-                        <td colspan="8" class="text-center text-danger">
-                            Failed to load data.
-                        </td>
-                    </tr>`;
-            });      
+      
     }
 
      function loadDashboardNewData() {
@@ -355,14 +347,27 @@ else
                 });
 
             })
-            .catch(function (error) {
+             
+    }
+</script>
+
+@* 
+                            .catch(function (error) {
                 console.error(error);
                 document.getElementById('dashboardNewDT').innerHTML = `
+<tr>
+    <td colspan="8" class="text-center text-danger">
+        Failed to load data.
+    </td>
+</tr>`;
+            }); *@
+
+@*       .catch(function (error) {
+                console.error(error);
+                document.getElementById('dashboardTbody').innerHTML = `
                     <tr>
                         <td colspan="8" class="text-center text-danger">
                             Failed to load data.
                         </td>
                     </tr>`;
-            });
-    }
-</script>
+            });      *@ 

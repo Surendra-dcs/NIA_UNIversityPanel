@@ -5,30 +5,30 @@ namespace NIAUNIVERSITYPANEL.Controllers
 {   
     public class ExamController : Controller
     {
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {
-            int? role = HttpContext.Session.GetInt32("Role");
-            if (role == null)
-            {
-                context.Result = new RedirectToActionResult(
-                    "Login",
-                    "Account",
-                    null);
+        //public override void OnActionExecuting(ActionExecutingContext context)
+        //{
+        //    int? role = HttpContext.Session.GetInt32("Role");
+        //    if (role == null)
+        //    {
+        //        context.Result = new RedirectToActionResult(
+        //            "Login",
+        //            "Account",
+        //            null);
 
-                return;
-            }
-            if (role != 1)
-            {
-                context.Result = new RedirectToActionResult(
-                    "Logout",
-                    "Account",
-                    null);
+        //        return;
+        //    }
+        //    if (role != 1)
+        //    {
+        //        context.Result = new RedirectToActionResult(
+        //            "Logout",
+        //            "Account",
+        //            null);
 
-                return;
-            }
+        //        return;
+        //    }
 
-            base.OnActionExecuting(context);
-        }
+        //    base.OnActionExecuting(context);
+        //}
 
         public IActionResult rolllist()
         {
@@ -92,7 +92,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-        public IActionResult AttendanceSeet ()
+        public IActionResult AttSheet()
+        {
+            return View();
+        }
+        public IActionResult AttendanceSeet()
         {
             return View();
         }

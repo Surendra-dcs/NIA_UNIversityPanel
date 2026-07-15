@@ -64,33 +64,25 @@
             </div>
             @if (courseId == 5 && rollId==4)
             {
-                <div class="nav-item has-dropdown" id="User">
-                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                <div class="nav-item has-dropdown" id="User2">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User2', event)">
                         <i class="fas fa-file-lines"></i>
                         <span>Academic Menus</span>
                         <i class="fas fa-chevron-right arrow-icon"></i>
                     </div>
                     <ul class="dropdown-menu">
                         <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
-                    </ul>
-                </div>
-                <div class="nav-item has-dropdown" id="subject">
-                    <div class="nav-link nav-toggle" onclick="toggleDropdown('subject', event)">
-                        <i class="fas fa-qrcode"></i>
-                        <span>Examinination</span>
-                        <i class="fas fa-chevron-right arrow-icon"></i>
-                    </div>
-                    <ul class="dropdown-menu">
                         <li><a href="/Exam/AttendanceSeet"><i class="fas fa-circle dot"></i>Download Attendance Sheet</a></li>
                         <li><a href="/Exam/StudentAttendance"><i class="fas fa-circle dot"></i>Fill Student Attendance</a></li>
                     </ul>
                 </div>
+                
 
             }
             else if (courseId == 32 && rollId==4)
             {
-                <div class="nav-item has-dropdown" id="User">
-                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User', event)">
+                <div class="nav-item has-dropdown" id="User3">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('User3', event)">
                         <i class="fas fa-file-lines"></i>
                         <span>Academic Menus</span>
                         <i class="fas fa-chevron-right arrow-icon"></i>
@@ -98,21 +90,11 @@
                     <ul class="dropdown-menu">
                         <li><a href="/Academic/enrollmentform"><i class="fas fa-circle dot"></i>Enrollment/Registration form</a></li>
                         <li><a href="/Academic/formverification"><i class="fas fa-circle dot"></i>Exam Form Verification</a></li>
-                    </ul>
-                </div>
-
-                <div class="nav-item has-dropdown" id="subject">
-                    <div class="nav-link nav-toggle" onclick="toggleDropdown('subject', event)">
-                        <i class="fas fa-qrcode"></i>
-                        <span>Examinination</span>
-                        <i class="fas fa-chevron-right arrow-icon"></i>
-                    </div>
-                    <ul class="dropdown-menu">
                         <li><a href="/Exam/AttendanceSeet"><i class="fas fa-circle dot"></i>Download Attendance Sheet</a></li>
-                        <li><a href="/Exam/StudentAttendance"><i class="fas fa-circle dot"></i>Fill Student Attendance</a></li>                               
+                        <li><a href="/Exam/StudentAttendance"><i class="fas fa-circle dot"></i>Fill Student Attendance</a></li>
                     </ul>
                 </div>
-
+               
 
             }
             else
