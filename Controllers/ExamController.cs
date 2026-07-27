@@ -104,6 +104,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult RollnumberSeet()
+        {
+            return View();
+        }
         public IActionResult P_Report()
         {
             return View();
