@@ -469,14 +469,9 @@
                     $("#tblStudentAtt").html(
                         '<tr><td colspan="8">No Record Found</td></tr>'
                     );
-
                     return;
-
                 }
 
-                // ==========================================
-                // CHECK IF ATTENDANCE ALREADY FILLED
-                // ==========================================
 
                 var alreadyLocked = response.some(function (item) {
 
@@ -504,10 +499,6 @@
                     return;
 
                 }
-
-                // ==========================================
-                // BIND TABLE
-                // ==========================================
 
                 $.each(response, function (i, item) {
 
