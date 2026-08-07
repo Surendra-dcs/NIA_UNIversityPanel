@@ -234,12 +234,18 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">Batch </label>
+                    <select class="form-select" id="BatchId">
+                        <option value="">Select Batch</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
                     <label class="form-label">Subject </label>
                     <select class="form-select" id="subjectId">
                         <option value="">Select Subject</option>
                     </select>
                 </div>
-
                 <div class="col-md-3">
                     <label class="form-label"> </label>
                     <button class="btn btn-primary" onclick="loadStudents()" style="margin-top:7%;">
@@ -285,66 +291,82 @@
     });
     let globalMarks = '';
     function loadSession() {
-        $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
-            let session = '<option value="">Select Session</option>';
-            res.forEach(x => {
-                session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
-            });
-            $('#sessionId').html(session);
+              $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+                  let session = '<option value="">Select Session</option>';
+                  res.forEach(x => {
+                      session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+                  });
+                  $('#sessionId').html(session);
+              });
+            }
+            function loadPrograms() {
+              $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+                  let opt = '<option value="">Select Program</option>';
+                  res.forEach(x => {
+                      opt += `<option value="${x.programId}">${x.programName}</option>`;
+                  });
+                  $('#programId').html(opt);
+              });
+            }
+            document.getElementById("programId").addEventListener("change", function () {
+           let programId = this.value;
+           $("#courseId").val('');
+           $("#semester").val('');
+           $("#BatchId").val('');
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("courseId");
+                   courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                   });
+               });
         });
-    }
-    function loadPrograms() {
-        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
-            let opt = '<option value="">Select Program</option>';
-            res.forEach(x => {
-                opt += `<option value="${x.programId}">${x.programName}</option>`;
-            });
-            $('#programId').html(opt);
+          document.getElementById("courseId").addEventListener("change", function () {
+           let courseId = this.value;
+           $("#semester").val('');
+           $("#BatchId").val('');
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("semester");
+                   courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                   });
+               });
         });
-    }
-    document.getElementById("programId").addEventListener("change", function () {
-        let programId = this.value;
-        $("#courseId").val('');
-        $("#semester").val('');
-        $("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
-            .then(res => res.json())
-            .then(data => {
-                let courseDropdown = document.getElementById("courseId");
-                courseDropdown.innerHTML = '<option value="">Select Course</option>';
-                   
-                data.forEach(item => {
-                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
-                });
-            });
-     });
-    document.getElementById("courseId").addEventListener("change", function () {
-        let courseId = this.value;
-       
-        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
-            .then(res => res.json())
-            .then(data => {
-                let courseDropdown = document.getElementById("semester");
-                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
-                data.forEach(item => {
-                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
-                });
-            });
-     });
-    document.getElementById("semester").addEventListener("change", function () {
-        let semId = this.value;
-        let courseId=$("#courseId").val();
-         $("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/getsubject/${semId}/${courseId}`)
-            .then(res => res.json())
-            .then(data => {
-                let courseDropdown = document.getElementById("subjectId");
-                courseDropdown.innerHTML = '<option value="">Select subject</option>';
-                data.forEach(item => {
-                     courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
-                });
-            });
-     });
+
+        $("#semester").on("change", function () {
+           let semId = this.value;
+           let courseId = $("#courseId").val();
+           $("#BatchId").html('<option value="">Select Batch</option>');
+           if (!semId) return;
+           $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+               let opt = '<option value="">Select Batch</option>';
+               data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+               $("#BatchId").html(opt);
+           });
+       });
+        document.getElementById("BatchId").addEventListener("change", function () {
+           let semester = $("#semester").val();
+           var courseid = $("#courseId").val();
+           var batch = this.value;
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/getsubject/${semester}/${courseid}/${batch}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("subjectId");
+                   courseDropdown.innerHTML = '<option value="">Select Subject</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                   });
+               });
+        });
+
 
        async function loadStudents() {
         let sessionId = $("#sessionId").val();
