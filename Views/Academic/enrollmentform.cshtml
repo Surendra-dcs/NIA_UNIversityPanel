@@ -461,14 +461,7 @@
                                 Print
                             </button>
 
-                            <button class="btn btn-sm ms-1"
-                                    style="${isVerified
-                                        ? 'background:gray;color:white;opacity:.6;cursor:not-allowed;'
-                                        : 'background:#2d7dd2;color:white;'}"
-                                    onclick="verifyForm(${data.id})"
-                                    ${isVerified ? 'disabled' : ''}>
-                                ${isVerified ? 'Verified' : 'Verify'}
-                            </button>
+                           
                         `;
                     }
                 }
@@ -477,6 +470,15 @@
 
         });
     }
+
+     // <button class="btn btn-sm ms-1"
+     //                                style="${isVerified
+     //                                    ? 'background:gray;color:white;opacity:.6;cursor:not-allowed;'
+     //                                    : 'background:#2d7dd2;color:white;'}"
+     //                                onclick="verifyForm(${data.id})"
+     //                                ${isVerified ? 'disabled' : ''}>
+     //                            ${isVerified ? 'Verified' : 'Verify'}
+     //                        </button>
 
     function verifyForm(id) {
         if (!confirm("Are you sure you want to verify this student?"))

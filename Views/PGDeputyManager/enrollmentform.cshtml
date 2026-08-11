@@ -281,12 +281,7 @@
                                 onclick='printEnrollment(${JSON.stringify(data)})'>
                                 Print
                             </button>                    
-                            <button class="btn btn-success btn-sm ms-1"
-                                style="${verifyStyle}"
-                                onclick='verifyForm(${data.id})'
-                                ${verifyDisabled}>
-                                ${buttonText}
-                            </button>
+                            
                         `;
                     }
                 }
@@ -295,6 +290,12 @@
 
     });
 
+    // <button class="btn btn-success btn-sm ms-1"
+    //                             style="${verifyStyle}"
+    //                             onclick='verifyForm(${data.id})'
+    //                             ${verifyDisabled}>
+    //                             ${buttonText}
+    //                         </button>
     function verifyForm(id) {
         if (!confirm("Are you sure you want to verify this student?"))
             return;
