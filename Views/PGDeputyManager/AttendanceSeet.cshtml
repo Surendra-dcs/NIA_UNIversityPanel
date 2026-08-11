@@ -81,6 +81,10 @@
         margin-top: 5px;
     }
 
+    h5 {
+        font-weight: 700;
+    }
+
     .exam-session {
         margin-top: 4px;
         font-size: 14px;
@@ -179,8 +183,18 @@
     }
 
     .signature-box {
-        margin-top: 40px;
+        margin-top: 20px;
         text-align: right;
+        font-weight: bold;
+    }
+
+    .signature-box1 {
+        margin-top: 5px;
+        font-weight: bold;
+    }
+
+    .signature-box2 {
+        margin-top: 5px;
         font-weight: bold;
     }
 
@@ -231,34 +245,160 @@
     }
 
 </style>
+<style>
+    .search-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .search-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0d3b66;
+        margin-bottom: 15px;
+    }
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-group {
+        min-width: 220px;
+        flex: 1;
+    }
+
+        .search-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .search-group select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+
+    .btn-group {
+        flex: 0;
+    }
+
+        .btn-group button {
+            height: 38px;
+            padding: 0 25px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .btn-group button:hover {
+                background: #0b5ed7;
+            }
+
+    .download-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .search-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .print-page {
+        position: relative;
+        page-break-after: always;
+        min-height: 190mm;
+    }
+
+        .print-page:last-child {
+            page-break-after: auto;
+        }
+
+</style>
 
 <div class="container-fluid">
 
-    <div class="top-panel">
+    <div class="search-panel">
 
-        <h2 style="color:red">Attendance Sheet</h2>
+        <div class="search-title">
+            🔍 All & Department  Wise Attendance Sheet
+            <div class="action-buttons">
+                <button type="button"
+                        onclick="printTable()"
+                        style="width:98px; height:38px; font-weight:800; background:#3b8508; color:white; cursor:pointer;">
+                    Print
+                </button>
+            </div>
+        </div>
 
-        <div class="search-area">
+        <div class="search-row">
 
-            <select id="ddlsubject" class="form-control">
-                <option value="">-- Select Subject --</option>
-            </select>
+            <div class="search-group">
+                <label>Session</label>
+                <select id="sessionId">
+                    <option value="">Select Session</option>
+                </select>
+            </div>
 
-            <button type="button"
-                    id="btnSearch"
-                    class="btn btn-success" style="height: 40px;width:76px;background: green; color: white;">
+            <div class="search-group">
+                <label>Program</label>
+                <select id="programId">
+                    <option value="">Select Program</option>
+                </select>
+            </div>
 
-                Search
+            <div class="search-group">
+                <label>Course</label>
+                <select id="courseId">
+                    <option value="">Select Course</option>
+                </select>
+            </div>
 
-            </button>
+            <div class="search-group">
+                <label>Semester</label>
+                <select id="semester">
+                    <option value="">Select Semester</option>
+                </select>
+            </div>
+            <div class="search-group">
+                <label for="Batch">Batch</label>
+                <select id="BatchId">
+                    <option value="">Select Batch</option>
+                </select>
+            </div>
 
-            <button type="button"
-                    id="btnPrint"
-                    class="btn btn-primary" style="height: 40px; width: 60px; background: blue; color: white;">
+            <div class="search-group">
+                <label for="subjectId">Subject</label>
+                <select id="subjectId">
+                    <option value="">Select Subject</option>
+                </select>
+            </div>
 
-                Print
+            <div class="search-group btn-group">
+                <button type="button" id="btnsearch">
+                    Search here ...
+                </button>
+            </div>
 
-            </button>
 
         </div>
 
@@ -267,78 +407,56 @@
 </div>
 
 <div id="printArea" class="a4-page">
-
     <div class="header">
-
         <div class="header-top">
-
             <div class="logo-area">
                 <img src="/Logo/nia_logo.png" />
             </div>
-
             <div class="header-center">
-
                 <div class="inst-name">
                     National Institute of Ayurveda, Jaipur
                 </div>
-
                 <div class="exam-title">
-                    ATTENDANCE SHEET
-                </div>
-
-                <div class="exam-session">
-                    (May-2026)
+                    <h4><span id="examId"></span></h4>
                 </div>
 
             </div>
-
             <div class="page-badge">
                 Page:1
             </div>
-
         </div>
-
     </div>
-
     <div class="meta-info">
-
         <div class="meta-row">
-
             <div>
                 <b>Name of Centre :</b>
                 NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
             </div>
-
         </div>
-
         <div class="meta-row">
-
             <div>
                 <b>Date :</b>
                 <span id="lblExamDate"></span>
             </div>
-
             <div>
                 <b>Time :</b>
                 <span id="lblExamTime"></span>
             </div>
-
         </div>
-
         <div class="meta-row">
+            <div>
+                <b>Room/Hall No. :</b>...
 
+            </div>
             <div>
                 <b>Subject :</b>
                 <span id="lblSubject"></span>
             </div>
-
             <div>
                 <b>Paper Code :</b>
                 <span id="lblSubjectCode"></span>
             </div>
-
         </div>
-
     </div>
 
     <div class="sheet-title">
@@ -348,9 +466,7 @@
     <table id="tblAttendance" class="attendance-table">
 
         <thead>
-
             <tr>
-
                 <th style="width:5%;">S.No</th>
                 <th style="width:25%;">Name of Candidate</th>
                 <th style="width:12%;">Roll No</th>
@@ -361,203 +477,211 @@
                     Signature of Candidate
                 </th>
                 <th style="width:10%;">Remark</th>
-
             </tr>
-
         </thead>
-
         <tbody id="attendanceBody">
         </tbody>
-
     </table>
-
     <div class="footer-area">
-
         <div class="footer-grid">
-
             <div>
-
                 <div class="footer-line">
-                    Total Present :
-                    <span id="lblPresent"></span>
-                </div>
-
+                    Total Number of Candidate Present : ...
+                </div><br />
                 <div class="footer-line">
-                    Total Absent :
-                    0
+                    Total Number of Candidate Absent : ....
+                </div><br /><br />
+                <div class="footer-line">
+                    Signature & Seal of Centre Supdt.
                 </div>
-
             </div>
-
-            <div class="signature-box">
-
-                Signature & Seal of Centre Supdt.
-
+            <div>
+                <div class="signature-box">
+                    Name & Signature of the Invigilator
+                </div><br />
+                <div class="signature-box1">
+                    (1)
+                </div><br />
+                <div class="signature-box2">
+                    (2)
+                </div>
             </div>
-
         </div>
-
     </div>
+
 
 </div>
 
 <script>
 
-    $(document).ready(function () {
+    $(document).on("click", "#btnsearch", function () {
 
-        loadSubjects();
+    const sessionVal = $("#sessionId").val();
+    const courseVal = $("#courseId").val();
+    const semesterVal = $("#semester").val();
+    const batchVal = $("#BatchId").val();
+    const subjectVal = $("#subjectId").val();
 
-        $("#btnSearch").click(function () {
+    if (
+        sessionVal === "" ||
+        courseVal === "" ||
+        semesterVal === "" ||
+        batchVal === "" ||
+        subjectVal === ""
+    ) {
+        alert("Please select all required fields.");
+        return;
+    }
 
-            var subjectName = $("#ddlsubject").val();
+    const sessionId = parseInt(sessionVal);
+    const courseId = parseInt(courseVal);
+    const semester = parseInt(semesterVal);
+    const BatchId = batchVal;
+    const subjectiddropdown = parseInt(subjectVal);
 
-            if (subjectName == "") {
-
-                alert("Please select subject");
-                return;
-            }
-
-            getAttendanceSheet(subjectName);
-
-        });
-
-        // PRINT BUTTON
-        $("#btnPrint").click(function () {
-
-            if ($("#printArea").html().trim() == "") {
-
-                alert("Please search attendance first");
-                return;
-            }
-
-            window.print();
-
-        });
+    getAttendanceSheet(sessionId, courseId, semester, BatchId, subjectiddropdown);
 
     });
 
-    // =========================================
-    // LOAD SUBJECTS
-    // =========================================
 
-    function loadSubjects() {
-
-        $.ajax({
-
-            url: ApiBaseUrl + "Exam/GetSubjectList",
-
-            type: "GET",
-
-            success: function (response) {
-
-                $("#ddlsubject").empty();
-
-                $("#ddlsubject").append(
-                    '<option value="">-- Select Subject --</option>'
-                );
-
-                $.each(response, function (i, item) {
-
-                    $("#ddlsubject").append(
-                        '<option value="' + item + '">' + item + '</option>'
-                    );
-
-                });
-
-            },
-
-            error: function () {
-
-                alert("Failed to load subject list");
-
-            }
+     $(document).ready(function () {
+        loadPrograms();
+        loadSession();
 
         });
 
-    }
+        function loadSession() {
+           $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+               let session = '<option value="">Select Session</option>';
+               res.forEach(x => {
+                   session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+               });
+               $('#sessionId').html(session);
+           });
+         }
+         function loadPrograms() {
+           $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+               let opt = '<option value="">Select Program</option>';
+               res.forEach(x => {
+                   opt += `<option value="${x.programId}">${x.programName}</option>`;
+               });
+               $('#programId').html(opt);
+           });
+         }
+         document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+       document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+     });
 
-    // =========================================
-    // GET ATTENDANCE
-    // =========================================
+     $("#semester").on("change", function () {
+        let semId = this.value;
+        let courseId = $("#courseId").val();
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!semId) return;
+        $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+            let opt = '<option value="">Select Batch</option>';
+            data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+            $("#BatchId").html(opt);
+        });
+    });
+     document.getElementById("BatchId").addEventListener("change", function () {
+        let semester = $("#semester").val();
+        var courseid = $("#courseId").val();
+        var batch = this.value;
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/getsubjectbycourseandBranch/${semester}/${courseid}/${batch}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("subjectId");
+                courseDropdown.innerHTML = '<option value="">Select Subject</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                });
+            });
+     });
 
-    function getAttendanceSheet(subjectName) {
+        function printTable() {
+            if ($("#printArea").html().trim() == "") {
+                alert("Please search attendance first");
+                return;
+            }
+            window.print();
+        }
+
+        function getAttendanceSheet(sessionId, courseId, semester,BatchId, subjectiddropdown) {
 
         $.ajax({
-
-            url: ApiBaseUrl + "Exam/GetAttendanceSheet?subjectName=" + encodeURIComponent(subjectName),
-
-            type: "GET",
+            url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
+            type: "Get",
 
             success: function (response) {
-
                 if (!response || response.length == 0) {
 
-                    alert("No data found");
+                    $(".candidate-row").html("No Record Found");
                     return;
+                }else{
+                  bindAttendanceSheet(response);
                 }
 
-                bindAttendanceSheet(response);
+
 
             },
-
             error: function (xhr) {
-
                 console.log(xhr.responseText);
-
                 alert("Error loading attendance sheet");
-
             }
-
         });
-
     }
 
-    // =========================================
-    // BIND ATTENDANCE
-    // =========================================
-
     function bindAttendanceSheet(data) {
-
         $("#printArea").html("");
-
         var totalRecords = data.length;
-
-        var recordsPerPage = 20;
-
+        var recordsPerPage = 8;
         var totalPages = Math.ceil(totalRecords / recordsPerPage);
-
         for (var page = 0; page < totalPages; page++) {
-
             var start = page * recordsPerPage;
-
             var end = start + recordsPerPage;
-
             var pageData = data.slice(start, end);
-
             var first = pageData[0];
-
             var rows = "";
-
             $.each(pageData, function (i, item) {
-
                 rows += `
-
                     <tr class="candidate-row">
-
                         <td>
                             ${start + i + 1}
                         </td>
-
                         <td class="candidate-name">
                             ${item.FirstName || ""}
                         </td>
-
                         <td>
-                            ${item.RollNumber || ""}
+                            ${item.Rollnumber || ""}
                         </td>
-
                         <td></td>
-
                         <td class="candidate-photo">
 
                             <img src="${item.CandidateImagePath || ''}"
@@ -588,57 +712,43 @@
                 `;
             });
 
-            // ONLY LAST PAGE SHOW TOTAL
             var footerHtml = "";
-
             if (page == totalPages - 1) {
-
                 footerHtml = `
-
                     <div class="footer-area">
-
                         <div class="footer-grid">
-
                             <div>
-
                                 <div class="footer-line">
-
-                                    Total Present :
-                                    ${totalRecords}
-
-                                </div>
-
+                                    Total Number of Candidate Present : ...
+                                </div><br/>
                                 <div class="footer-line">
-
-                                    Total Absent : 0
-
+                                    Total Number of Candidate Absent : ....
+                                </div><br/><br />
+                                <div class="footer-line">
+                                    Signature & Seal of Centre Supdt.
                                 </div>
-
                             </div>
-
+                            <div>
                             <div class="signature-box">
-
-                                Signature & Seal of Centre Supdt.
-
+                                Name & Signature of the Invigilator
+                            </div><br/>
+                             <div class="signature-box1">
+                               (1)
+                            </div><br/>
+                             <div class="signature-box2">
+                               (2)
                             </div>
-
+                             </div>
                         </div>
-
                     </div>
-
                 `;
             }
 
             var pageHtml = `
-
                 <div class="a4-page print-page">
-
                     <div class="header">
-
                         <div class="header-top">
-
                             <div class="logo-area">
-
                                 <img src="/Logo/nia_logo.png"
                                      style="
                                         width:60px;
@@ -648,121 +758,74 @@
                             </div>
 
                             <div class="header-center">
-
                                 <div class="inst-name">
-
                                     National Institute of Ayurveda, Jaipur
-
                                 </div>
-
-                                <div class="exam-title">
-
-                                    ATTENDANCE SHEET
-
-                                </div>
-
-                                <div class="exam-session">
-                                    (May-2026)
+                                 <div class="exam-title">
+                                    <h4>${first.Examname || ""}</h4>
                                 </div>
 
                             </div>
 
                             <div class="page-badge">
-
                                 Page : ${page + 1}
-
                             </div>
-
                         </div>
-
                     </div>
 
                     <div class="meta-info">
-
                         <div class="meta-row">
-
                             <div>
-
                                 <b>Name of Centre :</b>
-
                                 NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
-
                             </div>
-
                         </div>
-
                         <div class="meta-row">
-
+                          <div>
+                           <b>Room/Hall No. :</b>...
+                           </div>
                             <div>
-
                                 <b>Date :</b>
-
                                 ${first.Examdate || ""}
-
                             </div>
-
                             <div>
-
                                 <b>Time :</b>
-
                                 ${first.Examtime || ""}
-
                             </div>
-
                         </div>
-
                         <div class="meta-row">
-
                             <div>
-
                                 <b>Subject :</b>
 
-                                ${first.SubjectName || ""}
+                                ${first.subject_name || ""}
 
                             </div>
-
                             <div>
-
                                 <b>Paper Code :</b>
 
-                                ${first.SubjectCode || ""}
+                                ${first.subject_code || ""}
 
                             </div>
-
                         </div>
-
                     </div>
-
                     <div class="sheet-title">
-
                         ATTENDANCE-SHEET
-
                     </div>
-
                     <table class="attendance-table">
-
                         <thead>
-
                             <tr>
-
                                 <th style="width:5%;">S.No</th>
-
                                 <th style="width:25%;">
                                     Name of Candidate
                                 </th>
-
                                 <th style="width:12%;">
                                     Roll No
                                 </th>
-
                                 <th style="width:18%;">  Serial No. of Main Answer book
-
                                 </th>
-
                                 <th style="width:15%;">
                                     Photo
                                 </th>
-
                                 <th style="width:15%;">
                                     Signature
                                 </th>
@@ -772,27 +835,16 @@
                                 <th style="width:10%;">
                                     Remark
                                 </th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                             ${rows}
-
                         </tbody>
-
                     </table>
-
                     ${footerHtml}
-
                 </div>
-
             `;
-
             $("#printArea").append(pageHtml);
-
         }
 
     }
