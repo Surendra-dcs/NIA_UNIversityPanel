@@ -410,9 +410,9 @@
                         <td>${student.studentName || ''}</td>
                         <td>${student.enrollmentNo || ''}</td>
                         <td>${student.rollNumber || ''}</td>
-                        <td ${first.totaltheoryfristMarks == 0 ? 'style="display:none"' : ''}>${student.theoryfristIAMarks || ''}</td>
-                        <td ${first.totaltheorysecondMarks == 0 ? 'style="display:none"' : ''}>${student.theorysecondIAMArks || ''}</td>
-                        <td ${first.iatotalMarks == 0 ? 'style="display:none"' : ''}>${student.iamarks || ''}</td>
+                        <td ${first.totaltheoryfristMarks == 0 ? 'style="display:none"' : ''}>${student.theoryfristIAMarks}</td>
+                        <td ${first.totaltheorysecondMarks == 0 ? 'style="display:none"' : ''}>${student.theorysecondIAMArks}</td>
+                        <td ${first.iatotalMarks == 0 ? 'style="display:none"' : ''}>${student.iamarks}</td>
 
                     </tr>
                 `);
