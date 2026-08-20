@@ -26,5 +26,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult P_Attendance()
+        {
+            return View();
+        }
     }
 }
