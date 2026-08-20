@@ -543,11 +543,10 @@
 
      $(document).ready(function () {
         loadPrograms();
-        loadSession();
-       
-        });
+        loadSession();       
+      });
 
-        function loadSession() {
+       function loadSession() {
            $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
                let session = '<option value="">Select Session</option>';
                res.forEach(x => {
@@ -556,7 +555,7 @@
                $('#sessionId').html(session);
            });
          }
-         function loadPrograms() {
+       function loadPrograms() {
            $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
                let opt = '<option value="">Select Program</option>';
                res.forEach(x => {
@@ -565,7 +564,7 @@
                $('#programId').html(opt);
            });
          }
-         document.getElementById("programId").addEventListener("change", function () {
+       document.getElementById("programId").addEventListener("change", function () {
         let programId = this.value;
         $("#courseId").val('');
         $("#semester").val('');
