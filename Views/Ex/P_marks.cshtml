@@ -761,7 +761,7 @@
             let vivaMarks = parseFloat(vivaValue) || 0;
             let practicalMax = parseFloat($(row).find('.practical').data('max')) || 0;
             let vivaMax = parseFloat($(row).find('.viva').data('max')) || 0;
-            let rollNumber = $(row).find('td:eq(3)').text();
+            let rollNumber = $(row).find('td:eq(3)').text().trim();
             let attendance = $(row).find('.attendance').val();
             if (!attendance) {
                 alert(`Roll No ${rollNumber}: Please select Attendance.`);
