@@ -31,5 +31,6 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+       
     }
 }

@@ -1132,8 +1132,9 @@
         $(document).ready(function () {
             debugger
             var emailid = '@Context.Session.GetString("Email")';
+            var subjetId='@ViewBag.SubjectId'
             $.ajax({
-                 url: ApiBaseUrl + 'PracticalMarks/GetExbill?emailid=' + encodeURIComponent(emailid),
+                 url: ApiBaseUrl + 'PracticalMarks/GetExbill?emailid=' + encodeURIComponent(emailid)+'&subjetId='+subjetId,
                 type: 'GET',
                 success: function (res) {
                     if (!res || !res.length) {
