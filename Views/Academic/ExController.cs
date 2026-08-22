@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NIAUNIVERSITYPANEL.Models;
 
@@ -7,9 +8,20 @@ namespace NIAUNIVERSITYPANEL.Controllers
     public class ExController : Controller
     {
         private readonly ApiAuthService _api;
-        public ExController(ApiAuthService api)
+        private readonly IDataProtector _protector;
+        public ExController(ApiAuthService api, IDataProtectionProvider protector)
         {
             _api = api;
+            _protector = protector.CreateProtector("PdfIdProtection");
+        }
+        public string EncryptId(int id)
+        {
+            return _protector.Protect(id.ToString());
+        }
+        public long DecryptId(string encryptedId)
+        {
+            var decrypted = _protector.Unprotect(encryptedId);
+            return Convert.ToInt64(decrypted);
         }
         public IActionResult addExaminer()
         {
@@ -60,8 +72,13 @@ namespace NIAUNIVERSITYPANEL.Controllers
             return View();
         }
 
-        public IActionResult ExBillDetails()
+        public IActionResult ExBillDetails(int subjectId)
         {
+            ViewBag.SubjectId =subjectId;
+            return View();
+        }
+        public IActionResult SubjctWiseBill()
+        {           
             return View();
         }
     }
