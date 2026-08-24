@@ -1,0 +1,396 @@
+﻿@{
+    ViewData["Title"] = "Marksheet";
+    @inject IConfiguration Configuration
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+    </script>
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" />
+
+<style>
+    body {
+        background: #eef1f5;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    .search-bar {
+        max-width: 700px;
+        margin: 30px auto;
+    }
+
+    .marksheet-wrapper {
+        max-width: 1000px;
+        margin: 0 auto 50px auto;
+        background: #fff;
+        padding: 30px 35px;
+        border: 3px double #1a3a6b;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.15);
+        display: none; /* AJAX se data aane par JS ise dikhayega */
+    }
+
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #1a3a6b;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .institute-title {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+        .institute-title h1 {
+            font-size: 26px;
+            color: #1a3a6b;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .institute-title .eng-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .institute-title .sub-line {
+            font-size: 13px;
+            color: #555;
+        }
+
+    .exam-title {
+        text-align: center;
+        background: #1a3a6b;
+        color: #fff;
+        padding: 8px;
+        border-radius: 4px;
+        margin: 15px 0;
+    }
+
+        .exam-title h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .exam-title small {
+            font-size: 13px;
+        }
+
+    .student-info-table {
+        width: 100%;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+        .student-info-table td {
+            padding: 4px 6px;
+        }
+
+        .student-info-table .label {
+            font-weight: 700;
+            color: #1a3a6b;
+            white-space: nowrap;
+        }
+
+    table.marks-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+    }
+
+        table.marks-table th, table.marks-table td {
+            border: 1px solid #1a3a6b;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.marks-table thead th {
+            background: #dbe4f3;
+            color: #1a3a6b;
+            font-weight: 700;
+        }
+
+        table.marks-table td.subject-name {
+            text-align: left;
+            font-weight: 600;
+            min-width: 170px;
+        }
+
+        table.marks-table .total-row {
+            background: #f1c40f33;
+            font-weight: 800;
+        }
+
+    .remark-badge {
+        font-weight: 800;
+        color: #b30000;
+    }
+
+    .footer-note {
+        font-size: 11px;
+        color: #444;
+        margin-top: 15px;
+        line-height: 1.5;
+    }
+
+    .result-box {
+        text-align: right;
+        font-weight: 800;
+        font-size: 15px;
+        color: #0a7d28;
+        margin-top: 10px;
+    }
+
+    .signature-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 40px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    #loadingSpinner {
+        display: none;
+        text-align: center;
+        margin: 30px auto;
+    }
+
+    @@media print {
+        .no-print {
+            display: none;
+        }
+
+        .marksheet-wrapper {
+            box-shadow: none;
+            border: 2px solid #000;
+        }
+    }
+</style>
+
+<!-- ===================== SEARCH BAR ===================== -->
+<div class="search-bar no-print">
+    <div class="d-flex gap-2 mt-4">
+        <input type="text" id="rollNoInput" class="form-control" placeholder="अनुक्रमांक / Roll No. डालें (जैसे 2101002)" />
+        <button id="btnSearch" type="button" class="btn btn-primary px-4">Search</button>
+    </div>
+    <div id="errorBox" class="alert alert-warning mt-2" style="display:none;"></div>
+</div>
+
+<div id="loadingSpinner" class="no-print">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div>Data load ho raha hai...</div>
+</div>
+
+<!-- ===================== MARKSHEET (AJAX se yahan bind hoga) ===================== -->
+<div class="marksheet-wrapper" id="marksheetWrapper">
+
+    <div class="header-row">
+        <div>क्रम संख्या / Serial No.: <span id="txtSerialNo"></span></div>
+        <div>फोलियों संख्या / Folio No.: <span id="txtFolioNo"></span></div>
+    </div>
+
+    <div class="institute-title">
+        <h1>राष्ट्रीय आयुर्वेद संस्थान</h1>
+        <div class="eng-name">National Institute of Ayurveda</div>
+        <div class="sub-line">मानद विश्वविद्यालय (आयुष मंत्रालय, भारत सरकार) — Deemed to be University (Ministry of AYUSH, Govt. of India)</div>
+        <div class="sub-line">आमेर रोड, जयपुर-302002 &nbsp;|&nbsp; Amer Road, Jaipur-302002</div>
+    </div>
+
+    <div class="exam-title">
+        <h4 id="txtCourseName"></h4>
+        <small id="txtExamSession"></small>
+    </div>
+
+    <table class="student-info-table">
+        <tr>
+            <td class="label">नाम / Name:</td>
+            <td id="txtStudentName"></td>
+            <td class="label">अनुक्रमांक / Roll No.:</td>
+            <td id="txtRollNo"></td>
+        </tr>
+        <tr>
+            <td class="label">पिता का नाम / Father's Name:</td>
+            <td id="txtFatherName"></td>
+            <td class="label">नामांकन संख्या / Enrollment No.:</td>
+            <td id="txtEnrollmentNo"></td>
+        </tr>
+        <tr>
+            <td class="label">माता का नाम / Mother's Name:</td>
+            <td id="txtMotherName"></td>
+            <td class="label">प्रयास / Attempt:</td>
+            <td id="txtAttempt"></td>
+        </tr>
+    </table>
+
+    <div class="table-responsive">
+        <table class="marks-table">
+            <thead>
+                <tr>
+                    <th rowspan="2">विषय / Subject</th>
+                    <th rowspan="2">अधिकतम अंक<br />Max Marks</th>
+                    <th rowspan="2">न्यूनतम अंक<br />Min Marks</th>
+                    <th colspan="2">सैद्धांतिक / Theory</th>
+                    <th colspan="4">व्यावहारिक / Practical</th>
+                    <th rowspan="2">विषय योग<br />Subject Total</th>
+                    <th rowspan="2">टिप्पणी<br />Remark</th>
+                </tr>
+                <tr>
+                    <th>प्रथम</th>
+                    <th>द्वितीय</th>
+                    <th>Practical</th>
+                    <th>Viva</th>
+                    <th>ऐच्छिक</th>
+                    <th>आई.ए.</th>
+                </tr>
+            </thead>
+            <!-- ==== AJAX yahan <tr> rows append karega ==== -->
+            <tbody id="subjectsTableBody"></tbody>
+            <tfoot>
+                <tr class="total-row">
+                    <td colspan="9" style="text-align:right;">कुल योग / GRAND TOTAL</td>
+                    <td colspan="2" id="txtGrandTotal"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="footer-note">
+        <strong>डिस्टिंक्शन प्राप्ति / Distinction secured:</strong> <span id="txtDistinction"></span> &nbsp;|&nbsp;
+        <strong>प्रथम श्रेणी प्राप्ति / First Class:</strong> <span id="txtFirstClass"></span> &nbsp;|&nbsp;
+        <strong>कृपांक प्राप्ति / Grace Marks:</strong> <span id="txtGrace"></span> &nbsp;|&nbsp;
+        <strong>अनुत्तीर्ण / Failed:</strong> <span id="txtFailed"></span>
+    </div>
+
+    <div class="result-box">
+        परिणाम / RESULT: <span id="txtResult"></span> &nbsp;&nbsp; (<span id="txtResultDate"></span>)
+    </div>
+
+    <div class="signature-row">
+        <div>जयपुर / Jaipur</div>
+        <div>परीक्षा नियंत्रक<br />CONTROLLER OF EXAMINATIONS</div>
+    </div>
+
+    <div class="text-center no-print mt-4">
+        <button onclick="window.print()" class="btn btn-outline-primary">🖨️ Print / Save as PDF</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    // ============================================================
+    // AJAX FUNCTION: API se marksheet data laana aur page me bind karna
+    // ============================================================
+    function loadMarksheet(rollNo) {
+        debugger
+        $("#errorBox").hide();
+        $("#marksheetWrapper").hide();
+        $("#loadingSpinner").show();
+
+        $.ajax({
+            url: ApiBaseUrl+"MarksheetApi/GetByRollNo",
+            type: "GET",
+            data: { rollNo: rollNo },
+            dataType: "json",
+
+            success: function (response) {
+                $("#loadingSpinner").hide();
+                bindMarksheetData(response);
+                $("#marksheetWrapper").fadeIn();
+            },
+
+            error: function (xhr) {
+                $("#loadingSpinner").hide();
+                var msg = "कोई त्रुटि हुई। कृपया पुनः प्रयास करें।";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                $("#errorBox").text(msg).show();
+            }
+        });
+    }
+
+    // ============================================================
+    // DATA BIND FUNCTION: JSON response ko HTML elements me bharna
+    // ============================================================
+    function bindMarksheetData(data) {
+        var student = data.studentInfo;
+        var subjects = data.subjects;
+
+        // ---- Student info bind ----
+        $("#txtSerialNo").text(student.serialNo);
+        $("#txtFolioNo").text(student.folioNo);
+        $("#txtCourseName").text(student.courseName);
+        $("#txtExamSession").text(student.examSession);
+        $("#txtStudentName").text(student.studentName);
+        $("#txtRollNo").text(student.rollNo);
+        $("#txtFatherName").text(student.fatherName);
+        $("#txtEnrollmentNo").text(student.enrollmentNo);
+        $("#txtMotherName").text(student.motherName);
+        $("#txtAttempt").text(student.attempt);
+        $("#txtGrandTotal").text(student.grandTotal);
+        $("#txtDistinction").text(student.distinctionSubjects);
+        $("#txtFirstClass").text(student.firstClassSubjects);
+        $("#txtGrace").text(student.graceSubjects);
+        $("#txtFailed").text(student.failedSubjects);
+        $("#txtResult").text(student.result);
+        $("#txtResultDate").text(student.resultDate);
+
+        // ---- Subject rows dynamically bind (tbody khaali karke naye rows daalna) ----
+        var tbody = $("#subjectsTableBody");
+        tbody.empty();
+
+        $.each(subjects, function (index, sub) {
+            var row = "<tr>" +
+                "<td class='subject-name'>(" + sub.subjectCode + ") " + sub.subjectName + "</td>" +
+                "<td>" + sub.maxMarks + "</td>" +
+                "<td>" + sub.minMarks + "</td>" +
+                "<td>" + sub.theoryPart1 + "</td>" +
+                "<td>" + sub.theoryPart2 + "</td>" +
+                "<td>" + sub.practical + "</td>" +
+                "<td>" + sub.viva + "</td>" +
+                "<td>" + sub.elective + "</td>" +
+                "<td>" + sub.internalAssessment + "</td>" +
+                "<td><strong>" + sub.subjectTotal + "</strong></td>" +
+                "<td><span class='remark-badge'>" + (sub.remark ?? "") + "</span></td>" +
+                "</tr>";
+
+            tbody.append(row);
+        });
+    }
+
+    // ============================================================
+    // Button click aur Enter key par search trigger
+    // ============================================================
+    $(document).ready(function () {
+        $("#btnSearch").on("click", function () {
+            var rollNo = $("#rollNoInput").val().trim();
+            if (rollNo === "") {
+                $("#errorBox").text("कृपया Roll No. डालें।").show();
+                return;
+            }
+            loadMarksheet(rollNo);
+        });
+
+        $("#rollNoInput").on("keypress", function (e) {
+            if (e.which === 13) { // Enter key
+                $("#btnSearch").click();
+            }
+        });
+
+        // Agar URL me ?rollNo=xxx pehle se ho to auto-load kar dena
+        var urlParams = new URLSearchParams(window.location.search);
+        var preRollNo = urlParams.get("rollNo");
+        if (preRollNo) {
+            $("#rollNoInput").val(preRollNo);
+            loadMarksheet(preRollNo);
+        }
+    });
+</script>

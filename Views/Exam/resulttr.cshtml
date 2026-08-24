@@ -95,6 +95,9 @@
             page-break-after: auto;
         }
 
+    .s1{
+    padding: 5px;
+    }
 </style>
 
 <div class="search-panel">
@@ -138,6 +141,12 @@
             <label>Semester</label>
             <select id="semester">
                 <option value="">Select Semester</option>
+            </select>
+        </div>
+        <div class="search-group">
+            <label>Batch </label>
+            <select id="BatchId">
+                <option value="">Select Batch</option>
             </select>
         </div>
 
@@ -280,8 +289,8 @@
      });
        document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
-        $("#semester").val('');
-        $("#subjectId").val('');
+        $("#semester").val('');     
+        $("#BatchId").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
             .then(data => {
@@ -291,15 +300,29 @@
                      courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
                 });
             });
-     });
+      });
+      $("#semester").on("change", function () {
+           let semId = this.value;
+           let courseId = $("#courseId").val();
+           $("#BatchId").html('<option value="">Select Batch</option>');
+           if (!semId) return;
+           $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+               let opt = '<option value="">Select Batch</option>';
+               data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+               $("#BatchId").html(opt);
+           });
+       });
+     
+
+
 
         async function loadResult() {
         const courseId = $("#courseId").val();
         const semester = $("#semester").val();
         const sessionId = $("#sessionId").val();
-
+        let BatchId = $("#BatchId").val();
         const response = await fetch(
-            ApiBaseUrl + `Result/GetTabulationRegisterResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}`
+            ApiBaseUrl + `Result/GetTabulationRegisterResultReport?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
         );
 
        const data = await response.json();
