@@ -1,0 +1,773 @@
+﻿@{
+    ViewData["Title"] = "Result";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+
+
+<link href="~/css/TrStyleSheet.css" rel="stylesheet" />
+<script src="~/js/Printtrug.js"></script>
+<style>
+    .search-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    .search-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #0d3b66;
+        margin-bottom: 15px;
+    }
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-group {
+        min-width: 220px;
+        flex: 1;
+    }
+
+        .search-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .search-group select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+
+    .btn-group {
+        flex: 0;
+    }
+
+        .btn-group button {
+            height: 38px;
+            padding: 0 25px;
+            border: none;
+            background: #0d6efd;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+            .btn-group button:hover {
+                background: #0b5ed7;
+            }
+
+    .download-btn:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .search-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .print-page {
+        position: relative;
+        page-break-after: always;
+        min-height: 190mm;
+    }
+
+        .print-page:last-child {
+            page-break-after: auto;
+        }
+
+    .s1{
+    padding: 5px;
+    }
+
+</style>
+
+<style>
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        padding: 20px;
+        background: #f5f5f5;
+    }
+
+    table.ledger {
+        border-collapse: collapse;
+        width: 100%;
+        background: #fff;
+        font-size: 12px;
+    }
+
+        table.ledger th, table.ledger td {
+            border: 1px solid #000;
+            padding: 3px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }  
+
+        table.ledger thead th {
+            background: #fff;
+            font-weight: bold;
+        }
+
+    .group-head {
+        font-size: 12px;
+    }
+
+    .subject-head {
+        min-width: 140px;
+    }
+
+    .roll-head {
+        min-width: 150px;
+        text-align: left;
+    }
+
+    .vertical {
+        white-space: nowrap;
+    }
+
+    .vertical-col {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        padding: 6px 2px;
+        height: 130px;
+    }
+
+        .vertical-col.tall {
+            height: 232px;
+        }
+
+    td.data-cell {
+        height: 34px;
+        line-height: 20px;
+    }
+
+    .border-none{
+        border:none !important;
+    }
+
+    .k {
+        border: none !important;
+    }
+
+    .no-right-border {
+        border-right: none !important;
+    }
+
+    .no-bottom-border {
+        border-bottom: none !important;
+    }
+
+    .kk {
+        border-left: none !important;
+        border-right: none !important;
+    }
+
+    .kkk {
+        border-left: none !important;
+        border-bottom: none !important;
+
+    }
+
+    .kkkk {
+        border-left: none !important;
+        border-bottom: none !important;
+        border-right: none !important;
+    }
+
+</style>
+
+
+
+<div class="search-panel">
+
+    <div class="search-title">
+        🔍 Tabulation Register Search
+        <div class="action-buttons">
+            <button type="button"
+                    onclick="printTable()"
+                    style="width:98px; height:38px; font-weight:800; background:#3b8508; color:white; cursor:pointer;">
+                Print
+            </button>
+
+        </div>
+    </div>
+
+    <div class="search-row">
+
+        <div class="search-group">
+            <label>Session</label>
+            <select id="sessionId">
+                <option value="">Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Program</label>
+            <select id="programId">
+                <option value="">Select Program</option>
+                <option value="1">Under Graduate (UG)</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label>Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+        <div class="search-group">
+            <label>Batch </label>
+            <select id="BatchId">
+                <option value="">Select Batch</option>
+            </select>
+        </div>
+
+        <div class="search-group btn-group">
+            <button type="button" onclick="loadResultforBamsSecond()">
+                Search Report
+            </button>           
+        </div>
+    
+       
+    </div>
+</div>
+
+
+<div class="page" id="ledgerPage">
+        <div class="top">
+            <div class="logo">
+            <img src="~/Logo/nia_logo.png" />
+            </div>
+            <div class="heading">
+                <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
+                <p>Deemed to be University</p>
+                <p>(Ministry of AYUSH, Govt. of India)</p>
+                <p>Jorawar Singh Gate, Amer Road, Jaipur-302002</p>
+                <h4>
+                    <span id="ExamnameId"></span>
+                </h4>
+                <h3>TABULATION REGISTER/LEDGER</h3>
+            </div>
+
+            <div class="page-no">Page: 1</div>
+        </div>
+
+        <div class="issue-date">Date of Issue : .....................</div>
+
+       
+
+
+      
+    <table class="ledger">
+        <thead>
+            <tr>
+                <th rowspan="3">S.<br>No.</th>
+                <th rowspan="3" class="roll-head">
+                    Roll NO<br>Enrollment No.<br>Candidate Name<br>Father`s Name
+                </th>
+                <th rowspan="3" class="vertical vertical-col">Attempt</th>
+                <th rowspan="3" class="subject-head">
+                    Name of Subjects<br><small>in which appearing</small>
+                </th>
+
+                <th colspan="2" class="group-head no-bottom-border">Unique Code</th>
+
+                <th colspan="6" class="group-head no-bottom-border">Marks Scheme</th>
+
+                <th colspan="5" class="group-head no-bottom-border">Theory I</th>
+                <th colspan="5" class="group-head no-bottom-border">Theory II</th>
+
+                <th colspan="11" class="group-head no-bottom-border">OBTAINED MARKS</th>
+
+                <th rowspan="3" class="vertical vertical-col tall kkkk">
+                    Required to appear at the<br>Attempt Examinations
+                </th>
+                <th rowspan="3" class="vertical vertical-col kkk">
+                    Distinction - D / First Class - I
+                </th>
+                <th rowspan="3">Grand<br>Total</th>
+                <th rowspan="3">Result</th>
+            </tr>
+
+            <tr>
+                <!-- Unique Code sub -->
+                <th rowspan="2" class="k">I</th>
+                <th rowspan="2" class="k">II</th>
+
+                <!-- Marks Scheme sub -->
+                <th colspan="2" class="k">Theory</th>
+                <th colspan="4" class="k">Practical / Viva</th>
+                <th rowspan="2" class="k">Total</th>
+
+                <!-- Theory I sub (vertical) -->
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator I</th>
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator II</th>
+                <th class="vertical vertical-col k" rowspan="2">Difference between Evaluator<br> I &amp; II</th>
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator III</th>
+                <th class="vertical vertical-col tall k" rowspan="2">Average of Two Higher marks<br> among three evaluator Theory I Total</th>
+
+                <!-- Theory II sub (vertical) -->
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator I</th>
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator II</th>
+                <th class="vertical vertical-col k" rowspan="2">Difference between Evaluator<br> I &amp; II</th>
+                <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator III</th>
+                <th class="vertical vertical-col tall k" rowspan="2">Average of Two Higher marks<br> among three evaluator Theory II Total</th>
+
+                <!-- OBTAINED MARKS sub -->
+                <th colspan="2" class="k">Theory</th>
+                <th colspan="6" class="k">Practical / Viva</th>
+                <th rowspan="2" class="k">Subject<br>Total</th>
+                <th rowspan="2" class="k"><br /><br />Grace</th>
+            </tr>
+
+            <tr>
+                <!-- Marks Scheme -> Practical/Viva sub -->
+                <th class="k">I</th>
+                <th class="k">II</th>
+                <th class="k">Prac</th>
+                <th class="k">Viva</th>
+                <th class="k">Elec</th>
+                <th class="k">IA</th>
+
+                <!-- OBTAINED MARKS -> Theory sub -->
+                <th class="k">I</th>
+                <th class="k">II</th>
+                <th class="k">Total</th>
+
+                <!-- OBTAINED MARKS -> Practical/Viva sub -->
+                <th class="k">Prac</th>
+                <th class="k">Viva</th>
+                <th class="k">Elec</th>
+                <th class="k">IA</th>
+                <th class="k">Total</th>
+            </tr>
+        </thead>
+
+        <tbody id="resultBody2">
+            <!-- sample blank row for reference; add real rows here -->
+            <tr>
+                <td class="data-cell">1</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+                <td class="data-cell">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+        <div class="footer">
+            <div class="notes">
+                <b>Note.</b><br />
+                1. For candidate to pass, he/she shall require to obtain a minimum of
+                50% marks in each of Theory examination.<br />
+                2. The candidate securing 65% marks or above in a subject shall be
+                declared to have obtained First Class(Denoted by I) in that
+                Subject.<br />
+                3. The candidate securing 75% marks or above in a subject shall be
+                declared to have obtained distinction(Denoted by D)in that Subject.<br />
+                4. A candidate failing in the Theory part of a paper will be
+                considered fail in Theory.
+            </div>
+
+            <div class="sign">Tabulator</div>
+            <div class="sign1">DCOE</div>
+            <div class="sign">Controller of Examinations</div>
+            <div class="sign2">Registrar</div>
+            <div class="sign2">Vice Chancellor</div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {        
+        loadSession();
+        });
+         function loadSession() {
+           $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+               let session = '<option value="">Select Session</option>';
+               res.forEach(x => {
+                   session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+               });
+               $('#sessionId').html(session);
+           });
+         }
+         function loadPrograms() {
+           $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+               let opt = '<option value="">Select Program</option>';
+               res.forEach(x => {
+                   opt += `<option value="${x.programId}">${x.programName}</option>`;
+               });
+               $('#programId').html(opt);
+           });
+         }
+         document.getElementById("programId").addEventListener("change", function () {
+        let programId = this.value;
+        $("#courseId").val('');
+        $("#semester").val('');
+        $("#subjectId").val('');
+        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("courseId");
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';                   
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                });
+            });
+     });
+       document.getElementById("courseId").addEventListener("change", function () {
+        let courseId = this.value;
+        $("#semester").val('');     
+        $("#BatchId").val('');
+        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+            .then(res => res.json())
+            .then(data => {
+                let courseDropdown = document.getElementById("semester");
+                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                data.forEach(item => {
+                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                });
+            });
+      });
+      $("#semester").on("change", function () {
+           let semId = this.value;
+           let courseId = $("#courseId").val();
+           $("#BatchId").html('<option value="">Select Batch</option>');
+           if (!semId) return;
+           $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+               let opt = '<option value="">Select Batch</option>';
+               data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+               $("#BatchId").html(opt);
+           });
+       });
+     
+
+
+
+
+      async function loadResultforBamsSecond() {
+
+        const courseId = $("#courseId").val();
+        const semester = $("#semester").val();
+        const sessionId = $("#sessionId").val();
+        let BatchId = $("#BatchId").val();
+
+        const response = await fetch(
+            ApiBaseUrl +
+            `Result/GetTabulationRegisterResultReportforbamssecond?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
+        );
+
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
+            $("#ExamnameId").text('');
+            $("#resultBody").html('');
+            alert("No records found for the selected Session, Course and Semester.");
+            return;
+        }
+
+        $("#ExamnameId").text(data[0].examname || '');
+
+        // Group student-wise
+        let grouped = {};
+
+        data.forEach(item => {
+
+            let key = item.rollNumber;
+
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+
+            grouped[key].push(item);
+        });
+
+        let html = '';
+        let sno = 1;
+
+        Object.keys(grouped).forEach(key => {
+
+            let student = grouped[key];
+            let first = student[0];
+
+            html += `
+            <tr>
+
+                <!-- S.No -->
+                <td class="data-cell">
+                    ${sno++}
+                </td>
+                <td>
+                    ${first.rollNumber}
+                    <hr/>
+                    ${first.enrollmentNumber}
+                    <hr/>
+                    ${first.firstName}
+                    <hr/>
+                    ${first.fatherName}
+                </td>
+              
+
+                <!-- Attempt -->
+                <td class="data-cell">
+                    ${first.attempt || ''}
+                </td>
+
+         
+
+                <!-- Subject Name -->
+                <td class="data-cell kk" style="border: 1px solid #000; padding:3px 4px; text-align:left;">
+                    ${student.map(x => x.subjectName || '-').join('<br>')}
+                </td>
+
+                <!-- Script ID I -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.scriptIdI || '-').join('<br>')}
+                </td>
+
+                <!-- Script ID II -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.scriptIdII || '-').join('<br>')}
+                </td>
+
+                <!-- Theory I -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.theoryI || '-').join('<br>')}
+                </td>
+
+                <!-- Theory II -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.theoryII || '-').join('<br>')}
+                </td>
+
+                <!-- Practical -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.practical || '-').join('<br>')}
+                </td>
+
+                <!-- Viva Marks -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.vivaMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Elective Marks -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.electiveMarks || '-').join('<br>')}
+                </td>
+
+                <!-- IA Marks -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.iaMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Grand Total Marks -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.grandTotalMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Theory I Evaluator 1 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIEvaluator1 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory I Evaluator 2 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIEvaluator2 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory I Difference -->
+                <td class="data-cell kk">
+                    ${student.map(x =>
+                        x.thearyIDifference12 != null
+                            ? Number(x.thearyIDifference12).toFixed(2)
+                            : '-'
+                    ).join('<br>')}
+                </td>
+
+                <!-- Theory I Evaluator 3 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIEvaluator3 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory I Average -->
+                <td class="data-cell kk">
+                    ${student.map(x =>
+                        x.thearyIAverageOfTwoHigherMarks != null
+                            ? Number(x.thearyIAverageOfTwoHigherMarks).toFixed(2)
+                            : '-'
+                    ).join('<br>')}
+                </td>
+
+                <!-- Theory II Evaluator 1 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIIEvaluator1 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory II Evaluator 2 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIIEvaluator2 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory II Difference -->
+                <td class="data-cell kk">
+                    ${student.map(x =>
+                        x.thearyIIDifference12 != null
+                            ? Number(x.thearyIIDifference12).toFixed(2)
+                            : '-'
+                    ).join('<br>')}
+                </td>
+
+                <!-- Theory II Evaluator 3 -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.thearyIIEvaluator3 || '-').join('<br>')}
+                </td>
+
+                <!-- Theory II Average -->
+                <td class="data-cell kk">
+                    ${student.map(x =>
+                        x.thearyIIAverageOfTwoHigherMarks != null
+                            ? Number(x.thearyIIAverageOfTwoHigherMarks).toFixed(2)
+                            : '-'
+                    ).join('<br>')}
+                </td>
+
+                <!-- Final Theory I -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.finalTheoryIMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Final Theory II -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.finalTheoryIIMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Theory Total -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.theoryTotal || '-').join('<br>')}
+                </td>
+
+                <!-- Obtained Practical -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.obtenPracticalMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Obtained Viva -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.obtenVivaMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Obtained Elective -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.obtenElativeMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Obtained IA -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.obtenIAMarks || '-').join('<br>')}
+                </td>
+
+                <!-- Practical Total -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.practicalTotal || '-').join('<br>')}
+                </td>
+
+
+                <!-- Subject Total -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.subjectTotal || '').join('<br>')}
+                </td>
+                <!-- Grace Marks -->
+                <td class="data-cell kk">
+                    ${student.map(x => x.graceMarks || '').join('<br>')}
+                </td>
+
+
+                <!-- Required To Appear -->
+                <td class="data-cell kk">
+                    ${student
+                        .filter(x => x.required_To_Appear)
+                        .map(x => x.required_To_Appear)
+                        .join('<br>')}
+                </td>
+
+                <!-- Distinction -->
+                <td class="data-cell kk">
+                    ${student
+                        .filter(x => x.distinction)
+                        .map(x => x.distinction)
+                        .join('<br>')}
+                </td>
+
+                <!-- Grand Total -->
+                <td class="data-cell">
+                    ${first.grandTotal || '-'}
+                </td>
+
+                <!-- Result -->
+                <td class="data-cell">
+                    ${first.result || ''}
+                </td>
+
+            </tr>`;
+        });
+
+        $("#resultBody2").html(html);
+    }
+
+</script>
+

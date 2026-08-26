@@ -129,6 +129,12 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-       
+
+        public IActionResult resulttrug()
+        {
+            return View();
+        }
+
+
     }
 }
