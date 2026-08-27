@@ -17,7 +17,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <style>
-  @@page {
+   @@page {
     size: A4 portrait;
     margin: 3mm 4mm;
   }
@@ -67,15 +67,23 @@
   /* Outer & Inner Double Border Container */
   .outer-border {
     width: 196mm;
-    margin: 10px auto 20px auto;
+    min-height: 277mm;
+    margin: 10px auto 25px auto;
     border: 2.5px solid #6b93cb;
     padding: 3px;
     background: #fff;
     box-sizing: border-box;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: relative;
+    display: flex;
+    flex-direction: column;
   }
   .sheet {
     width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     border: 1.5px solid #6b93cb;
     padding: 3.5mm 5.5mm;
     position: relative;
@@ -186,11 +194,14 @@
     margin-top: 4px;
   }
   .academic-col-left {
-    width: 49.5%;
+    flex: 1;
     text-align: center;
   }
+  .academic-center-spacer {
+    flex: 0 0 120px;
+  }
   .academic-col-right {
-    width: 49.5%;
+    flex: 1;
     text-align: center;
   }
 
@@ -386,10 +397,12 @@
   .serial-bottom {
     position: absolute;
     right: 0;
-    bottom: -11px;
-    font-size: 7.5px;
+    bottom: -16px;
+    font-size: 8px;
     font-weight: bold;
   }
+
+
 
         /* =====================================================
            PRINT POPUP
@@ -565,7 +578,7 @@
         }
 
   /* Strict Single-Page Print Optimization */
-  @@media print {
+ @@media print {
     @@page {
       size: A4 portrait;
       margin: 3mm 4mm;
@@ -574,7 +587,8 @@
       margin: 0 !important;
       padding: 0 !important;
       background: #fff !important;
-      height: 100% !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
       overflow: hidden !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
@@ -584,6 +598,9 @@
     }
     .outer-border {
       width: 100% !important;
+      height: calc(100vh - 6mm) !important;
+      min-height: calc(100vh - 6mm) !important;
+      max-height: calc(100vh - 6mm) !important;
       margin: 0 auto !important;
       border: 2.5px solid #6b93cb !important;
       padding: 3px !important;
@@ -591,13 +608,27 @@
       box-sizing: border-box !important;
       page-break-inside: avoid !important;
       page-break-after: avoid !important;
+      display: flex !important;
+      flex-direction: column !important;
     }
     .sheet {
       width: 100% !important;
+      height: 100% !important;
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
       border: 1.5px solid #6b93cb !important;
+      padding: 3mm 5mm !important;
       box-sizing: border-box !important;
       page-break-inside: avoid !important;
       page-break-after: avoid !important;
+    }
+    .footer-block {
+      margin-top: auto !important;
+    }
+    .serial-bottom {
+      bottom: -13px !important;
     }
   }
 </style>
@@ -625,37 +656,41 @@
                 <span><span class="hi-text">फोलियों संख्या</span> /Folio No.:<span id="Folio"></span></span>
     </div>
 
-    <div class="header-row">
-      <div class="header-col-left">
-        <p class="inst-name-hi hi-text">राष्ट्रीय आयुर्वेद संस्थान</p>
-        <p class="inst-sub-hi hi-text">मानद विश्वविद्यालय</p>
-        <p class="inst-addr-hi hi-text">(आयुष मंत्रालय, भारत सरकार)<br>आमेर रोड, जयपुर-302002</p>
-      </div>
-      <div class="logo-col">
-       <img src="~/Logo/logo.webp" alt="National Institute of Ayurveda Logo">
-      </div>
-      <div class="header-col-right">
-        <p class="inst-name-en">National Institute of Ayurveda</p>
-        <p class="inst-sub-en">Deemed to be University</p>
-        <p class="inst-ministry-en">(Ministry of AYUSH, Govt. of India)</p>
-        <p class="inst-addr-en">Amer Road, Jaipur-302002</p>
-      </div>
-    </div>
 
-    <div class="academic-row">
-      <div class="academic-col-left">
-        <p class="course-line-hi-main hi-text">आयुर्वेदाचार्य-द्वितीय व्यावसायिक</p>
-        <p class="course-line-hi-sub hi-text">(आयुर्वेदिक चिकित्सा एवं शल्य चिकित्सा में स्नातक<br>बैचलर ऑफ आयुर्वेदिक मेडिसिन एण्ड सर्जरी- बी.ए.एम.एस)</p>
-        <p class="doc-title-hi hi-text">अंक विवरणिका</p>
+            <div class="header-row">
+                <div class="header-col-left">
+                    <p class="inst-name-hi hi-text">राष्ट्रीय आयुर्वेद संस्थान</p>
+                    <p class="inst-sub-hi hi-text">मानद विश्वविद्यालय</p>
+                    <p class="inst-addr-hi hi-text">(आयुष मंत्रालय, भारत सरकार)<br>आमेर रोड, जयपुर-302002</p>
+                </div>
+                <div class="logo-col">
+                    <img src="~/Logo/logo.webp" alt="National Institute of Ayurveda Logo">
+                </div>
+                <div class="header-col-right">
+                    <p class="inst-name-en">National Institute of Ayurveda</p>
+                    <p class="inst-sub-en">Deemed to be University</p>
+                    <p class="inst-ministry-en">(Ministry of AYUSH, Govt. of India)</p>
+                    <p class="inst-addr-en">Amer Road, Jaipur-302002</p>
+                </div>
+            </div>
+
+            <div class="academic-row">
+                <div class="academic-col-left">
+                    <p class="course-line-hi-main hi-text">आयुर्वेदाचार्य-द्वितीय व्यावसायिक</p>
+                    <p class="course-line-hi-sub hi-text">(आयुर्वेदिक चिकित्सा एवं शल्य चिकित्सा में स्नातक<br>बैचलर ऑफ आयुर्वेदिक मेडिसिन एण्ड सर्जरी- बी.ए.एम.एस)</p>
+                    <p class="doc-title-hi hi-text">अंक विवरणिका</p>
                     <p class="exam-held hi-text">(परीक्षा सम्पादित जुलाई-अगस्त 2026)</p>
-      </div>
-      <div class="academic-col-right">
-        <p class="course-line-en-main">B.A.M.S. II Professional</p>
-        <p class="course-line-en-sub">(Bachelor of Ayurvedic Medicine and Surgery-B.A.M.S.)</p>
-        <p class="doc-title-en">MARKS STATEMENT</p>
+                </div>
+                <div class="academic-center-spacer"></div>
+                <div class="academic-col-right">
+                    <p class="course-line-en-main">B.A.M.S. II Professional</p>
+                    <p class="course-line-en-sub">(Bachelor of Ayurvedic Medicine and Surgery-B.A.M.S.)</p>
+                    <p class="doc-title-en">MARKS STATEMENT</p>
                     <p class="exam-held">(Examination Held in July-August 2026)</p>
-      </div>
-    </div>
+                </div>
+            </div>
+
+   
 
             <table class="student-info">
                 <tr>
@@ -781,9 +816,8 @@
         <span class="hi-text">परीक्षा नियंत्रक</span><br>
         CONTROLLER OF EXAMINATIONS
       </div>
-                <div class="serial-bottom"><span id="serialbottom"></span></div>
     </div>
-
+            <div class="serial-bottom"><span id="serialbottom"></span></div>
   </div>
 </div>
     <div id="printModal" class="print-modal">
