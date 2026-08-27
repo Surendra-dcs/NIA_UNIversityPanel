@@ -135,6 +135,16 @@ namespace NIAUNIVERSITYPANEL.Controllers
             return View();
         }
 
+        public IActionResult dataforresult()
+        {
+            return View();
+        }
+
+        public IActionResult Studentmarksheet(string enrollmentNumber)
+        {
+            ViewBag.enrollment=enrollmentNumber;
+            return View();
+        }        
 
     }
 }
