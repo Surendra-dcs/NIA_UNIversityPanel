@@ -647,13 +647,13 @@
         <p class="course-line-hi-main hi-text">आयुर्वेदाचार्य-द्वितीय व्यावसायिक</p>
         <p class="course-line-hi-sub hi-text">(आयुर्वेदिक चिकित्सा एवं शल्य चिकित्सा में स्नातक<br>बैचलर ऑफ आयुर्वेदिक मेडिसिन एण्ड सर्जरी- बी.ए.एम.एस)</p>
         <p class="doc-title-hi hi-text">अंक विवरणिका</p>
-        <p class="exam-held hi-text">(परीक्षा सम्पादित जनवरी-फरवरी 2025)</p>
+                    <p class="exam-held hi-text">(परीक्षा सम्पादित जुलाई-अगस्त 2026)</p>
       </div>
       <div class="academic-col-right">
         <p class="course-line-en-main">B.A.M.S. II Professional</p>
         <p class="course-line-en-sub">(Bachelor of Ayurvedic Medicine and Surgery-B.A.M.S.)</p>
         <p class="doc-title-en">MARKS STATEMENT</p>
-        <p class="exam-held">(Examination Held in January-February 2025)</p>
+                    <p class="exam-held">(Examination Held in July-August 2026)</p>
       </div>
     </div>
 
@@ -688,6 +688,7 @@
                     <td class="label">
                         <span class="hi-text">माता का नाम/Mother's Name</span>:
                         <span class="hi-text" id="motherNameHindi"></span>
+                        / <span id="MotherName"></span>
                     </td>
 
                     <td class="label">
@@ -1246,31 +1247,83 @@ function formatIA(value, subjectName) {
                 // STUDENT DETAILS
                 // =================================================
 
+
+
+
+
                 $("#studentName").text(
 
                     displayValue(
                         getValue(
                             student,
-                            "FirstName"
+                                  "FirstName"
                         ),
                         ""
                     )
 
                 );
 
+                                 $("#studentNameHindi").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                                  "StudentHindiName"
+                                ),
+                                ""
+                            )
+
+                        );
 
                 $("#fatherName").text(
 
                     displayValue(
                         getValue(
                             student,
-                            "FatherName"
+                                   "FatherName"
                         ),
                         ""
                     )
 
                 );
 
+
+
+                                $("#fatherNameHindi").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                                   "FatherNameHindi"
+                                ),
+                                ""
+                            )
+
+                        );
+
+                     $("#MotherName").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                    "MotherName"
+                                ),
+                                ""
+                            )
+
+                        );
+
+                                          $("#motherNameHindi").text(
+
+                                    displayValue(
+                                        getValue(
+                                            student,
+                                                    "MotherNameHindi"
+                                        ),
+                                        ""
+                                    )
+
+                                );
 
                 $("#rollNumber").text(
 
@@ -1324,7 +1377,7 @@ function formatIA(value, subjectName) {
 
                 if (examName !== "") {
 
-                    $(".exam-held").text(
+                    $(".exam-h").text(
                         "Examination Held in " +
                         examName
                     );
@@ -1400,59 +1453,109 @@ function formatIA(value, subjectName) {
                             );
 
 
-                        // =========================================
-                        // MARKS DISTRIBUTION
-                        // =========================================
+                               // =========================================
+        // MARKS DISTRIBUTION
+        // (Max marks ka sum chahiye - obtained ka nahi)
+        // =========================================
 
-                        let theoryTotal =
-                            getValue(
-                                item,
-                                "TheoryTotal"
-                            );
+        let theoryI_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "TheoryI"
+                )
+            );
+
+        let theoryII_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "TheoryII"
+                )
+            );
+
+        let theoryTotal =
+            (
+                (isNaN(theoryI_max) ? 0 : theoryI_max) +
+                (isNaN(theoryII_max) ? 0 : theoryII_max)
+            );
 
 
-                        let practicalTotal =
-                            getValue(
-                                item,
-                                "practicalTotal"
-                            );
+        let practical_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "Practical"
+                )
+            );
+
+        let viva_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "VivaMarks"
+                )
+            );
+
+        let elective_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "ElectiveMarks"
+                )
+            );
+
+        let ia_max =
+            parseFloat(
+                getValue(
+                    item,
+                    "IAMarks"
+                )
+            );
+
+        let practicalTotal =
+            (
+                (isNaN(practical_max) ? 0 : practical_max) +
+                (isNaN(viva_max) ? 0 : viva_max) +
+                (isNaN(elective_max) ? 0 : elective_max) +
+                (isNaN(ia_max) ? 0 : ia_max)
+            );
 
 
-                        let distribution = "";
+        let distribution = "";
 
+        if (
+            theoryTotal > 0 ||
+            practicalTotal > 0
+        ) {
 
-                        if (
-                            theoryTotal !== "" ||
-                            practicalTotal !== ""
-                        ) {
+            distribution = `
 
-                            distribution = `
+                सै. ${displayValue(
+                    theoryTotal,
+                    ""
+                )}
 
-                                सै. ${displayValue(
-                                    theoryTotal,
-                                    ""
-                                )}
+                Th ${displayValue(
+                    theoryTotal,
+                    ""
+                )}
 
-                                Th ${displayValue(
-                                    theoryTotal,
-                                    ""
-                                )}
+                <br>
 
-                                <br>
+                व्याव. ${displayValue(
+                    practicalTotal,
+                    ""
+                )}
 
-                                व्याव. ${displayValue(
-                                    practicalTotal,
-                                    ""
-                                )}
+                Pr ${displayValue(
+                    practicalTotal,
+                    ""
+                )}
 
-                                Pr ${displayValue(
-                                    practicalTotal,
-                                    ""
-                                )}
+            `;
 
-                            `;
-
-                        }
+        }
 
 
                         // =========================================
