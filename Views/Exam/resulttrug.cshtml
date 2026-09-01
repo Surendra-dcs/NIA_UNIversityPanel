@@ -703,22 +703,19 @@
 
                 <!-- Obtained Practical -->
                 <td class="data-cell kk">
-                    ${student.map(x => x.obtenPracticalMarks || '-').join('<br>')}
+                    ${student.map(x => fmtMark(x.obtenPracticalMarks)).join('<br>')}
                 </td>
-
                 <!-- Obtained Viva -->
                 <td class="data-cell kk">
-                    ${student.map(x => x.obtenVivaMarks || '-').join('<br>')}
+                    ${student.map(x => fmtMark(x.obtenVivaMarks)).join('<br>')}
                 </td>
-
                 <!-- Obtained Elective -->
                 <td class="data-cell kk">
-                    ${student.map(x => x.obtenElativeMarks || '-').join('<br>')}
+                    ${student.map(x => fmtMark(x.obtenElativeMarks)).join('<br>')}
                 </td>
-
                 <!-- Obtained IA -->
                 <td class="data-cell kk">
-                    ${student.map(x => x.obtenIAMarks || '-').join('<br>')}
+                    ${student.map(x => fmtMark(x.obtenIAMarks)).join('<br>')}
                 </td>
 
                 <!-- Practical Total -->
@@ -768,6 +765,11 @@
 
         $("#resultBody2").html(html);
     }
-
+     function fmtMark(v) {
+        if (v === null || v === undefined || v === '') return '-';
+        const num = parseFloat(v);
+        if (isNaN(num)) return v;   
+        return Math.round(num).toString();
+    }
 </script>
 

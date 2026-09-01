@@ -9,404 +9,472 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<title>Marks Statement - National Institute of Ayurveda</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Marks Statement - National Institute of Ayurveda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<style>
-   @@page {
-    size: A4 portrait;
-    margin: 3mm 4mm;
-  }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #eef2f7;
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 10px;
-    color: #000;
-    -webkit-font-smoothing: antialiased;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  .hi-text {
-    font-family: 'Noto Serif Devanagari', 'Times New Roman', serif;
-  }
+    <style>
+        @@page {
+            size: A4 portrait;
+            margin: 3mm 4mm;
+        }
 
-  /* Top Action Bar (Screen Only) */
-  .no-print-bar {
-    text-align: center;
-    padding: 12px 0 6px 0;
-  }
-  .print-btn {
-    background-color: #254078;
-    color: #ffffff;
-    border: none;
-    padding: 8px 22px;
-    font-size: 13.5px;
-    font-weight: bold;
-    font-family: Arial, sans-serif;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .print-btn:hover {
-    background-color: #1a2f58;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-  }
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #eef2f7;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10px;
+            color: #000;
+            -webkit-font-smoothing: antialiased;
+        }
 
-  /* Outer & Inner Double Border Container */
-  .outer-border {
-    width: 196mm;
-    min-height: 277mm;
-    margin: 10px auto 25px auto;
-    border: 2.5px solid #6b93cb;
-    padding: 3px;
-    background: #fff;
-    box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-  }
-  .sheet {
-    width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border: 1.5px solid #6b93cb;
-    padding: 3.5mm 5.5mm;
-    position: relative;
-    background: #fff;
-    box-sizing: border-box;
-  }
+        * {
+            box-sizing: border-box;
+        }
 
-  /* Top Bar */
-  .top-numbers {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11.5px;
-    font-weight: bold;
-    margin-bottom: 1px;
-    color: #000;
-    letter-spacing: -0.1px;
-  }
+        .hi-text {
+            font-family: 'Noto Serif Devanagari', 'Times New Roman', serif;
+        }
 
-  /* Header Row */
-  .header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1px;
-  }
-  .header-col-left {
-    flex: 1;
-    text-align: center;
-  }
-  .header-col-right {
-    flex: 1;
-    text-align: center;
-  }
-  .logo-col {
-    flex: 0 0 120px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .logo-col img {
-    height: 115px;
-    width: 115px;
-    object-fit: contain;
-  }
+        /* Top Action Bar (Screen Only) */
+        .no-print-bar {
+            text-align: center;
+            padding: 12px 0 6px 0;
+        }
 
-  /* Headings */
-  .inst-name-hi {
-    font-size: 23px;
-    font-weight: 800;
-    margin: 0;
-    line-height: 1.05;
-    color: #000;
-    letter-spacing: -0.2px;
-  }
-  .inst-sub-hi {
-    font-size: 14px;
-    font-weight: 700;
-    margin: 2px 0 0 0;
-    line-height: 1.12;
-    color: #000;
-  }
-  .inst-addr-hi {
-    font-size: 11.8px;
-    font-weight: 600;
-    margin: 1.5px 0 0 0;
-    line-height: 1.15;
-    color: #000;
-  }
+        .print-btn {
+            background-color: #254078;
+            color: #ffffff;
+            border: none;
+            padding: 8px 22px;
+            font-size: 13.5px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-  .inst-name-en {
-    font-size: 22px;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.05;
-    color: #000;
-    font-family: 'Times New Roman', Times, serif;
-    letter-spacing: -0.2px;
-  }
-  .inst-sub-en {
-    font-size: 14px;
-    font-weight: 700;
-    margin: 2px 0 0 0;
-    line-height: 1.12;
-    color: #000;
-    font-family: 'Times New Roman', Times, serif;
-  }
-  .inst-ministry-en {
-    font-size: 11.8px;
-    font-weight: bold;
-    margin: 1.5px 0 0 0;
-    line-height: 1.15;
-    color: #5c90d2;
-    font-family: 'Times New Roman', Times, serif;
-  }
-  .inst-addr-en {
-    font-size: 11.8px;
-    font-weight: 600;
-    margin: 1px 0 0 0;
-    line-height: 1.15;
-    color: #000;
-    font-family: 'Times New Roman', Times, serif;
-  }
+            .print-btn:hover {
+                background-color: #1a2f58;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            }
 
-  /* Academic Row */
-  .academic-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 4px;
-  }
-  .academic-col-left {
-    flex: 1;
-    text-align: center;
-  }
-  .academic-center-spacer {
-    flex: 0 0 120px;
-  }
-  .academic-col-right {
-    flex: 1;
-    text-align: center;
-  }
+        /* Outer & Inner Double Border Container */
+        .outer-border {
+            width: 196mm;
+            min-height: 277mm;
+            margin: 10px auto 25px auto;
+            border: 2.5px solid #6b93cb;
+            padding: 3px;
+            background: #fff;
+            box-sizing: border-box;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
 
-  .course-line-hi-main {
-    font-size: 16.5px;
-    font-weight: 800;
-    margin: 0;
-    line-height: 1.12;
-    letter-spacing: -0.1px;
-  }
-  .course-line-hi-sub {
-    font-size: 11.5px;
-    font-weight: 700;
-    margin: 1px 0 0 0;
-    line-height: 1.15;
-  }
-  .course-line-en-main {
-    font-size: 18.5px;
-    font-weight: 700;
-    margin: 0;
-    line-height: 1.12;
-    font-family: 'Times New Roman', Times, serif;
-    letter-spacing: -0.1px;
-  }
-  .course-line-en-sub {
-    font-size: 11.5px;
-    font-weight: 700;
-    margin: 1px 0 0 0;
-    line-height: 1.15;
-    font-family: 'Times New Roman', Times, serif;
-  }
-  .doc-title-hi {
-    font-size: 17px;
-    font-weight: 800;
-    margin: 4px 0 0 0;
-    line-height: 1.12;
-  }
-  .doc-title-en {
-    font-size: 15.5px;
-    font-weight: 700;
-    margin: 4px 0 0 0;
-    letter-spacing: 0.2px;
-    font-family: 'Times New Roman', Times, serif;
-  }
-  .exam-held {
-    font-size: 12px;
-    font-weight: 700;
-    margin: 1px 0 0 0;
-    line-height: 1.12;
-  }
+        .sheet {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1.5px solid #6b93cb;
+            padding: 3.5mm 5.5mm;
+            position: relative;
+            background: #fff;
+            box-sizing: border-box;
+        }
 
-  /* Student Info Table */
-  .student-info {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 5px;
-    margin-bottom: 3px;
-    font-size: 11.5px;
-  }
-  .student-info td {
-    padding: 1px 0;
-    vertical-align: top;
-    line-height: 1.25;
-  }
-  .student-info .label {
-    font-weight: 700;
-    white-space: nowrap;
-  }
+        /* Top Bar */
+        .top-numbers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: #000;
+            letter-spacing: -0.1px;
+        }
 
-  /* Marks Table */
-  table.marks {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 8.5px;
-    margin-top: 2px;
-  }
-  table.marks th, table.marks td {
-    border: 1px solid #000;
-    padding: 2px 1.5px;
-    text-align: center;
-    vertical-align: middle;
-  }
-  table.marks th {
-    font-weight: bold;
-    font-size: 8.5px;
-    line-height: 1.1;
-    background-color: #fff;
-  }
-  table.marks td {
-    height: 30px;
-    font-size: 9px;
-    font-weight: bold;
-  }
-  table.marks td.subject-name {
-    text-align: left;
-    font-size: 8.5px;
-    line-height: 1.18;
-    padding-left: 3.5px;
-    font-weight: bold;
-  }
-  table.marks td.distribution {
-    font-size: 8px;
-    line-height: 1.12;
-    font-weight: bold;
-  }
-  .grand-total-row td {
-    font-weight: bold;
-    text-align: right;
-    font-size: 10px;
-    height: 20px;
-  }
+        /* Header Row */
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1px;
+        }
 
-  /* Summary Table */
-  table.summary {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 8.5px;
-    margin-top: -1px;
-  }
-  table.summary td {
-    border: 1px solid #000;
-    padding: 2.5px 3.5px;
-    vertical-align: top;
-    font-weight: bold;
-    line-height: 1.18;
-  }
+        .header-col-left {
+            flex: 1;
+            text-align: center;
+        }
 
-  /* Notes & Result Section (Full 100% Width, Reduced Font Size to 8.5px, Font-Weight 600) */
-  .notes-section {
-    width: 100%;
-    margin-top: 5px;
-  }
-  .notes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 2px;
-  }
-  .notes-title {
-    font-size: 10.5px;
-    font-weight: 700;
-  }
-  .result-box {
-    font-size: 13.5px;
-    font-weight: bold;
-    color: #000;
-  }
-  .notes-body {
-    width: 100%;
-    font-size: 8.5px;
-    font-weight: 600;
-    line-height: 1.25;
-    color: #000;
-  }
-  .notes-body p {
-    margin: 1.5px 0;
-  }
-  .notes-body strong {
-    font-weight: 700;
-  }
+        .header-col-right {
+            flex: 1;
+            text-align: center;
+        }
 
-  /* Footer */
-  .footer-block {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-top: 8px;
-    font-size: 9.8px;
-    font-weight: bold;
-    position: relative;
-  }
-  .place-date {
-    text-align: left;
-    line-height: 1.22;
-  }
-  .qr-center {
-    text-align: center;
-  }
-  .qr-center img {
-    width: 58px;
-    height: 58px;
-    object-fit: contain;
-  }
-  .signature {
-    text-align: center;
-  }
-  .signature img {
-    height: 38px;
-    width: 125px;
-    margin-bottom: -2px;
-  }
-  .serial-bottom {
-    position: absolute;
-    right: 0;
-    bottom: -16px;
-    font-size: 8px;
-    font-weight: bold;
-  }
+        .logo-col {
+            flex: 0 0 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+            .logo-col img {
+                height: 115px;
+                width: 115px;
+                object-fit: contain;
+            }
 
+        /* Headings */
+        .inst-name-hi {
+            font-size: 23px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.05;
+            color: #000;
+            letter-spacing: -0.2px;
+        }
+
+        .inst-sub-hi {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 2px 0 0 0;
+            line-height: 1.12;
+            color: #000;
+        }
+
+        .inst-addr-hi {
+            font-size: 11.8px;
+            font-weight: 600;
+            margin: 1.5px 0 0 0;
+            line-height: 1.15;
+            color: #000;
+        }
+
+        .inst-name-en {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.05;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: -0.2px;
+        }
+
+        .inst-sub-en {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 2px 0 0 0;
+            line-height: 1.12;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .inst-ministry-en {
+            font-size: 11.8px;
+            font-weight: bold;
+            margin: 1.5px 0 0 0;
+            line-height: 1.15;
+            color: #5c90d2;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .inst-addr-en {
+            font-size: 11.8px;
+            font-weight: 600;
+            margin: 1px 0 0 0;
+            line-height: 1.15;
+            color: #000;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Academic Row */
+        .academic-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+        }
+
+        .academic-col-left {
+            flex: 1;
+            text-align: center;
+        }
+
+        .academic-center-spacer {
+            flex: 0 0 120px;
+        }
+
+        .academic-col-right {
+            flex: 1;
+            text-align: center;
+        }
+
+        .course-line-hi-main {
+            font-size: 16.5px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.12;
+            letter-spacing: -0.1px;
+        }
+
+        .course-line-hi-sub {
+            font-size: 11.5px;
+            font-weight: 700;
+            margin: 1px 0 0 0;
+            line-height: 1.15;
+        }
+
+        .course-line-en-main {
+            font-size: 18.5px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.12;
+            font-family: 'Times New Roman', Times, serif;
+            letter-spacing: -0.1px;
+        }
+
+        .course-line-en-sub {
+            font-size: 11.5px;
+            font-weight: 700;
+            margin: 1px 0 0 0;
+            line-height: 1.15;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .doc-title-hi {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 4px 0 0 0;
+            line-height: 1.12;
+        }
+
+        .doc-title-en {
+            font-size: 15.5px;
+            font-weight: 700;
+            margin: 4px 0 0 0;
+            letter-spacing: 0.2px;
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .exam-held {
+            font-size: 12px;
+            font-weight: 700;
+            margin: 1px 0 0 0;
+            line-height: 1.12;
+        }
+
+        /* Student Info Table */
+        .student-info {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            margin-bottom: 3px;
+            font-size: 11.5px;
+        }
+
+            .student-info td {
+                padding: 1px 0;
+                vertical-align: top;
+                line-height: 1.25;
+            }
+
+            .student-info .label {
+                font-weight: 700;
+                white-space: nowrap;
+            }
+
+        /* Marks Table */
+        table.marks {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5px;
+            margin-top: 2px;
+        }
+
+            table.marks th, table.marks td {
+                border: 1px solid #000;
+                padding: 2px 1.5px;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            table.marks th {
+                font-weight: bold;
+                font-size: 8.5px;
+                line-height: 1.1;
+                background-color: #fff;
+            }
+
+            table.marks td {
+                height: 30px;
+                font-size: 9px;
+                font-weight: bold;
+            }
+
+                table.marks td.subject-name {
+                    text-align: left;
+                    font-size: 8.5px;
+                    line-height: 1.18;
+                    padding-left: 3.5px;
+                    font-weight: bold;
+                }
+
+                table.marks td.distribution {
+                    font-size: 8px;
+                    line-height: 1.12;
+                    font-weight: bold;
+                }
+
+        .grand-total-row td {
+            font-weight: bold;
+            text-align: right;
+            font-size: 10px;
+            height: 20px;
+        }
+
+        /* Summary Table */
+        table.summary {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5px;
+            margin-top: -1px;
+        }
+
+            table.summary td {
+                border: 1px solid #000;
+                padding: 2.5px 3.5px;
+                vertical-align: top;
+                font-weight: bold;
+                line-height: 1.18;
+            }
+
+        /* Notes & Result Section (Full 100% Width, Reduced Font Size to 8.5px, Font-Weight 600) */
+        .notes-section {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+
+        .notes-title {
+            font-size: 10.5px;
+            font-weight: 700;
+        }
+
+        .result-box {
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .notes-body {
+            width: 100%;
+            font-size: 8.5px;
+            font-weight: 600;
+            line-height: 1.25;
+            color: #000;
+        }
+
+            .notes-body p {
+                margin: 1.5px 0;
+            }
+
+            .notes-body strong {
+                font-weight: 700;
+            }
+
+        /* Footer */
+        .footer-block {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 8px;
+            font-size: 9.8px;
+            font-weight: bold;
+            position: relative;
+        }
+
+        .place-date {
+            text-align: left;
+            line-height: 1.22;
+        }
+
+        .qr-center {
+            text-align: center;
+        }
+
+            .qr-center img {
+                width: 58px;
+                height: 58px;
+                object-fit: contain;
+            }
+
+        .signature {
+            text-align: center;
+        }
+
+            .signature img {
+                height: 38px;
+                width: 125px;
+                margin-bottom: -2px;
+            }
+
+        .serial-bottom {
+            position: absolute;
+            right: 0;
+            bottom: -16px;
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        /* =========================================================
+           GRACE SUBJECT - FULL ROW YELLOW
+           ========================================================= */
+
+        table.marks tr.grace-row > td {
+            background: yellow !important;
+            background-color: yellow !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+            table.marks tr.grace-row > td * {
+                background: transparent !important;
+            }
+
+        /* Print me bhi force yellow */
+        @@media print {
+            table.marks tr.grace-row > td {
+                background: yellow !important;
+                background-color: yellow !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
 
         /* =====================================================
-           PRINT POPUP
-           ===================================================== */
+                   PRINT POPUP
+                   ===================================================== */
 
         .print-modal {
             display: none;
@@ -434,24 +502,21 @@
 
 
         @@keyframes printModalOpen {
-            from
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
 
-        {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
 
         /* =====================================================
-           HEADER
-           ===================================================== */
+                   HEADER
+                   ===================================================== */
 
         .print-modal-header {
             display: flex;
@@ -485,8 +550,8 @@
 
 
         /* =====================================================
-           BODY
-           ===================================================== */
+                   BODY
+                   ===================================================== */
 
         .print-modal-body {
             padding: 20px;
@@ -524,8 +589,8 @@
 
 
         /* =====================================================
-           FOOTER
-           ===================================================== */
+                   FOOTER
+                   ===================================================== */
 
         .print-modal-footer {
             display: flex;
@@ -565,77 +630,80 @@
 
 
         /* =====================================================
-           PRINT
-           ===================================================== */
+                   PRINT
+                   ===================================================== */
 
         @@media print {
-            .print-modal
-
-        {
-            display: none !important;
+            .print-modal {
+                display: none !important;
+            }
         }
 
-        }
+        /* Strict Single-Page Print Optimization */
+        @@media print {
+            @@page {
+                size: A4 portrait;
+                margin: 3mm 4mm;
+            }
 
-  /* Strict Single-Page Print Optimization */
- @@media print {
-    @@page {
-      size: A4 portrait;
-      margin: 3mm 4mm;
-    }
-    html, body {
-      margin: 0 !important;
-      padding: 0 !important;
-      background: #fff !important;
-      height: 100vh !important;
-      max-height: 100vh !important;
-      overflow: hidden !important;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-    }
-    .no-print-bar {
-      display: none !important;
-    }
-    .outer-border {
-      width: 100% !important;
-      height: calc(100vh - 6mm) !important;
-      min-height: calc(100vh - 6mm) !important;
-      max-height: calc(100vh - 6mm) !important;
-      margin: 0 auto !important;
-      border: 2.5px solid #6b93cb !important;
-      padding: 3px !important;
-      box-shadow: none !important;
-      box-sizing: border-box !important;
-      page-break-inside: avoid !important;
-      page-break-after: avoid !important;
-      display: flex !important;
-      flex-direction: column !important;
-    }
-    .sheet {
-      width: 100% !important;
-      height: 100% !important;
-      flex: 1 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: space-between !important;
-      border: 1.5px solid #6b93cb !important;
-      padding: 3mm 5mm !important;
-      box-sizing: border-box !important;
-      page-break-inside: avoid !important;
-      page-break-after: avoid !important;
-    }
-    .footer-block {
-      margin-top: auto !important;
-    }
-    .serial-bottom {
-      bottom: -13px !important;
-    }
-  }
-</style>
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #fff !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                overflow: hidden !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .no-print-bar {
+                display: none !important;
+            }
+
+            .outer-border {
+                width: 100% !important;
+                height: calc(100vh - 6mm) !important;
+                min-height: calc(100vh - 6mm) !important;
+                max-height: calc(100vh - 6mm) !important;
+                margin: 0 auto !important;
+                border: 2.5px solid #6b93cb !important;
+                padding: 3px !important;
+                box-shadow: none !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                display: flex !important;
+                flex-direction: column !important;
+            }
+
+            .sheet {
+                width: 100% !important;
+                height: 100% !important;
+                flex: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                border: 1.5px solid #6b93cb !important;
+                padding: 3mm 5mm !important;
+                box-sizing: border-box !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+            }
+
+            .footer-block {
+                margin-top: auto !important;
+            }
+
+            .serial-bottom {
+                bottom: -13px !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="no-print-bar">
+    <div class="no-print-bar">
         <button type="button" onclick="openPrintPopup()" class="print-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2"
@@ -646,15 +714,15 @@
             </svg>
             Print Marksheet / प्रिंट करें
         </button>
-</div>
+    </div>
 
-<div class="outer-border">
-  <div class="sheet">
+    <div class="outer-border">
+        <div class="sheet">
 
-    <div class="top-numbers">
+            <div class="top-numbers">
                 <span><span class="hi-text">क्रम संख्या</span> /Serial No.: <span id="Serialno"></span></span>
                 <span><span class="hi-text">फोलियों संख्या</span> /Folio No.:<span id="Folio"></span></span>
-    </div>
+            </div>
 
 
             <div class="header-row">
@@ -690,7 +758,7 @@
                 </div>
             </div>
 
-   
+
 
             <table class="student-info">
                 <tr>
@@ -733,29 +801,29 @@
                 </tr>
             </table>
 
-    <table class="marks">
-      <thead>
-        <tr>
-          <th rowspan="3" style="width:20%;"><span class="hi-text">विषय / पत्र</span><br>Subjects/Paper</th>
-          <th rowspan="3" style="width:11%;"><span class="hi-text">अंक वितरण</span><br>Marks Distribution</th>
-          <th rowspan="3" style="width:6%;"><span class="hi-text">अधिकतम अंक</span><br>Max. Marks<br>(2100)</th>
-          <th rowspan="3" style="width:6%;"><span class="hi-text">न्यूनतम अंक</span><br>Min. Marks<br>(1050)</th>
-          <th colspan="7"><span class="hi-text">प्राप्तांक</span> - Marks Obtained</th>
-          <th rowspan="3" style="width:6%;"><span class="hi-text">टिप्पणी</span><br>Remark</th>
-        </tr>
-        <tr>
-          <th rowspan="2" style="width:6.5%;"><span class="hi-text">सैद्धांतिक प्रथम</span><br>Theory I<br>(100)</th>
-          <th rowspan="2" style="width:6.5%;"><span class="hi-text">सैद्धांतिक द्वितीय</span><br>Theory II<br>(100)</th>
-          <th colspan="4" style="width:27%;"><span class="hi-text">व्यावहारिक या नैदानिक मूल्यांकन</span><br>Practical/Clinical Assessment</th>
-          <th rowspan="2" style="width:7%;"><span class="hi-text">विषय योग</span><br>Subject Total</th>
-        </tr>
-        <tr>
-          <th style="width:7.5%;"><span class="hi-text">व्यावहारिक या नैदानिक</span><br>Practical /Clinical<br>(100)</th>
-          <th style="width:7%;"><span class="hi-text">साक्षात्कार</span><br>Viva<br />(*75)<br /> (#60)<br />(@@70)</th>
-          <th style="width:6.5%;"><span class="hi-text">ऐच्छिक</span><br>Electives<br/>(10)</th>
-          <th style="width:6%;"><span class="hi-text">आई.ए.</span><br>IA<br>(30)<br/>(*15)</th>
-        </tr>
-      </thead>
+            <table class="marks">
+                <thead>
+                    <tr>
+                        <th rowspan="3" style="width:20%;"><span class="hi-text">विषय / पत्र</span><br>Subjects/Paper</th>
+                        <th rowspan="3" style="width:11%;"><span class="hi-text">अंक वितरण</span><br>Marks Distribution</th>
+                        <th rowspan="3" style="width:6%;"><span class="hi-text">अधिकतम अंक</span><br>Max. Marks<br>(2100)</th>
+                        <th rowspan="3" style="width:6%;"><span class="hi-text">न्यूनतम अंक</span><br>Min. Marks<br>(1050)</th>
+                        <th colspan="7"><span class="hi-text">प्राप्तांक</span> - Marks Obtained</th>
+                        <th rowspan="3" style="width:6%;"><span class="hi-text">टिप्पणी</span><br>Remark</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2" style="width:6.5%;"><span class="hi-text">सैद्धांतिक प्रथम</span><br>Theory I<br>(100)</th>
+                        <th rowspan="2" style="width:6.5%;"><span class="hi-text">सैद्धांतिक द्वितीय</span><br>Theory II<br>(100)</th>
+                        <th colspan="4" style="width:27%;"><span class="hi-text">व्यावहारिक या नैदानिक मूल्यांकन</span><br>Practical/Clinical Assessment</th>
+                        <th rowspan="2" style="width:7%;"><span class="hi-text">विषय योग</span><br>Subject Total</th>
+                    </tr>
+                    <tr>
+                        <th style="width:7.5%;"><span class="hi-text">व्यावहारिक या नैदानिक</span><br>Practical /Clinical<br>(100)</th>
+                        <th style="width:7%;"><span class="hi-text">साक्षात्कार</span><br>Viva<br />(*75)<br /> (#60)<br />(@@70)</th>
+                        <th style="width:6.5%;"><span class="hi-text">ऐच्छिक</span><br>Electives<br />(10)</th>
+                        <th style="width:6%;"><span class="hi-text">आई.ए.</span><br>IA<br>(30)<br />(*15)</th>
+                    </tr>
+                </thead>
                 <tbody id="marksTableBody">
                 </tbody>
 
@@ -768,58 +836,70 @@
                         <td></td>
                     </tr>
                 </tfoot>
-    </table>
+            </table>
 
-    <table class="summary">
-      <tr>
-        <td style="width:25%;"><span class="hi-text">डिस्टिक्शन प्राप्तिः</span><br>Distinction secured: A-2</td>
-        <td style="width:35%;"><span class="hi-text">प्रथम श्रेणी प्राप्तिः</span><br>First Class secured: A-1, A-3, A-5, A-6</td>
-        <td style="width:20%;"><span class="hi-text">कृपांक प्राप्तिः</span><br>Grace Marks Awarded:</td>
-        <td style="width:20%;"><span class="hi-text">अनुत्तीर्णः</span><br>Failed:</td>
-      </tr>
-    </table>
+            <table class="summary">
+                <tr>
+                    <td style="width:25%;"><span class="hi-text">डिस्टिक्शन प्राप्तिः</span><br>Distinction secured: A-2</td>
+                    <td style="width:35%;"><span class="hi-text">प्रथम श्रेणी प्राप्तिः</span><br>First Class secured: A-1, A-3, A-5, A-6</td>
+                    <td style="width:20%;"><span class="hi-text">कृपांक प्राप्तिः</span><br>Grace Marks Awarded:</td>
+                    <td style="width:20%;"><span class="hi-text">अनुत्तीर्णः</span><br>Failed:</td>
+                </tr>
+            </table>
 
-    <div class="notes-section">
-      <div class="notes-header">
-        <div class="notes-title"><strong><span class="hi-text">टिप्पणी</span> / Note:</strong></div>
-        <div class="result-box"><span class="hi-text">परिणाम</span> / RESULT: <span class="hi-text">उत्तीर्ण</span>/PASS</div>
-      </div>
-      <div class="notes-body">
-        <p>1. <span class="hi-text">एक विषय में उत्तीर्ण होने के लिए अभ्यर्थी को सैद्धांतिक और व्यावहारिक परीक्षा में से प्रत्येक में न्यूनतम 50% अंक प्राप्त करना आवश्यक है।</span><br>
-        To pass a subject candidate requires to obtain a minimum of 50% marks in each of Theory and Practical Examination</p>
-        <p>2. <span class="hi-text">किसी विषय में 65% या उससे अधिक अंक प्राप्त करने वाले अभ्यर्थी को उस विषय में प्रथम श्रेणी (I द्वारा चिन्हित) प्राप्त से उत्तीर्ण दिखाया जायेगा।</span><br>
-        Candidate securing 65% marks or above in a Subject shall be declared to have obtained First Class (Denoted by I) in that Subject.</p>
-        <p>3. <span class="hi-text">किसी विषय में 75% या उससे अधिक अंक प्राप्त करने वाले अभ्यर्थी को उस विषय में डिस्टिक्शन (D द्वारा चिन्हित) प्राप्त दिखाया जायेगा।</span><br>
-        Candidate securing 75% marks or above in a Subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</p>
-        <p>4. <span class="hi-text">किसी पेपर के सैद्धांतिक या व्यावहारिक भाग में अनुत्तीर्ण होने वाले अभ्यर्थी को उस विषय में अनुत्तीर्ण माना जाएगा।</span><br>
-        Candidate falling in the Theory or practical of a paper will be considered fail in that subject.</p>
-        <p>5. <span class="hi-text">अंक - विवरणिका तैयार करने के दौरान यदि कोई त्रुटि हो जाती है और बाद में ध्यान में लाई जाती है, तो उसे ठीक करने का पूर्ण अधिकार विश्वविद्यालय के पास होगा।</span><br>
-        In case of any mistake occurred during the preparation of marks-statement brought to notice afterwards, the University will be fully empowered to correct the same.</p>
-        <p>6. <span class="hi-text">D-डिस्टिक्शन I-प्रथम श्रेणी G-कृपांक F-अनुत्तीर्ण AB-अनुपस्थित सै.-सैद्धांतिक व्याव.-व्यावहारिक आई.ए.-आंतरिक मूल्यांकन</span><br>
-        D-Distinction I-First Class G-Grace F-Fall AB-Absent Th.-Theory Pr-Practical IA-Internal Assessment</p>
-        <p>7. Max.-Maximum Min.-Minimum</p>
-      </div>
-    </div>
+            <div class="notes-section">
+                <div class="notes-header">
+                    <div class="notes-title"><strong><span class="hi-text">टिप्पणी</span> / Note:</strong></div>
+                    <div class="result-box"><span class="hi-text">परिणाम</span> / RESULT: <span class="hi-text">उत्तीर्ण</span>/PASS</div>
+                </div>
+                <div class="notes-body">
+                    <p>
+                        1. <span class="hi-text">एक विषय में उत्तीर्ण होने के लिए अभ्यर्थी को सैद्धांतिक और व्यावहारिक परीक्षा में से प्रत्येक में न्यूनतम 50% अंक प्राप्त करना आवश्यक है।</span><br>
+                        To pass a subject candidate requires to obtain a minimum of 50% marks in each of Theory and Practical Examination
+                    </p>
+                    <p>
+                        2. <span class="hi-text">किसी विषय में 65% या उससे अधिक अंक प्राप्त करने वाले अभ्यर्थी को उस विषय में प्रथम श्रेणी (I द्वारा चिन्हित) प्राप्त से उत्तीर्ण दिखाया जायेगा।</span><br>
+                        Candidate securing 65% marks or above in a Subject shall be declared to have obtained First Class (Denoted by I) in that Subject.
+                    </p>
+                    <p>
+                        3. <span class="hi-text">किसी विषय में 75% या उससे अधिक अंक प्राप्त करने वाले अभ्यर्थी को उस विषय में डिस्टिक्शन (D द्वारा चिन्हित) प्राप्त दिखाया जायेगा।</span><br>
+                        Candidate securing 75% marks or above in a Subject shall be declared to have obtained distinction (Denoted by D) in that Subject.
+                    </p>
+                    <p>
+                        4. <span class="hi-text">किसी पेपर के सैद्धांतिक या व्यावहारिक भाग में अनुत्तीर्ण होने वाले अभ्यर्थी को उस विषय में अनुत्तीर्ण माना जाएगा।</span><br>
+                        Candidate falling in the Theory or practical of a paper will be considered fail in that subject.
+                    </p>
+                    <p>
+                        5. <span class="hi-text">अंक - विवरणिका तैयार करने के दौरान यदि कोई त्रुटि हो जाती है और बाद में ध्यान में लाई जाती है, तो उसे ठीक करने का पूर्ण अधिकार विश्वविद्यालय के पास होगा।</span><br>
+                        In case of any mistake occurred during the preparation of marks-statement brought to notice afterwards, the University will be fully empowered to correct the same.
+                    </p>
+                    <p>
+                        6. <span class="hi-text">D-डिस्टिक्शन I-प्रथम श्रेणी G-कृपांक F-अनुत्तीर्ण AB-अनुपस्थित सै.-सैद्धांतिक व्याव.-व्यावहारिक आई.ए.-आंतरिक मूल्यांकन</span><br>
+                        D-Distinction I-First Class G-Grace F-Fall AB-Absent Th.-Theory Pr-Practical IA-Internal Assessment
+                    </p>
+                    <p>7. Max.-Maximum Min.-Minimum</p>
+                </div>
+            </div>
 
-    <div class="footer-block">
-      <div class="place-date">
-        <span class="hi-text">जयपुर</span><br>
-        Jaipur<br>
-        <span class="hi-text">परिणाम दिनांक</span>: - <br>
-        Result date: -
-      </div>
-      <div class="qr-center">
-       <img src="~/Logo/qr.svg" alt="QR Code">
-      </div>
-      <div class="signature">
-        <img src="~/Logo/signature.svg" alt="Signature"><br>
-        <span class="hi-text">परीक्षा नियंत्रक</span><br>
-        CONTROLLER OF EXAMINATIONS
-      </div>
-    </div>
+            <div class="footer-block">
+                <div class="place-date">
+                    <span class="hi-text">जयपुर</span><br>
+                    Jaipur<br>
+                    <span class="hi-text">परिणाम दिनांक</span>: - <br>
+                    Result date: -
+                </div>
+                <div class="qr-center">
+                    <img src="~/Logo/qr.svg" alt="QR Code">
+                </div>
+                <div class="signature">
+                    <img src="~/Logo/adminsignatur.jpg" alt="Signature"><br>
+                    <span class="hi-text">परीक्षा नियंत्रक</span><br>
+                    CONTROLLER OF EXAMINATIONS
+                </div>
+            </div>
             <div class="serial-bottom"><span id="serialbottom"></span></div>
-  </div>
-</div>
+        </div>
+    </div>
     <div id="printModal" class="print-modal">
 
         <div class="print-modal-content">
@@ -907,1511 +987,63 @@
 
     <script>
 
-    // ============================================================
-    // DOCUMENT READY
-    // ============================================================
 
-    $(document).ready(function () {
+            $(document).ready(function () {
 
-        loadmarksheet();
+                loadmarksheet();
 
-    });
+            });
 
 
-    // ============================================================
-    // GET API VALUE - CASE INSENSITIVE
-    // ============================================================
+            function getValue(obj, propertyName) {
+                if (!obj) {
+                    return "";
+                }
+                let key = Object.keys(obj).find(function (k) {
+                    return k.toLowerCase() === propertyName.toLowerCase();
+                });
+                if (key === undefined) {
+                    return "";
+                }
+                if (
+                    obj[key] === null ||
+                    obj[key] === undefined
+                ) {
+                    return "";
+                }
 
-    function getValue(obj, propertyName) {
+                return obj[key];
 
-        if (!obj) {
-            return "";
-        }
-
-        let key = Object.keys(obj).find(function (k) {
-
-            return k.toLowerCase() === propertyName.toLowerCase();
-
-        });
-
-        if (key === undefined) {
-            return "";
-        }
-
-        if (
-            obj[key] === null ||
-            obj[key] === undefined
-        ) {
-            return "";
-        }
-
-        return obj[key];
-
-    }
-
-
-    // ============================================================
-    // DISPLAY VALUE
-    // ============================================================
-
-    function displayValue(value, defaultValue = "-") {
-
-        if (
-            value === null ||
-            value === undefined ||
-            value === ""
-        ) {
-
-            return defaultValue;
-
-        }
-
-        return value;
-
-    }
-
-
-    // ============================================================
-    // NORMAL MARK FORMAT
-    //
-    // Agar API se:
-    // @@51
-    // @@51
-    // #35
-    // *52
-    //
-    // aaye to sahi format me show karega.
-    // ============================================================
-
-  
-function formatMarks(value) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "-";
-
-    }
-
-    let mark =
-        value.toString().trim();
-
-
-    if (
-        mark.startsWith("@@") ||
-        mark.startsWith("#") ||
-        mark.startsWith("*")
-    ) {
-
-        return mark;
-
-    }
-
-    return mark;
-
-}
-
-
-
-    // ============================================================
-    // GET SUBJECT CODE
-    //
-    // (A-1) DRAVYAGUNA VIGYAN
-    //       ↓
-    // A-1
-    // ============================================================
-
-          function getSubjectCode(subjectName) {
-
-            if (
-                subjectName === null ||
-                subjectName === undefined ||
-                subjectName === ""
-            ) {
-
-                return "";
-            }
-            let text =
-                subjectName.toString().trim();
-            let parenMatch =
-                text.match(/\(([A-Za-z]-\d+)\)/);
-            if (parenMatch) {
-                return parenMatch[1].toUpperCase();
             }
 
-            let leadingMatch =
-                text.match(/^([A-Za-z]-\d+)/);
-            if (leadingMatch) {
-                return leadingMatch[1].toUpperCase();
-            }
-            return "";
 
-        }
 
-
-    // ============================================================
-    // VIVA FORMAT
-    //
-    // A-1 = @@
-    // A-2 = @@
-    // A-3 = @@
-    // A-4 = #
-    // A-5 = *
-    // A-6 = #
-    // ============================================================
-
- function formatViva(value, subjectName) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "-";
-
-    }
-
-    let mark =
-        value.toString().trim();
-
-
-    // ========================================================
-    // AGAR API SE ALREADY PREFIX AAYA HAI
-    // ========================================================
-
-    if (
-        mark.startsWith("@@") ||
-        mark.startsWith("#") ||
-        mark.startsWith("*")
-    ) {
-
-        return mark;
-
-    }
-
-
-    let subjectCode =
-        getSubjectCode(subjectName);
-
-
-    switch (subjectCode) {
-
-        case "A-1":
-            return "@@" + mark;
-
-        case "A-2":
-            return "@@" + mark;
-
-        case "A-3":
-            return "@@" + mark;
-
-        case "A-4":
-            return "#" + mark;
-
-        case "A-5":
-            return "*" + mark;
-
-        case "A-6":
-            return "#" + mark;
-
-        default:
-            return mark;
-
-    }
-
-}
-
-
-    // ============================================================
-    // IA FORMAT
-    //
-    // A-5 = *12
-    // बाकी normal
-    // ============================================================
-
-   // A-5 = *value
-// बाकी normal
-// ============================================================
-
-function formatIA(value, subjectName) {
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        return "-";
-
-    }
-
-    let mark =
-        value.toString().trim();
-
-
-    if (
-        mark.startsWith("@@") ||
-        mark.startsWith("#") ||
-        mark.startsWith("*")
-    ) {
-
-        return mark;
-
-    }
-
-
-    let subjectCode =
-        getSubjectCode(subjectName);
-
-
-    if (subjectCode === "A-5") {
-
-        return "*" + mark;
-
-    }
-
-    return mark;
-
-}
-
-    // ============================================================
-    // RESULT FAIL CHECK
-    // ============================================================
-
-    function isFail(result) {
-
-        if (
-            result === null ||
-            result === undefined ||
-            result === ""
-        ) {
-
-            return false;
-
-        }
-
-        let value =
-            result.toString()
-                .trim()
-                .toUpperCase();
-
-
-        return (
-            value === "FAIL" ||
-            value === "F"
-        );
-
-    }
-
-
-    // ============================================================
-    // LOAD MARKSHEET
-    // ============================================================
-
-    function loadmarksheet() {
-
-        let enrollment =
-            '@ViewBag.enrollment';
-
-
-        $.ajax({
-
-            url:
-                ApiBaseUrl +
-                `Result/getdataformarksheet?enrollment=${encodeURIComponent(enrollment)}`,
-
-            method: "GET",
-
-
-            // ====================================================
-            // SUCCESS
-            // ====================================================
-
-            success: function (data) {
-
-                console.log(
-                    "Marksheet API Data:",
-                    data
-                );
-
-
-                // =================================================
-                // CHECK DATA
-                // =================================================
+            function displayValue(value, defaultValue = "-") {
 
                 if (
-                    !data ||
-                    !Array.isArray(data) ||
-                    data.length === 0
+                    value === null ||
+                    value === undefined ||
+                    value === ""
                 ) {
 
-                    $("#marksTableBody").html(`
-
-                        <tr>
-
-                            <td
-                                colspan="12"
-                                style="text-align:center;"
-                            >
-                                No record found
-                            </td>
-
-                        </tr>
-
-                    `);
-
-                    return;
+                    return defaultValue;
 
                 }
 
-
-                // =================================================
-                // FIRST RECORD
-                // =================================================
-
-                let student =
-                    data[0];
-
-
-                // =================================================
-                // STUDENT DETAILS
-                // =================================================
-
-
-
-
-
-                $("#studentName").text(
-
-                    displayValue(
-                        getValue(
-                            student,
-                                  "FirstName"
-                        ),
-                        ""
-                    )
-
-                );
-
-                                 $("#studentNameHindi").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                                  "StudentHindiName"
-                                ),
-                                ""
-                            )
-
-                        );
-
-                $("#fatherName").text(
-
-                    displayValue(
-                        getValue(
-                            student,
-                                   "FatherName"
-                        ),
-                        ""
-                    )
-
-                );
-
-
-
-                                $("#fatherNameHindi").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                                   "FatherNameHindi"
-                                ),
-                                ""
-                            )
-
-                        );
-
-                     $("#MotherName").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                    "MotherName"
-                                ),
-                                ""
-                            )
-
-                        );
-
-                                          $("#motherNameHindi").text(
-
-                                    displayValue(
-                                        getValue(
-                                            student,
-                                                    "MotherNameHindi"
-                                        ),
-                                        ""
-                                    )
-
-                                );
-
-                $("#rollNumber").text(
-
-                    displayValue(
-                        getValue(
-                            student,
-                            "RollNumber"
-                        ),
-                        ""
-                    )
-
-                );
-
-
-                $("#enrollmentNumber").text(
-
-                    displayValue(
-                        getValue(
-                            student,
-                            "EnrollmentNumber"
-                        ),
-                        enrollment
-                    )
-
-                );
-
-
-                $("#attempt").text(
-
-                    displayValue(
-                        getValue(
-                            student,
-                            "Attempt"
-                        ),
-                        ""
-                    )
-
-                );
-
-
-                // =================================================
-                // EXAM NAME
-                // =================================================
-
-                let examName =
-                    getValue(
-                        student,
-                        "Examname"
-                    );
-
-
-                if (examName !== "") {
-
-                    $(".exam-h").text(
-                        "Examination Held in " +
-                        examName
-                    );
-
-                }
-
-
-                // =================================================
-                // TABLE BODY
-                // =================================================
-
-                let tbody =
-                    $("#marksTableBody");
-
-
-                tbody.empty();
-
-
-                // =================================================
-                // GRAND TOTAL CALCULATION
-                // =================================================
-
-                let calculatedGrandTotal = 0;
-
-
-                // =================================================
-                // SUMMARY ARRAYS
-                // =================================================
-
-                let distinctionSubjects = [];
-
-                let firstClassSubjects = [];
-
-                let graceMarks = [];
-
-                let failedSubjects = [];
-
-
-                // =================================================
-                // SUBJECT LOOP
-                // =================================================
-
-                $.each(
-                    data,
-                    function (index, item) {
-
-
-                        // =========================================
-                        // SUBJECT NAME
-                        // =========================================
-
-                        let subjectName =
-                            getValue(
-                                item,
-                                "subjectName"
-                            );
-
-
-                        let subjectHindiName =
-                            getValue(
-                                item,
-                                "subjectHindiName"
-                            );
-
-
-                        // =========================================
-                        // SUBJECT CODE
-                        // =========================================
-
-                        let subjectCode =
-                            getSubjectCode(
-                                subjectName
-                            );
-
-
-                               // =========================================
-        // MARKS DISTRIBUTION
-        // (Max marks ka sum chahiye - obtained ka nahi)
-        // =========================================
-
-        let theoryI_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "TheoryI"
-                )
-            );
-
-        let theoryII_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "TheoryII"
-                )
-            );
-
-        let theoryTotal =
-            (
-                (isNaN(theoryI_max) ? 0 : theoryI_max) +
-                (isNaN(theoryII_max) ? 0 : theoryII_max)
-            );
-
-
-        let practical_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "Practical"
-                )
-            );
-
-        let viva_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "VivaMarks"
-                )
-            );
-
-        let elective_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "ElectiveMarks"
-                )
-            );
-
-        let ia_max =
-            parseFloat(
-                getValue(
-                    item,
-                    "IAMarks"
-                )
-            );
-
-        let practicalTotal =
-            (
-                (isNaN(practical_max) ? 0 : practical_max) +
-                (isNaN(viva_max) ? 0 : viva_max) +
-                (isNaN(elective_max) ? 0 : elective_max) +
-                (isNaN(ia_max) ? 0 : ia_max)
-            );
-
-
-        let distribution = "";
-
-        if (
-            theoryTotal > 0 ||
-            practicalTotal > 0
-        ) {
-
-            distribution = `
-
-                सै. ${displayValue(
-                    theoryTotal,
-                    ""
-                )}
-
-                Th ${displayValue(
-                    theoryTotal,
-                    ""
-                )}
-
-                <br>
-
-                व्याव. ${displayValue(
-                    practicalTotal,
-                    ""
-                )}
-
-                Pr ${displayValue(
-                    practicalTotal,
-                    ""
-                )}
-
-            `;
-
-        }
-
-
-                        // =========================================
-                        // MAX MARKS
-                        // =========================================
-
-                        let maxMarks =
-                            getValue(
-                                item,
-                                "GrandTotalMarks"
-                            );
-
-
-                        // =========================================
-                        // MIN MARKS
-                        // =========================================
-
-                        let minMarks =
-                            getValue(
-                                item,
-                                "MinTotalMarks"
-                            );
-
-
-                        // =========================================
-                        // MIN MARKS NOT FROM API
-                        // MAX / 2
-                        // =========================================
-
-                        if (
-                            minMarks === "" &&
-                            maxMarks !== ""
-                        ) {
-
-                            let max =
-                                parseFloat(
-                                    maxMarks
-                                );
-
-
-                            if (!isNaN(max)) {
-
-                                minMarks =
-                                    max / 2;
-
-                            }
-
-                        }
-
-
-                        // =========================================
-                        // THEORY I
-                        // =========================================
-
-                        let theoryI =
-                            getValue(
-                                item,
-                                "FinalTheoryIMarks"
-                            );
-
-
-                        if (theoryI === "") {
-
-                            theoryI =
-                                getValue(
-                                    item,
-                                    "TheoryI"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // THEORY II
-                        // =========================================
-
-                        let theoryII =
-                            getValue(
-                                item,
-                                "FinalTheoryIIMarks"
-                            );
-
-
-                        if (theoryII === "") {
-
-                            theoryII =
-                                getValue(
-                                    item,
-                                    "TheoryII"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // PRACTICAL
-                        // =========================================
-
-                        let practical =
-                            getValue(
-                                item,
-                                "ObtenPracticalMarks"
-                            );
-
-
-                        if (practical === "") {
-
-                            practical =
-                                getValue(
-                                    item,
-                                    "Practical"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // VIVA
-                        // =========================================
-
-                        let viva =
-                            getValue(
-                                item,
-                                "ObtenVivaMarks"
-                            );
-
-
-                        if (viva === "") {
-
-                            viva =
-                                getValue(
-                                    item,
-                                    "VivaMarks"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // ELECTIVE
-                        // =========================================
-
-                        let elective =
-                            getValue(
-                                item,
-                                "ObtenElativeMarks"
-                            );
-
-
-                        if (elective === "") {
-
-                            elective =
-                                getValue(
-                                    item,
-                                    "ElectiveMarks"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // IA
-                        // =========================================
-
-                        let ia =
-                            getValue(
-                                item,
-                                "ObtenIAMarks"
-                            );
-
-
-                        if (ia === "") {
-
-                            ia =
-                                getValue(
-                                    item,
-                                    "IAMarks"
-                                );
-
-                        }
-
-
-                        // =========================================
-                        // SUBJECT TOTAL
-                        // =========================================
-
-                        let subjectTotal =
-                            getValue(
-                                item,
-                                "subjectTotal"
-                            );
-
-
-                        let totalNumber =
-                            parseFloat(
-                                subjectTotal
-                            );
-
-
-                        if (!isNaN(totalNumber)) {
-
-                            calculatedGrandTotal +=
-                                totalNumber;
-
-                        }
-
-
-                        // =========================================
-                        // DISTINCTION
-                        // =========================================
-
-                        let distinction =
-                            getValue(
-                                item,
-                                "Distinction"
-                            );
-
-
-                        // =========================================
-                        // RESULT
-                        // =========================================
-
-                        let result =
-                            getValue(
-                                item,
-                                "Result"
-                            );
-
-
-                        // =========================================
-                        // REMARK
-                        // =========================================
-
-                        let remark =
-                            distinction;
-
-
-                        if (isFail(result)) {
-
-                            remark = "F";
-
-                        }
-
-
-                        // =========================================
-                        // DISTINCTION VALUE
-                        // =========================================
-
-                        let distinctionValue =
-                            distinction
-                                .toString()
-                                .trim()
-                                .toUpperCase();
-
-
-                        // =========================================
-                        // DISTINCTION
-                        // =========================================
-
-                        if (
-                            distinctionValue === "D"
-                        ) {
-
-                            distinctionSubjects.push(
-                                subjectCode
-                            );
-
-                        }
-
-
-                        // =========================================
-                        // FIRST CLASS
-                        // =========================================
-
-                        if (
-                            distinctionValue === "I"
-                        ) {
-
-                            firstClassSubjects.push(
-                                subjectCode
-                            );
-
-                        }
-
-
-                        // =========================================
-                        // GRACE MARKS
-                        // =========================================
-
-                        let grace =
-                            getValue(
-                                item,
-                                "GraceMarks"
-                            );
-
-
-                        if (
-                            grace !== "" &&
-                            parseFloat(grace) > 0
-                        ) {
-
-                            graceMarks.push(
-                                subjectCode +
-                                " (" +
-                                grace +
-                                ")"
-                            );
-
-                        }
-
-
-                        // =========================================
-                        // FAILED
-                        // =========================================
-
-                        if (
-                            isFail(result)
-                        ) {
-
-                            failedSubjects.push(
-                                subjectCode
-                            );
-
-                        }
-
-
-                        // =================================================
-                        // APPEND ROW
-                        // =================================================
-
-                        tbody.append(`
-
-                            <tr>
-
-
-                                <!-- =============================== -->
-                                <!-- SUBJECT -->
-                                <!-- =============================== -->
-
-                                <td class="subject-name">
-
-                                    ${displayValue(
-                                        subjectHindiName,
-                                        ""
-                                    )}
-
-                                    ${
-                                        subjectHindiName !== ""
-                                            ? "<br>"
-                                            : ""
-                                    }
-
-                                    ${displayValue(
-                                        subjectName,
-                                        ""
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- MARKS DISTRIBUTION -->
-                                <!-- =============================== -->
-
-                                <td class="distribution">
-
-                                    ${distribution}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- MAX -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${displayValue(
-                                        maxMarks
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- MIN -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${displayValue(
-                                        minMarks
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- THEORY I -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatMarks(
-                                        theoryI
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- THEORY II -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatMarks(
-                                        theoryII
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- PRACTICAL -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatMarks(
-                                        practical
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- VIVA -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatViva(
-                                        viva,
-                                        subjectName
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- ELECTIVE -->
-                                <!-- =============================== -->
-
-                                      <td>
-            ${formatElective(
-                elective,
-                subjectName
-            )}
-        </td>
-
-
-                                <!-- =============================== -->
-                                <!-- IA -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatIA(
-                                        ia,
-                                        subjectName
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- SUBJECT TOTAL -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${formatMarks(
-                                        subjectTotal
-                                    )}
-
-                                </td>
-
-
-                                <!-- =============================== -->
-                                <!-- REMARK -->
-                                <!-- =============================== -->
-
-                                <td>
-
-                                    ${displayValue(
-                                        remark,
-                                        ""
-                                    )}
-
-                                </td>
-
-
-                            </tr>
-
-                        `);
-
-                    }
-                );
-
-
-                // ====================================================
-                // GRAND TOTAL
-                // ====================================================
-
-                let apiGrandTotal =
-                    getValue(
-                        student,
-                        "GrandTotal"
-                    );
-
-
-                if (apiGrandTotal !== "") {
-
-                    $("#grandTotal").text(
-                        formatMarks(
-                            apiGrandTotal
-                        )
-                    );
-
-                }
-                else {
-
-                    $("#grandTotal").text(
-                        formatMarks(
-                            calculatedGrandTotal
-                        )
-                    );
-
-                }
-
-
-                // ====================================================
-                // SUMMARY
-                // ====================================================
-
-                let summaryRow =
-                    $(".summary tr");
-
-
-                if (summaryRow.length > 0) {
-
-                    let cells =
-                        summaryRow.find("td");
-
-
-                    // =================================================
-                    // DISTINCTION
-                    // =================================================
-
-                    if (cells.length > 0) {
-
-                        $(cells[0]).html(`
-
-                            <span class="hi-text">
-                                डिस्टिक्शन प्राप्तिः
-                            </span>
-
-                            <br>
-
-                            Distinction secured:
-
-                            ${
-                                distinctionSubjects.length > 0
-                                    ? distinctionSubjects.join(", ")
-                                    : ""
-                            }
-
-                        `);
-
-                    }
-
-
-                    // =================================================
-                    // FIRST CLASS
-                    // =================================================
-
-                    if (cells.length > 1) {
-
-                        $(cells[1]).html(`
-
-                            <span class="hi-text">
-                                प्रथम श्रेणी प्राप्तिः
-                            </span>
-
-                            <br>
-
-                            First Class secured:
-
-                            ${
-                                firstClassSubjects.length > 0
-                                    ? firstClassSubjects.join(", ")
-                                    : ""
-                            }
-
-                        `);
-
-                    }
-
-
-                    // =================================================
-                    // GRACE
-                    // =================================================
-
-                    if (cells.length > 2) {
-
-                        $(cells[2]).html(`
-
-                            <span class="hi-text">
-                                कृपांक प्राप्तिः
-                            </span>
-
-                            <br>
-
-                            Grace Marks Awarded:
-
-                            ${
-                                graceMarks.length > 0
-                                    ? graceMarks.join(", ")
-                                    : ""
-                            }
-
-                        `);
-
-                    }
-
-
-                    // =================================================
-                    // FAILED
-                    // =================================================
-
-                    if (cells.length > 3) {
-
-                        $(cells[3]).html(`
-
-                            <span class="hi-text">
-                                अनुत्तीर्णः
-                            </span>
-
-                            <br>
-
-                            Failed:
-
-                            ${
-                                failedSubjects.length > 0
-                                    ? failedSubjects.join(", ")
-                                    : ""
-                            }
-
-                        `);
-
-                    }
-
-                }
-
-
-                // ====================================================
-                // FINAL RESULT
-                // ====================================================
-
-                let finalResult =
-                    getValue(
-                        student,
-                        "Result"
-                    );
-
-
-                if ($(".result-box").length > 0) {
-
-                    $(".result-box").html(`
-
-                        <span class="hi-text">
-                            परिणाम
-                        </span>
-
-                        / RESULT:
-
-                        <span class="hi-text">
-
-                            ${displayValue(
-                                finalResult,
-                                ""
-                            )}
-
-                        </span>
-
-                        /
-
-                        ${displayValue(
-                            finalResult,
-                            ""
-                        )}
-
-                    `);
-
-                }
-
-
-                // ====================================================
-                // SERIAL NO
-                // ====================================================
-
-                let serialNo =
-                    getValue(
-                        student,
-                        "SerialNo"
-                    );
-
-
-                if (
-                    serialNo !== "" &&
-                    $("#Serialno").length > 0
-                ) {
-
-                    $("#Serialno").text(
-                        serialNo
-                    );
-
-                }
-
-
-                // ====================================================
-                // FOLIO
-                // ====================================================
-
-                let folioNo =
-                    getValue(
-                        student,
-                        "Folio"
-                    );
-
-
-                if (
-                    folioNo !== "" &&
-                    $("#Folio").length > 0
-                ) {
-
-                    $("#Folio").text(
-                        folioNo
-                    );
-
-                }
-
-
-                // ====================================================
-                // BOTTOM SERIAL
-                // ====================================================
-
-                let serialBottom =
-                    getValue(
-                        student,
-                        "SerialBottom"
-                    );
-
-
-                if (
-                    serialBottom !== "" &&
-                    $("#serialbottom").length > 0
-                ) {
-
-                    $("#serialbottom").text(
-                        serialBottom
-                    );
-
-                }
-
-            },
-
-
-            // ====================================================
-            // AJAX ERROR
-            // ====================================================
-
-            error: function (
-                xhr,
-                status,
-                error
-            ) {
-
-                console.error(
-                    "Marksheet API Error:",
-                    error
-                );
-
-
-                console.error(
-                    "API Response:",
-                    xhr.responseText
-                );
-
-
-                alert(
-                    "Failed to load marksheet data."
-                );
+                return value;
 
             }
-        });
-      }
-            function formatElective(value, subjectName) {
 
-            let subjectCode =
-                getSubjectCode(subjectName);
 
+
+        function formatMarks(value) {
 
             if (
                 value === null ||
                 value === undefined ||
-                value === "" ||
-                parseFloat(value) === 0
+                value === ""
             ) {
 
-                // A-4/A-5/A-6 के लिए bhi value blank/0 ho to "-"
                 return "-";
 
             }
@@ -2420,230 +1052,1868 @@ function formatIA(value, subjectName) {
                 value.toString().trim();
 
 
+            if (
+                mark.startsWith("@@") ||
+                mark.startsWith("#") ||
+                mark.startsWith("*")
+            ) {
+
+                return mark;
+
+            }
+
+            return mark;
+
+        }
+
+
+
+            // ============================================================
+            // GET SUBJECT CODE
+            //
+            // (A-1) DRAVYAGUNA VIGYAN
+            //       ↓
+            // A-1
+            // ============================================================
+
+                  function getSubjectCode(subjectName) {
+
+                    if (
+                        subjectName === null ||
+                        subjectName === undefined ||
+                        subjectName === ""
+                    ) {
+
+                        return "";
+                    }
+                    let text =
+                        subjectName.toString().trim();
+                    let parenMatch =
+                        text.match(/\(([A-Za-z]-\d+)\)/);
+                    if (parenMatch) {
+                        return parenMatch[1].toUpperCase();
+                    }
+
+                    let leadingMatch =
+                        text.match(/^([A-Za-z]-\d+)/);
+                    if (leadingMatch) {
+                        return leadingMatch[1].toUpperCase();
+                    }
+                    return "";
+
+                }
+
+
+            // ============================================================
+            // VIVA FORMAT
+            //
+            // A-1 = @@
+            // A-2 = @@
+            // A-3 = @@
+            // A-4 = #
+            // A-5 = *
+            // A-6 = #
+            // ============================================================
+
+         function formatViva(value, subjectName) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+
+                return "-";
+
+            }
+
+            let mark =
+                value.toString().trim();
+
+
+            // ========================================================
+            // AGAR API SE ALREADY PREFIX AAYA HAI
+            // ========================================================
+
+            if (
+                mark.startsWith("@@") ||
+                mark.startsWith("#") ||
+                mark.startsWith("*")
+            ) {
+
+                return mark;
+
+            }
+
+
+            let subjectCode =
+                getSubjectCode(subjectName);
+
+
+            switch (subjectCode) {
+
+                case "A-1":
+                    return "@@" + mark;
+
+                case "A-2":
+                    return "@@" + mark;
+
+                case "A-3":
+                    return "@@" + mark;
+
+                case "A-4":
+                    return "#" + mark;
+
+                case "A-5":
+                    return "*" + mark;
+
+                case "A-6":
+                    return "#" + mark;
+
+                default:
+                    return mark;
+
+            }
+
+        }
+
+
+            // ============================================================
+            // IA FORMAT
+            //
+            // A-5 = *12
+            // बाकी normal
+            // ============================================================
+
+           // A-5 = *value
+        // बाकी normal
+        // ============================================================
+
+        function formatIA(value, subjectName) {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+
+                return "-";
+
+            }
+
+            let mark =
+                value.toString().trim();
+
+
+            if (
+                mark.startsWith("@@") ||
+                mark.startsWith("#") ||
+                mark.startsWith("*")
+            ) {
+
+                return mark;
+
+            }
+
+
+            let subjectCode =
+                getSubjectCode(subjectName);
+
+
+            if (subjectCode === "A-5") {
+
+                return "*" + mark;
+
+            }
+
+            return mark;
+
+        }
+
+            // ============================================================
+            // RESULT FAIL CHECK
+            // ============================================================
+
+            function isFail(result) {
+
+                if (
+                    result === null ||
+                    result === undefined ||
+                    result === ""
+                ) {
+
+                    return false;
+
+                }
+
+                let value =
+                    result.toString()
+                        .trim()
+                        .toUpperCase();
+
+
+                return (
+                    value === "FAIL" ||
+                    value === "F"
+                );
+
+            }
+
+
+            // ============================================================
+            // LOAD MARKSHEET
+            // ============================================================
+
+            function loadmarksheet() {
+
+                let enrollment =
+                    '@ViewBag.enrollment';
+
+
+                $.ajax({
+
+                    url:
+                        ApiBaseUrl +
+                        `Result/getdataformarksheet?enrollment=${encodeURIComponent(enrollment)}`,
+
+                    method: "GET",
+
+
+                    // ====================================================
+                    // SUCCESS
+                    // ====================================================
+
+                    success: function (data) {
+
+                        console.log(
+                            "Marksheet API Data:",
+                            data
+                        );
+
+
+                        // =================================================
+                        // CHECK DATA
+                        // =================================================
+
+                        if (
+                            !data ||
+                            !Array.isArray(data) ||
+                            data.length === 0
+                        ) {
+
+                            $("#marksTableBody").html(`
+
+                                <tr>
+
+                                    <td
+                                        colspan="12"
+                                        style="text-align:center;"
+                                    >
+                                        No record found
+                                    </td>
+
+                                </tr>
+
+                            `);
+
+                            return;
+
+                        }
+
+
+                        // =================================================
+                        // FIRST RECORD
+                        // =================================================
+
+                        let student =
+                            data[0];
+
+
+                        // =================================================
+                        // STUDENT DETAILS
+                        // =================================================
+
+
+
+
+
+                        $("#studentName").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                          "FirstName"
+                                ),
+                                ""
+                            )
+
+                        );
+
+                                         $("#studentNameHindi").text(
+
+                                    displayValue(
+                                        getValue(
+                                            student,
+                                                          "StudentHindiName"
+                                        ),
+                                        ""
+                                    )
+
+                                );
+
+                        $("#fatherName").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                           "FatherName"
+                                ),
+                                ""
+                            )
+
+                        );
+
+
+
+                                        $("#fatherNameHindi").text(
+
+                                    displayValue(
+                                        getValue(
+                                            student,
+                                                           "FatherNameHindi"
+                                        ),
+                                        ""
+                                    )
+
+                                );
+
+                             $("#MotherName").text(
+
+                                    displayValue(
+                                        getValue(
+                                            student,
+                                            "MotherName"
+                                        ),
+                                        ""
+                                    )
+
+                                );
+
+                                                  $("#motherNameHindi").text(
+
+                                            displayValue(
+                                                getValue(
+                                                    student,
+                                                            "MotherNameHindi"
+                                                ),
+                                                ""
+                                            )
+
+                                        );
+
+                        $("#rollNumber").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                    "RollNumber"
+                                ),
+                                ""
+                            )
+
+                        );
+
+
+                        $("#enrollmentNumber").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                    "EnrollmentNumber"
+                                ),
+                                enrollment
+                            )
+
+                        );
+
+
+                        $("#attempt").text(
+
+                            displayValue(
+                                getValue(
+                                    student,
+                                    "Attempt"
+                                ),
+                                ""
+                            )
+
+                        );
+
+
+                        // =================================================
+                        // EXAM NAME
+                        // =================================================
+
+                        let examName =
+                            getValue(
+                                student,
+                                "Examname"
+                            );
+
+
+                        if (examName !== "") {
+
+                            $(".exam-h").text(
+                                "Examination Held in " +
+                                examName
+                            );
+
+                        }
+
+
+                        // =================================================
+                        // TABLE BODY
+                        // =================================================
+
+                        let tbody =
+                            $("#marksTableBody");
+
+
+                        tbody.empty();
+
+
+                        // =================================================
+                        // GRAND TOTAL CALCULATION
+                        // =================================================
+
+                        let calculatedGrandTotal = 0;
+
+
+                        // =================================================
+                        // SUMMARY ARRAYS
+                        // =================================================
+
+                        let distinctionSubjects = [];
+
+                        let firstClassSubjects = [];
+
+                        let graceMarks = [];
+
+                        let failedSubjects = [];
+
+
+                        // =================================================
+                        // SUBJECT LOOP
+                        // =================================================
+
+                        $.each(
+                            data,
+                            function (index, item) {
+
+
+                                // =========================================
+                                // SUBJECT NAME
+                                // =========================================
+
+                                let subjectName =
+                                    getValue(
+                                        item,
+                                        "subjectName"
+                                    );
+
+
+                                let subjectHindiName =
+                                    getValue(
+                                        item,
+                                        "subjectHindiName"
+                                    );
+
+
+                                // =========================================
+                                // SUBJECT CODE
+                                // =========================================
+
+                                let subjectCode =
+                                    getSubjectCode(
+                                        subjectName
+                                    );
+
+
+                                       // =========================================
+                // MARKS DISTRIBUTION
+                // (Max marks ka sum chahiye - obtained ka nahi)
+                // =========================================
+
+                let theoryI_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "TheoryI"
+                        )
+                    );
+
+                let theoryII_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "TheoryII"
+                        )
+                    );
+
+                let theoryTotal =
+                    (
+                        (isNaN(theoryI_max) ? 0 : theoryI_max) +
+                        (isNaN(theoryII_max) ? 0 : theoryII_max)
+                    );
+
+
+                let practical_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "Practical"
+                        )
+                    );
+
+                let viva_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "VivaMarks"
+                        )
+                    );
+
+                let elective_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "ElectiveMarks"
+                        )
+                    );
+
+                let ia_max =
+                    parseFloat(
+                        getValue(
+                            item,
+                            "IAMarks"
+                        )
+                    );
+
+                let practicalTotal =
+                    (
+                        (isNaN(practical_max) ? 0 : practical_max) +
+                        (isNaN(viva_max) ? 0 : viva_max) +
+                        (isNaN(elective_max) ? 0 : elective_max) +
+                        (isNaN(ia_max) ? 0 : ia_max)
+                    );
+
+
+                let distribution = "";
+
+                if (
+                    theoryTotal > 0 ||
+                    practicalTotal > 0
+                ) {
+
+                    distribution = `
+
+                        सै. ${displayValue(
+                            theoryTotal,
+                            ""
+                        )}
+
+                        Th ${displayValue(
+                            theoryTotal,
+                            ""
+                        )}
+
+                        <br>
+
+                        व्याव. ${displayValue(
+                            practicalTotal,
+                            ""
+                        )}
+
+                        Pr ${displayValue(
+                            practicalTotal,
+                            ""
+                        )}
+
+                    `;
+
+                }
+
+
+                                // =========================================
+                                // MAX MARKS
+                                // =========================================
+
+                                let maxMarks =
+                                    getValue(
+                                        item,
+                                        "GrandTotalMarks"
+                                    );
+
+
+                                // =========================================
+                                // MIN MARKS
+                                // =========================================
+
+                                let minMarks =
+                                    getValue(
+                                        item,
+                                        "MinTotalMarks"
+                                    );
+
+
+                                // =========================================
+                                // MIN MARKS NOT FROM API
+                                // MAX / 2
+                                // =========================================
+
+                                if (
+                                    minMarks === "" &&
+                                    maxMarks !== ""
+                                ) {
+
+                                    let max =
+                                        parseFloat(
+                                            maxMarks
+                                        );
+
+
+                                    if (!isNaN(max)) {
+
+                                        minMarks =
+                                            max / 2;
+
+                                    }
+
+                                }
+
+
+                                // =========================================
+                                // THEORY I
+                                // =========================================
+
+                                let theoryI =
+                                    getValue(
+                                        item,
+                                        "FinalTheoryIMarks"
+                                    );
+
+
+                                if (theoryI === "") {
+
+                                    theoryI =
+                                        getValue(
+                                            item,
+                                            "TheoryI"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // THEORY II
+                                // =========================================
+
+                                let theoryII =
+                                    getValue(
+                                        item,
+                                        "FinalTheoryIIMarks"
+                                    );
+
+
+                                if (theoryII === "") {
+
+                                    theoryII =
+                                        getValue(
+                                            item,
+                                            "TheoryII"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // PRACTICAL
+                                // =========================================
+
+                                let practical =
+                                    getValue(
+                                        item,
+                                        "ObtenPracticalMarks"
+                                    );
+
+
+                                if (practical === "") {
+
+                                    practical =
+                                        getValue(
+                                            item,
+                                            "Practical"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // VIVA
+                                // =========================================
+
+                                let viva =
+                                    getValue(
+                                        item,
+                                        "ObtenVivaMarks"
+                                    );
+
+
+                                if (viva === "") {
+
+                                    viva =
+                                        getValue(
+                                            item,
+                                            "VivaMarks"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // ELECTIVE
+                                // =========================================
+
+                                let elective =
+                                    getValue(
+                                        item,
+                                        "ObtenElativeMarks"
+                                    );
+
+
+                                if (elective === "") {
+
+                                    elective =
+                                        getValue(
+                                            item,
+                                            "ElectiveMarks"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // IA
+                                // =========================================
+
+                                let ia =
+                                    getValue(
+                                        item,
+                                        "ObtenIAMarks"
+                                    );
+
+
+                                if (ia === "") {
+
+                                    ia =
+                                        getValue(
+                                            item,
+                                            "IAMarks"
+                                        );
+
+                                }
+
+
+                                // =========================================
+                                // SUBJECT TOTAL
+                                // =========================================
+
+                                let subjectTotal =
+                                    getValue(
+                                        item,
+                                        "subjectTotal"
+                                    );
+
+
+                                let totalNumber =
+                                    parseFloat(
+                                        subjectTotal
+                                    );
+
+
+                                if (!isNaN(totalNumber)) {
+
+                                    calculatedGrandTotal +=
+                                        totalNumber;
+
+                                }
+
+
+                                // =========================================
+                                // DISTINCTION
+                                // =========================================
+
+                                let distinction =
+                                    getValue(
+                                        item,
+                                        "Distinction"
+                                    );
+
+
+                                // =========================================
+                                // RESULT
+                                // =========================================
+
+                                let result =
+                                    getValue(
+                                        item,
+                                        "Result"
+                                    );
+
+
+                                // =========================================
+                                // REMARK
+                                // =========================================
+
+                                let remark =
+                                    distinction;
+
+
+                                if (isFail(result)) {
+
+                                    remark = "F";
+
+                                }
+
+
+                                // =========================================
+                                // DISTINCTION VALUE
+                                // =========================================
+
+                                let distinctionValue =
+                                    distinction
+                                        .toString()
+                                        .trim()
+                                        .toUpperCase();
+
+
+                                // =========================================
+                                // DISTINCTION
+                                // =========================================
+
+                                if (
+                                    distinctionValue === "D"
+                                ) {
+
+                                    distinctionSubjects.push(
+                                        subjectCode
+                                    );
+
+                                }
+
+
+                                // =========================================
+                                // FIRST CLASS
+                                // =========================================
+
+                                if (
+                                    distinctionValue === "I"
+                                ) {
+
+                                    firstClassSubjects.push(
+                                        subjectCode
+                                    );
+
+                                }
+
+
+                                // =========================================
+                                // GRACE MARKS
+                                // =========================================
+        // =========================================================
+        // GRACE MARKS
+        // =========================================================
+
+        let grace = getValue(item, "GraceMarks");
+
+        let hasGrace = false;
+        let graceDisplay = "";
+
+        // GraceMarks ko safely string me convert karo
+        let graceText = "";
+
+        if (grace !== null && grace !== undefined) {
+
+            graceText = grace
+                .toString()
+                .replace(/<br\s*\/?>/gi, " ")
+                .replace(/<[^>]*>/g, " ")
+                .replace(/&nbsp;/gi, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            console.log("RAW GraceMarks:", grace);
+            console.log("CLEAN GraceMarks:", graceText);
+
+            // G-A-1, G-A-2, G-A-3 etc.
+            let graceMatch = graceText.match(/G\s*-\s*A\s*-\s*\d+/i);
+
+            if (graceMatch) {
+
+                hasGrace = true;
+
+                graceDisplay = graceMatch[0]
+                    .replace(/\s+/g, "")
+                    .toUpperCase();
+
+                console.log(
+                    "GRACE FOUND:",
+                    subjectCode,
+                    graceDisplay
+                );
+
+                graceMarks.push(
+                    subjectCode + " (" + graceDisplay + ")"
+                );
+            }
+        }
+
+
+        // =========================================================
+        // FAILED
+        // =========================================================
+
+        if (isFail(result)) {
+
+            failedSubjects.push(
+                subjectCode
+            );
+
+        }
+
+
+
+                               
+
+                                // =================================================
+                                // APPEND ROW
+                                // =================================================
+
+                                tbody.append(`
+
+                                        <tr class="${hasGrace ? "grace-row" : ""}"
+        ${hasGrace ? 'style="background-color: yellow !important;"' : ''}>
+
+
+                                        <!-- =============================== -->
+                                        <!-- SUBJECT -->
+                                        <!-- =============================== -->
+
+                                        <td class="subject-name">
+
+                                            ${displayValue(
+                                                subjectHindiName,
+                                                ""
+                                            )}
+
+                                            ${
+                                                subjectHindiName !== ""
+                                                    ? "<br>"
+                                                    : ""
+                                            }
+
+                                            ${displayValue(
+                                                subjectName,
+                                                ""
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- MARKS DISTRIBUTION -->
+                                        <!-- =============================== -->
+
+                                        <td class="distribution">
+
+                                            ${distribution}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- MAX -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${displayValue(
+                                                maxMarks
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- MIN -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${displayValue(
+                                                minMarks
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- THEORY I -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatMarks(
+                                                theoryI
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- THEORY II -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatMarks(
+                                                theoryII
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- PRACTICAL -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatMarks(
+                                                practical
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- VIVA -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatViva(
+                                                viva,
+                                                subjectName
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- ELECTIVE -->
+                                        <!-- =============================== -->
+
+                                              <td>
+                    ${formatElective(
+                        elective,
+                        subjectName
+                    )}
+                </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- IA -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatIA(
+                                                ia,
+                                                subjectName
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- SUBJECT TOTAL -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${formatMarks(
+                                                subjectTotal
+                                            )}
+
+                                        </td>
+
+
+                                        <!-- =============================== -->
+                                        <!-- REMARK -->
+                                        <!-- =============================== -->
+
+                                        <td>
+
+                                            ${displayValue(
+                                                remark,
+                                                ""
+                                            )}
+
+                                        </td>
+
+
+                                    </tr>
+
+                                `);
+
+                            }
+                        );
+
+
+                        // ====================================================
+                        // GRAND TOTAL
+                        // ====================================================
+
+                        let apiGrandTotal =
+                            getValue(
+                                student,
+                                "GrandTotal"
+                            );
+
+
+                        if (apiGrandTotal !== "") {
+
+                            $("#grandTotal").text(
+                                formatMarks(
+                                    apiGrandTotal
+                                )
+                            );
+
+                        }
+                        else {
+
+                            $("#grandTotal").text(
+                                formatMarks(
+                                    calculatedGrandTotal
+                                )
+                            );
+
+                        }
+
+
+                        // ====================================================
+                        // SUMMARY
+                        // ====================================================
+
+                        let summaryRow =
+                            $(".summary tr");
+
+
+                        if (summaryRow.length > 0) {
+
+                            let cells =
+                                summaryRow.find("td");
+
+
+                            // =================================================
+                            // DISTINCTION
+                            // =================================================
+
+                            if (cells.length > 0) {
+
+                                $(cells[0]).html(`
+
+                                    <span class="hi-text">
+                                        डिस्टिक्शन प्राप्तिः
+                                    </span>
+
+                                    <br>
+
+                                    Distinction secured:
+
+                                    ${
+                                        distinctionSubjects.length > 0
+                                            ? distinctionSubjects.join(", ")
+                                            : ""
+                                    }
+
+                                `);
+
+                            }
+
+
+                            // =================================================
+                            // FIRST CLASS
+                            // =================================================
+
+                            if (cells.length > 1) {
+
+                                $(cells[1]).html(`
+
+                                    <span class="hi-text">
+                                        प्रथम श्रेणी प्राप्तिः
+                                    </span>
+
+                                    <br>
+
+                                    First Class secured:
+
+                                    ${
+                                        firstClassSubjects.length > 0
+                                            ? firstClassSubjects.join(", ")
+                                            : ""
+                                    }
+
+                                `);
+
+                            }
+
+
+                            // =================================================
+                            // GRACE
+                            // =================================================
+
+                            if (cells.length > 2) {
+
+                                $(cells[2]).html(`
+
+                                    <span class="hi-text">
+                                        कृपांक प्राप्तिः
+                                    </span>
+
+                                    <br>
+
+                                    Grace Marks Awarded:
+
+                                    ${
+                                        graceMarks.length > 0
+                                            ? graceMarks.join(", ")
+                                            : ""
+                                    }
+
+                                `);
+
+                            }
+
+
+                            // =================================================
+                            // FAILED
+                            // =================================================
+
+                            if (cells.length > 3) {
+
+                                $(cells[3]).html(`
+
+                                    <span class="hi-text">
+                                        अनुत्तीर्णः
+                                    </span>
+
+                                    <br>
+
+                                    Failed:
+
+                                    ${
+                                        failedSubjects.length > 0
+                                            ? failedSubjects.join(", ")
+                                            : ""
+                                    }
+
+                                `);
+
+                            }
+
+                        }
+
+
+                        // ====================================================
+                        // FINAL RESULT
+                        // ====================================================
+
+                        let finalResult =
+                            getValue(
+                                student,
+                                "Result"
+                            );
+
+
+                        if ($(".result-box").length > 0) {
+
+                            $(".result-box").html(`
+
+                                <span class="hi-text">
+                                    परिणाम
+                                </span>
+
+                                / RESULT:
+
+                                <span class="hi-text">
+
+                                    ${displayValue(
+                                        finalResult,
+                                        ""
+                                    )}
+
+                                </span>
+
+                                /
+
+                                ${displayValue(
+                                    finalResult,
+                                    ""
+                                )}
+
+                            `);
+
+                        }
+
+
+                        // ====================================================
+                        // SERIAL NO
+                        // ====================================================
+
+                        let serialNo =
+                            getValue(
+                                student,
+                                "SerialNo"
+                            );
+
+
+                        if (
+                            serialNo !== "" &&
+                            $("#Serialno").length > 0
+                        ) {
+
+                            $("#Serialno").text(
+                                serialNo
+                            );
+
+                        }
+
+
+                        // ====================================================
+                        // FOLIO
+                        // ====================================================
+
+                        let folioNo =
+                            getValue(
+                                student,
+                                "Folio"
+                            );
+
+
+                        if (
+                            folioNo !== "" &&
+                            $("#Folio").length > 0
+                        ) {
+
+                            $("#Folio").text(
+                                folioNo
+                            );
+
+                        }
+
+
+                        // ====================================================
+                        // BOTTOM SERIAL
+                        // ====================================================
+
+                        let serialBottom =
+                            getValue(
+                                student,
+                                "SerialBottom"
+                            );
+
+
+                        if (
+                            serialBottom !== "" &&
+                            $("#serialbottom").length > 0
+                        ) {
+
+                            $("#serialbottom").text(
+                                serialBottom
+                            );
+
+                        }
+
+                    },
+
+
+                    // ====================================================
+                    // AJAX ERROR
+                    // ====================================================
+
+                    error: function (
+                        xhr,
+                        status,
+                        error
+                    ) {
+
+                        console.error(
+                            "Marksheet API Error:",
+                            error
+                        );
+
+
+                        console.error(
+                            "API Response:",
+                            xhr.responseText
+                        );
+
+
+                        alert(
+                            "Failed to load marksheet data."
+                        );
+
+                    }
+                });
+              }
+                   
+
+
+        
+        // ============================================================
+        // COMMON MARK FORMATTER
+        // ============================================================
+
+        function cleanMark(value) {
+
+            // --------------------------------------------------------
+            // NULL / UNDEFINED
+            // --------------------------------------------------------
+
+            if (value === null || value === undefined) {
+                return "-";
+            }
+
+
+            // --------------------------------------------------------
+            // STRING ME CONVERT
+            // --------------------------------------------------------
+
+            let text = value.toString().trim();
+
+
+            // --------------------------------------------------------
+            // EMPTY STRING
+            // --------------------------------------------------------
+
+            if (text === "") {
+                return "-";
+            }
+
+
+            // --------------------------------------------------------
+            // NUMBER
+            // --------------------------------------------------------
+
+            let num = parseFloat(text);
+
+
+            // --------------------------------------------------------
+            // AGAR NUMBER NAHI HAI
+            // ORIGINAL VALUE RETURN
+            // --------------------------------------------------------
+
+            if (isNaN(num)) {
+                return text;
+            }
+
+
+            // --------------------------------------------------------
+            // DECIMAL REMOVE
+            //
+            // 0.00  -> 0
+            // 5.00  -> 5
+            // 15.00 -> 15
+            //
+            // NOTE:
+            // Agar 10.50 hai to 11 hoga
+            // --------------------------------------------------------
+
+            return Math.round(num).toString();
+        }
+
+
+
+        // ============================================================
+        // FORMAT MARKS
+        // ============================================================
+
+        function formatMarks(value) {
+
+            return cleanMark(value);
+
+        }
+
+
+
+        // ============================================================
+        // FORMAT VIVA
+        // ============================================================
+
+        function formatViva(value, subjectName) {
+
+            // --------------------------------------------------------
+            // SUBJECT CODE
+            // --------------------------------------------------------
+
+            let subjectCode = getSubjectCode(subjectName);
+
+
+            // --------------------------------------------------------
+            // MARK
+            // --------------------------------------------------------
+
+            let mark = cleanMark(value);
+
+
+            // --------------------------------------------------------
+            // NULL / BLANK => -
+            // --------------------------------------------------------
+
+            if (mark === "-") {
+                return "-";
+            }
+
+
+            // --------------------------------------------------------
+            // VIVA SUBJECT-WISE FORMAT
+            // --------------------------------------------------------
+
+            switch (subjectCode) {
+
+                case "A-1":
+
+                    return mark + "<br/>(Viva)";
+
+
+                case "A-2":
+
+                    return mark + "<br/>(Viva)";
+
+
+                case "A-3":
+
+                    return mark + "<br/>(Viva)";
+
+
+                default:
+
+                    return mark;
+            }
+
+        }
+
+
+
+        // ============================================================
+        // FORMAT ELECTIVE
+        // ============================================================
+
+        function formatElective(value, subjectName) {
+
+            // --------------------------------------------------------
+            // SUBJECT CODE
+            // --------------------------------------------------------
+
+            let subjectCode = getSubjectCode(subjectName);
+
+
+            // --------------------------------------------------------
+            // MARK
+            // --------------------------------------------------------
+
+            let mark = cleanMark(value);
+
+
+            // --------------------------------------------------------
+            // NULL / BLANK => -
+            // --------------------------------------------------------
+
+            if (mark === "-") {
+                return "-";
+            }
+
+
+            // --------------------------------------------------------
+            // ELECTIVE SUBJECT-WISE FORMAT
+            // --------------------------------------------------------
+
             switch (subjectCode) {
 
                 case "A-4":
-                            return mark + "<br/> (Set-SA)";
+
+                    return mark + "<br/>(Set-SA)";
+
 
                 case "A-5":
-                            return mark + "<br/> (Set-SB)";
+
+                    return mark + "<br/>(Set-SB)";
+
 
                 case "A-6":
-                            return mark + "<br/> (Set-SC)";
+
+                    return mark + "<br/>(Set-SC)";
+
 
                 default:
-                    return "-";
 
+                    return mark;
             }
 
         }
 
-    // ============================================================
-    // PRINT POPUP OPEN
-    // ============================================================
-
-    function openPrintPopup() {
-
-        $("#printModal").css(
-            "display",
-            "flex"
-        );
 
 
-        $("#printSerialNo").val(
-            $("#Serialno")
-                .text()
-                .trim()
-        );
+        // ============================================================
+        // FORMAT IA
+        // ============================================================
+
+        function formatIA(value, subjectName) {
+
+            // --------------------------------------------------------
+            // MARK
+            // --------------------------------------------------------
+
+            let mark = cleanMark(value);
 
 
-        $("#printFolioNo").val(
-            $("#Folio")
-                .text()
-                .trim()
-        );
+            // --------------------------------------------------------
+            // NULL / BLANK => -
+            // --------------------------------------------------------
+
+            if (mark === "-") {
+                return "-";
+            }
 
 
-        $("#printBottomSerial").val(
-            $("#serialbottom")
-                .text()
-                .trim()
-        );
+            // --------------------------------------------------------
+            // IA MARK
+            // --------------------------------------------------------
 
-
-        $("#printSerialNo").focus();
-
-    }
-
-
-    // ============================================================
-    // CLOSE PRINT POPUP
-    // ============================================================
-
-    function closePrintPopup() {
-
-        $("#printModal").hide();
-
-    }
-
-
-    // ============================================================
-    // SAVE AND PRINT
-    // ============================================================
-
-    function saveAndPrint() {
-
-        let serialNo =
-            $("#printSerialNo")
-                .val()
-                .trim();
-
-
-        let folioNo =
-            $("#printFolioNo")
-                .val()
-                .trim();
-
-
-        let bottomSerialNo =
-            $("#printBottomSerial")
-                .val()
-                .trim();
-
-
-        // ========================================================
-        // SERIAL VALIDATION
-        // ========================================================
-
-        if (serialNo === "") {
-
-            alert(
-                "Please enter Serial No."
-            );
-
-            $("#printSerialNo").focus();
-
-            return;
+            return mark;
 
         }
+        
 
 
-        // ========================================================
-        // FOLIO VALIDATION
-        // ========================================================
+            // ============================================================
+            // PRINT POPUP OPEN
+            // ============================================================
 
-        if (folioNo === "") {
+            function openPrintPopup() {
 
-            alert(
-                "Please enter Folio No."
-            );
-
-            $("#printFolioNo").focus();
-
-            return;
-
-        }
+                $("#printModal").css(
+                    "display",
+                    "flex"
+                );
 
 
-        // ========================================================
-        // BOTTOM SERIAL VALIDATION
-        // ========================================================
-
-        if (bottomSerialNo === "") {
-
-            alert(
-                "Please enter Bottom Serial No."
-            );
-
-            $("#printBottomSerial").focus();
-
-            return;
-
-        }
+                $("#printSerialNo").val(
+                    $("#Serialno")
+                        .text()
+                        .trim()
+                );
 
 
-        // ========================================================
-        // SET VALUES IN MARKSHEET
-        // ========================================================
-
-        $("#Serialno").text(
-            serialNo
-        );
+                $("#printFolioNo").val(
+                    $("#Folio")
+                        .text()
+                        .trim()
+                );
 
 
-        $("#Folio").text(
-            folioNo
-        );
+                $("#printBottomSerial").val(
+                    $("#serialbottom")
+                        .text()
+                        .trim()
+                );
 
 
-        $("#serialbottom").text(
-            bottomSerialNo
-        );
+                $("#printSerialNo").focus();
+
+            }
 
 
-        // ========================================================
-        // CLOSE POPUP
-        // ========================================================
+            // ============================================================
+            // CLOSE PRINT POPUP
+            // ============================================================
 
-        closePrintPopup();
+            function closePrintPopup() {
 
+                $("#printModal").hide();
 
-        // ========================================================
-        // PRINT AFTER DOM UPDATE
-        // ========================================================
-
-        setTimeout(function () {
-
-            window.print();
-
-        }, 200);
-
-    }
+            }
 
 
-    // ============================================================
-    // ESC KEY - CLOSE PRINT POPUP
-    // ============================================================
+            // ============================================================
+            // SAVE AND PRINT
+            // ============================================================
 
-    $(document).on(
-        "keydown",
-        function (e) {
+            function saveAndPrint() {
 
-            if (
-                e.key === "Escape" &&
-                $("#printModal").is(":visible")
-            ) {
+                let serialNo =
+                    $("#printSerialNo")
+                        .val()
+                        .trim();
+
+
+                let folioNo =
+                    $("#printFolioNo")
+                        .val()
+                        .trim();
+
+
+                let bottomSerialNo =
+                    $("#printBottomSerial")
+                        .val()
+                        .trim();
+
+
+                // ========================================================
+                // SERIAL VALIDATION
+                // ========================================================
+
+                if (serialNo === "") {
+
+                    alert(
+                        "Please enter Serial No."
+                    );
+
+                    $("#printSerialNo").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // FOLIO VALIDATION
+                // ========================================================
+
+                if (folioNo === "") {
+
+                    alert(
+                        "Please enter Folio No."
+                    );
+
+                    $("#printFolioNo").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // BOTTOM SERIAL VALIDATION
+                // ========================================================
+
+                if (bottomSerialNo === "") {
+
+                    alert(
+                        "Please enter Bottom Serial No."
+                    );
+
+                    $("#printBottomSerial").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // SET VALUES IN MARKSHEET
+                // ========================================================
+
+                $("#Serialno").text(
+                    serialNo
+                );
+
+
+                $("#Folio").text(
+                    folioNo
+                );
+
+
+                $("#serialbottom").text(
+                    bottomSerialNo
+                );
+
+
+                // ========================================================
+                // CLOSE POPUP
+                // ========================================================
 
                 closePrintPopup();
 
-            }
 
-        }
-    );
+                // ========================================================
+                // PRINT AFTER DOM UPDATE
+                // ========================================================
 
+                setTimeout(function () {
 
-    // ============================================================
-    // CLICK OUTSIDE POPUP TO CLOSE
-    // ============================================================
+                    window.print();
 
-    $(document).on(
-        "click",
-        "#printModal",
-        function (e) {
-
-            if (
-                e.target === this
-            ) {
-
-                closePrintPopup();
+                }, 200);
 
             }
 
-        }
-    );
+
+            // ============================================================
+            // ESC KEY - CLOSE PRINT POPUP
+            // ============================================================
+
+            $(document).on(
+                "keydown",
+                function (e) {
+
+                    if (
+                        e.key === "Escape" &&
+                        $("#printModal").is(":visible")
+                    ) {
+
+                        closePrintPopup();
+
+                    }
+
+                }
+            );
 
 
-</script>
+            // ============================================================
+            // CLICK OUTSIDE POPUP TO CLOSE
+            // ============================================================
+
+            $(document).on(
+                "click",
+                "#printModal",
+                function (e) {
+
+                    if (
+                        e.target === this
+                    ) {
+
+                        closePrintPopup();
+
+                    }
+
+                }
+            );
+
+
+    </script>
 </body>
 </html>
 
