@@ -845,15 +845,13 @@
         ".sign-box {" +
         "border-left: 1px solid #111;" +
         "display: flex;" +
-        "align-items: center;" +
+        "align-items: flex-end;" +
         "justify-content: center;" +
         "padding: 4px;" +
         "font-size: 6.5pt;" +
         "font-weight: bold;" +
         "min-height: 55px;" +
-        "text-align: center;" +
         "}",
-
 
         ".controller {" +
         "line-height: 1.1;" +

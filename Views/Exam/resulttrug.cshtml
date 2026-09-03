@@ -94,8 +94,8 @@
             page-break-after: auto;
         }
 
-    .s1{
-    padding: 5px;
+    .s1 {
+        padding: 5px;
     }
 
 </style>
@@ -119,7 +119,7 @@
             padding: 3px 4px;
             text-align: center;
             vertical-align: middle;
-        }  
+        }
 
         table.ledger thead th {
             background: #fff;
@@ -159,8 +159,8 @@
         line-height: 20px;
     }
 
-    .border-none{
-        border:none !important;
+    .border-none {
+        border: none !important;
     }
 
     .k {
@@ -183,7 +183,6 @@
     .kkk {
         border-left: none !important;
         border-bottom: none !important;
-
     }
 
     .kkkk {
@@ -250,39 +249,39 @@
         <div class="search-group btn-group">
             <button type="button" onclick="loadResultforBamsSecond()">
                 Search Report
-            </button>           
+            </button>
         </div>
-    
-       
+
+
     </div>
 </div>
 
 
 <div class="page" id="ledgerPage">
-        <div class="top">
-            <div class="logo">
+    <div class="top">
+        <div class="logo">
             <img src="~/Logo/nia_logo.png" />
-            </div>
-            <div class="heading">
-                <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
-                <p>Deemed to be University</p>
-                <p>(Ministry of AYUSH, Govt. of India)</p>
-                <p>Jorawar Singh Gate, Amer Road, Jaipur-302002</p>
-                <h4>
-                    <span id="ExamnameId"></span>
-                </h4>
-                <h3>TABULATION REGISTER/LEDGER</h3>
-            </div>
-
-            <div class="page-no">Page: 1</div>
+        </div>
+        <div class="heading">
+            <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
+            <p>Deemed to be University</p>
+            <p>(Ministry of AYUSH, Govt. of India)</p>
+            <p>Jorawar Singh Gate, Amer Road, Jaipur-302002</p>
+            <h4>
+                <span id="ExamnameId"></span>
+            </h4>
+            <h3>TABULATION REGISTER/LEDGER</h3>
         </div>
 
-        <div class="issue-date">Date of Issue : .....................</div>
+        <div class="page-no">Page: 1</div>
+    </div>
 
-       
+    <div class="issue-date">Date of Issue : .....................</div>
 
 
-      
+
+
+
     <table class="ledger">
         <thead>
             <tr>
@@ -412,29 +411,29 @@
         </tbody>
     </table>
 
-        <div class="footer">
-            <div class="notes">
-                <b>Note.</b><br />
-                1. For candidate to pass, he/she shall require to obtain a minimum of
-                50% marks in each of Theory examination.<br />
-                2. The candidate securing 65% marks or above in a subject shall be
-                declared to have obtained First Class(Denoted by I) in that
-                Subject.<br />
-                3. The candidate securing 75% marks or above in a subject shall be
-                declared to have obtained distinction(Denoted by D)in that Subject.<br />
-                4. A candidate failing in the Theory part of a paper will be
-                considered fail in Theory.
-            </div>
-
-            <div class="sign">Tabulator</div>
-            <div class="sign1">DCOE</div>
-            <div class="sign">Controller of Examinations</div>
-            <div class="sign2">Registrar</div>
-            <div class="sign2">Vice Chancellor</div>
+    <div class="footer">
+        <div class="notes">
+            <b>Note.</b><br />
+            1. For candidate to pass, he/she shall require to obtain a minimum of
+            50% marks in each of Theory examination.<br />
+            2. The candidate securing 65% marks or above in a subject shall be
+            declared to have obtained First Class(Denoted by I) in that
+            Subject.<br />
+            3. The candidate securing 75% marks or above in a subject shall be
+            declared to have obtained distinction(Denoted by D)in that Subject.<br />
+            4. A candidate failing in the Theory part of a paper will be
+            considered fail in Theory.
         </div>
+
+        <div class="sign">Tabulator</div>
+        <div class="sign1">DCOE</div>
+        <div class="sign">Controller of Examinations</div>
+        <div class="sign2">Registrar</div>
+        <div class="sign2">Vice Chancellor</div>
     </div>
-    <script>
-        $(document).ready(function () {        
+</div>
+<script>
+        $(document).ready(function () {
         loadSession();
         });
          function loadSession() {
@@ -464,7 +463,7 @@
             .then(res => res.json())
             .then(data => {
                 let courseDropdown = document.getElementById("courseId");
-                courseDropdown.innerHTML = '<option value="">Select Course</option>';                   
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
                 data.forEach(item => {
                      courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
                 });
@@ -472,7 +471,7 @@
      });
        document.getElementById("courseId").addEventListener("change", function () {
         let courseId = this.value;
-        $("#semester").val('');     
+        $("#semester").val('');
         $("#BatchId").val('');
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
@@ -495,281 +494,355 @@
                $("#BatchId").html(opt);
            });
        });
-     
 
 
 
 
-      async function loadResultforBamsSecond() {
+    async function loadResultforBamsSecond() {
 
-        const courseId = $("#courseId").val();
-        const semester = $("#semester").val();
-        const sessionId = $("#sessionId").val();
-        let BatchId = $("#BatchId").val();
+         const courseId = $("#courseId").val();
+         const semester = $("#semester").val();
+         const sessionId = $("#sessionId").val();
+         let BatchId = $("#BatchId").val();
 
-        const response = await fetch(
-            ApiBaseUrl +
-            `Result/GetTabulationRegisterResultReportforbamssecond?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
-        );
+         const response = await fetch(
+             ApiBaseUrl +
+             `Result/GetTabulationRegisterResultReportforbamssecond?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
+         );
 
-        const data = await response.json();
+         const data = await response.json();
 
-        if (!data || data.length === 0) {
-            $("#ExamnameId").text('');
-            $("#resultBody").html('');
-            alert("No records found for the selected Session, Course and Semester.");
-            return;
-        }
+         if (!data || data.length === 0) {
+             $("#ExamnameId").text('');
+             $("#resultBody2").html('');
+             alert("No records found for the selected Session, Course and Semester.");
+             return;
+         }
 
-        $("#ExamnameId").text(data[0].examname || '');
+         $("#ExamnameId").text(data[0].examname || '');
 
-        // Group student-wise
-        let grouped = {};
+         // Group student-wise
+         let grouped = {};
 
-        data.forEach(item => {
+         data.forEach(item => {
 
-            let key = item.rollNumber;
+             let key = item.rollNumber;
 
-            if (!grouped[key]) {
-                grouped[key] = [];
-            }
+             if (!grouped[key]) {
+                 grouped[key] = [];
+             }
 
-            grouped[key].push(item);
-        });
+             grouped[key].push(item);
+         });
 
-        let html = '';
-        let sno = 1;
+         let html = '';
+         let sno = 1;
 
-        Object.keys(grouped).forEach(key => {
+         Object.keys(grouped).forEach(key => {
 
-            let student = grouped[key];
-            let first = student[0];
+             let student = grouped[key];
+             let first = student[0];
 
-            html += `
-            <tr>
+             html += `
+             <tr>
 
-                <!-- S.No -->
-                <td class="data-cell">
-                    ${sno++}
-                </td>
-                <td>
-                    ${first.rollNumber}
-                    <hr/>
-                    ${first.enrollmentNumber}
-                    <hr/>
-                    ${first.firstName}
-                    <hr/>
-                    ${first.fatherName}
-                </td>
-              
-
-                <!-- Attempt -->
-                <td class="data-cell">
-                    ${first.attempt || ''}
-                </td>
-
-         
-
-                <!-- Subject Name -->
-                <td class="data-cell kk" style="border: 1px solid #000; padding:3px 4px; text-align:left;">
-                    ${student.map(x => x.subjectName || '-').join('<br>')}
-                </td>
-
-                <!-- Script ID I -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.scriptIdI || '-').join('<br>')}
-                </td>
-
-                <!-- Script ID II -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.scriptIdII || '-').join('<br>')}
-                </td>
-
-                <!-- Theory I -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.theoryI || '-').join('<br>')}
-                </td>
-
-                <!-- Theory II -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.theoryII || '-').join('<br>')}
-                </td>
-
-                <!-- Practical -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.practical || '-').join('<br>')}
-                </td>
-
-                <!-- Viva Marks -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.vivaMarks || '-').join('<br>')}
-                </td>
-
-                <!-- Elective Marks -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.electiveMarks || '-').join('<br>')}
-                </td>
-
-                <!-- IA Marks -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.iaMarks || '-').join('<br>')}
-                </td>
-
-                <!-- Grand Total Marks -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.grandTotalMarks || '-').join('<br>')}
-                </td>
-
-                <!-- Theory I Evaluator 1 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIEvaluator1 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory I Evaluator 2 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIEvaluator2 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory I Difference -->
-                <td class="data-cell kk">
-                    ${student.map(x =>
-                        x.thearyIDifference12 != null
-                            ? Number(x.thearyIDifference12).toFixed(2)
-                            : '-'
-                    ).join('<br>')}
-                </td>
-
-                <!-- Theory I Evaluator 3 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIEvaluator3 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory I Average -->
-                <td class="data-cell kk">
-                    ${student.map(x =>
-                        x.thearyIAverageOfTwoHigherMarks != null
-                            ? Number(x.thearyIAverageOfTwoHigherMarks).toFixed(2)
-                            : '-'
-                    ).join('<br>')}
-                </td>
-
-                <!-- Theory II Evaluator 1 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIIEvaluator1 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory II Evaluator 2 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIIEvaluator2 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory II Difference -->
-                <td class="data-cell kk">
-                    ${student.map(x =>
-                        x.thearyIIDifference12 != null
-                            ? Number(x.thearyIIDifference12).toFixed(2)
-                            : '-'
-                    ).join('<br>')}
-                </td>
-
-                <!-- Theory II Evaluator 3 -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.thearyIIEvaluator3 || '-').join('<br>')}
-                </td>
-
-                <!-- Theory II Average -->
-                <td class="data-cell kk">
-                    ${student.map(x =>
-                        x.thearyIIAverageOfTwoHigherMarks != null
-                            ? Number(x.thearyIIAverageOfTwoHigherMarks).toFixed(2)
-                            : '-'
-                    ).join('<br>')}
-                </td>
-
-                <!-- Final Theory I -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.finalTheoryIMarks || '-').join('<br>')}
-                </td>
-
-                <!-- Final Theory II -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.finalTheoryIIMarks || '-').join('<br>')}
-                </td>
-
-                <!-- Theory Total -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.theoryTotal || '-').join('<br>')}
-                </td>
-
-                <!-- Obtained Practical -->
-                <td class="data-cell kk">
-                    ${student.map(x => fmtMark(x.obtenPracticalMarks)).join('<br>')}
-                </td>
-                <!-- Obtained Viva -->
-                <td class="data-cell kk">
-                    ${student.map(x => fmtMark(x.obtenVivaMarks)).join('<br>')}
-                </td>
-                <!-- Obtained Elective -->
-                <td class="data-cell kk">
-                    ${student.map(x => fmtMark(x.obtenElativeMarks)).join('<br>')}
-                </td>
-                <!-- Obtained IA -->
-                <td class="data-cell kk">
-                    ${student.map(x => fmtMark(x.obtenIAMarks)).join('<br>')}
-                </td>
-
-                <!-- Practical Total -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.practicalTotal || '-').join('<br>')}
-                </td>
+                 <!-- S.No -->
+                 <td class="data-cell">
+                     ${sno++}
+                 </td>
+                 <td>
+                     ${first.rollNumber}
+                     <hr/>
+                     ${first.enrollmentNumber}
+                     <hr/>
+                     ${first.firstName}
+                     <hr/>
+                     ${first.fatherName}
+                 </td>
 
 
-                <!-- Subject Total -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.subjectTotal || '').join('<br>')}
-                </td>
-                <!-- Grace Marks -->
-                <td class="data-cell kk">
-                    ${student.map(x => x.graceMarks || '').join('<br>')}
-                </td>
+                 <!-- Attempt -->
+                 <td class="data-cell">
+                     ${first.attempt || ''}
+                 </td>
 
 
-                <!-- Required To Appear -->
-                <td class="data-cell kk">
-                    ${student
-                        .filter(x => x.required_To_Appear)
-                        .map(x => x.required_To_Appear)
-                        .join('<br>')}
-                </td>
 
-                <!-- Distinction -->
-                <td class="data-cell kk">
-                    ${student
-                        .filter(x => x.distinction)
-                        .map(x => x.distinction)
-                        .join('<br>')}
-                </td>
+                 <!-- Subject Name -->
+                 <!-- FIX: subject name se aage ki saari per-subject
+                      columns mein ab wrapCell() lagaya hai - jis subject
+                      mein grace lagi hai uski line YELLOW, jo fail hai
+                      uski line RED dikhegi (chahe ye ek hi <td> ke andar
+                      multiple subjects <br> se joined kyun na ho). -->
+                 <td class="data-cell kk" style="border: 1px solid #000; padding:3px 4px; text-align:left;">
+                     ${student.map(x => wrapCell(x, x.subjectName || '-')).join('<br>')}
+                 </td>
 
-                <!-- Grand Total -->
-                <td class="data-cell">
-                    ${first.grandTotal || '-'}
-                </td>
+                 <!-- Script ID I -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, x.scriptIdI || '-')).join('<br>')}
+                 </td>
 
-                <!-- Result -->
-                <td class="data-cell">
-                    ${first.result || ''}
-                </td>
+                 <!-- Script ID II -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, x.scriptIdII || '-')).join('<br>')}
+                 </td>
 
-            </tr>`;
-        });
+                 <!-- Theory I -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.theoryI))).join('<br>')}
+                 </td>
 
-        $("#resultBody2").html(html);
-    }
+                 <!-- Theory II -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.theoryII))).join('<br>')}
+                 </td>
+
+                 <!-- Practical -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.practical))).join('<br>')}
+                 </td>
+
+                 <!-- Viva Marks -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.vivaMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Elective Marks -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.electiveMarks))).join('<br>')}
+                 </td>
+
+                 <!-- IA Marks -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.iaMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Grand Total Marks -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.grandTotalMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Theory I Evaluator 1 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIEvaluator1))).join('<br>')}
+                 </td>
+
+                 <!-- Theory I Evaluator 2 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIEvaluator2))).join('<br>')}
+                 </td>
+
+                 <!-- Theory I Difference -->
+                 <td class="data-cell kk">
+                     ${student.map(x =>
+                         wrapCell(
+                             x,
+                             x.thearyIDifference12 != null
+                                 ? Number(x.thearyIDifference12).toFixed(2)
+                                 : '-'
+                         )
+                     ).join('<br>')}
+                 </td>
+
+                 <!-- Theory I Evaluator 3 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIEvaluator3))).join('<br>')}
+                 </td>
+
+                 <!-- Theory I Average -->
+                 <td class="data-cell kk">
+                     ${student.map(x =>
+                         wrapCell(
+                             x,
+                             x.thearyIAverageOfTwoHigherMarks != null
+                                 ? Number(x.thearyIAverageOfTwoHigherMarks).toFixed(2)
+                                 : '-'
+                         )
+                     ).join('<br>')}
+                 </td>
+
+                 <!-- Theory II Evaluator 1 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIIEvaluator1))).join('<br>')}
+                 </td>
+
+                 <!-- Theory II Evaluator 2 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIIEvaluator2))).join('<br>')}
+                 </td>
+
+                 <!-- Theory II Difference -->
+                 <td class="data-cell kk">
+                     ${student.map(x =>
+                         wrapCell(
+                             x,
+                             x.thearyIIDifference12 != null
+                                 ? Number(x.thearyIIDifference12).toFixed(2)
+                                 : '-'
+                         )
+                     ).join('<br>')}
+                 </td>
+
+                 <!-- Theory II Evaluator 3 -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.thearyIIEvaluator3))).join('<br>')}
+                 </td>
+
+                 <!-- Theory II Average -->
+                 <td class="data-cell kk">
+                     ${student.map(x =>
+                         wrapCell(
+                             x,
+                             x.thearyIIAverageOfTwoHigherMarks != null
+                                 ? Number(x.thearyIIAverageOfTwoHigherMarks).toFixed(2)
+                                 : '-'
+                         )
+                     ).join('<br>')}
+                 </td>
+
+                 <!-- Final Theory I -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.finalTheoryIMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Final Theory II -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMarkZeroDash(x.finalTheoryIIMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Theory Total -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMarkZeroDash(x.theoryTotal))).join('<br>')}
+                 </td>
+
+                 <!-- Obtained Practical -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.obtenPracticalMarks))).join('<br>')}
+                 </td>
+                 <!-- Obtained Viva -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.obtenVivaMarks))).join('<br>')}
+                 </td>
+                 <!-- Obtained Elective -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.obtenElativeMarks))).join('<br>')}
+                 </td>
+                 <!-- Obtained IA -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.obtenIAMarks))).join('<br>')}
+                 </td>
+
+                 <!-- Practical Total -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.practicalTotal))).join('<br>')}
+                 </td>
+
+
+                 <!-- Subject Total -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, fmtMark(x.subjectTotal))).join('<br>')}
+                 </td>
+                 <!-- Grace Marks -->
+                 <td class="data-cell kk">
+                     ${student.map(x => wrapCell(x, x.graceMarks || '&nbsp;')).join('<br>')}
+                 </td>
+
+
+                 <!-- Required To Appear -->
+                 <!-- FIX: pehle .filter() lagi thi jo un subjects ko
+                      cell se hata deta tha jinke paas ye value nahi
+                      thi - isse lines Subject Name column se align
+                      nahi hoti thi (jaise A-2 ka data A-1 ki jagah
+                      dikhta tha). Ab filter hata ke HAR subject ke
+                      liye ek line rakhi hai (khaali ho to bhi), taaki
+                      A-2 ka "Required to Appear" hamesha A-2 ki hi
+                      row ke saamne aaye. -->
+                 <td class="data-cell kk">
+                     ${student
+                         .map(x => wrapCell(x, x.required_To_Appear || '&nbsp;'))
+                         .join('<br>')}
+                 </td>
+
+                 <!-- Distinction -->
+                 <td class="data-cell kk">
+                     ${student
+                         .map(x => wrapCell(x, x.distinction || '&nbsp;'))
+                         .join('<br>')}
+                 </td>
+
+                 <!-- Grand Total -->
+                 <td class="data-cell">
+                     ${fmtMark(first.grandTotal)}
+                 </td>
+
+                 <!-- Result -->
+                 <td class="data-cell">
+                     ${first.result || ''}
+                 </td>
+
+             </tr>`;
+         });
+
+         $("#resultBody2").html(html);
+     }
+
+     /* ============================================================
+        fmtMark — display helper
+
+        - Number aaye to nearest whole number tak ROUND karke dikhata
+          hai (floating-point garbage jaise 41.000000000004 ab kabhi
+          nahi dikhega).
+        - 'AB' ya koi bhi non-numeric text (Theory marks absent hone
+          par 'AB' bhej sakta hai) ko bina tode/error diye JAISA HAI
+          WAISA hi dikha deta hai.
+        - null/undefined/khaali value ke liye '-' dikhata hai.
+        ============================================================ */
      function fmtMark(v) {
-        if (v === null || v === undefined || v === '') return '-';
-        const num = parseFloat(v);
-        if (isNaN(num)) return v;   
-        return Math.round(num).toString();
+         if (v === null || v === undefined || v === '') return '-';
+         const num = parseFloat(v);
+         if (isNaN(num)) return v;   // e.g. 'AB' - as-is, round mat karo
+         return Math.round(num).toString();
+     }
+         function fmtMarkZeroDash(v) {
+        let result = fmtMark(v);
+        return result === '0' ? '-' : result;
     }
+     /* ============================================================
+        subjectBg — us subject ke liye background color decide karta
+        hai:
+        - Required_To_Appear bhara hua => subject FAIL => red
+        - GraceMarks bhara hua         => subject GRACE => yellow
+        - warna                        => koi highlight nahi
+        ============================================================ */
+     function subjectBg(item) {
+         if (item.required_To_Appear) return '#ffd6d6';   // FAIL - red
+         if (item.graceMarks) return '#fff3b0';            // GRACE - yellow
+         return '';
+     }
+
+     /* ============================================================
+        wrapCell — Subject Name se lekar aage ki har per-subject
+        column ke value ko ek block-level <span> mein wrap karta hai,
+        jisse us subject ki poori "line" (is column ke andar) colored
+        dikhti hai - is tarah ek hi <td> ke andar kayi subjects
+        <br> se joined hone ke bawajood, har subject ki apni row-jaisi
+        colored strip ban jaati hai.
+        ============================================================ */
+     function wrapCell(item, value) {
+         let bg = subjectBg(item);
+         if (!bg) return value;
+         return `<span style="display:block;background:${bg};padding:2px 4px;margin:-2px -4px;">${value}</span>`;
+     }
+
+
+     function fmtMark(v) {
+         if (v === null || v === undefined || v === '') return '-';
+         const num = parseFloat(v);
+         if (isNaN(num)) return v;   // e.g. 'AB' - as-is, round mat karo
+         return Math.round(num).toString();
+     }
+
+
 </script>
 
