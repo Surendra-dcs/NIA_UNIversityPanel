@@ -984,7 +984,6 @@
 
     </div>
 
-
     <script>
 
 
@@ -1016,7 +1015,10 @@
 
             }
 
-
+                    function formatMarksZeroDash(value) {
+            let result = cleanMark(value);
+            return result === "0" ? "-" : result;
+        }
 
             function displayValue(value, defaultValue = "-") {
 
@@ -1034,38 +1036,48 @@
 
             }
 
-
-
-        function formatMarks(value) {
-
-            if (
-                value === null ||
-                value === undefined ||
-                value === ""
-            ) {
-
-                return "-";
-
-            }
-
-            let mark =
-                value.toString().trim();
-
-
-            if (
-                mark.startsWith("@@") ||
-                mark.startsWith("#") ||
-                mark.startsWith("*")
-            ) {
-
-                return mark;
-
-            }
-
-            return mark;
-
+                   function fmtMarkZeroDash(v) {
+            let result = fmtMark(v);
+            return result === '0' ? '-' : result;
         }
+            // ============================================================
+            // COMMON MARK FORMATTER
+            //
+            // Number ROUND hota hai (floating-point garbage jaise
+            // 41.000000000004 kabhi nahi dikhega). 'AB' ya koi bhi
+            // non-numeric text as-is safely dikhta hai.
+            // ============================================================
 
+            function cleanMark(value) {
+
+                if (value === null || value === undefined) {
+                    return "-";
+                }
+
+                let text = value.toString().trim();
+
+                if (text === "") {
+                    return "-";
+                }
+
+                let num = parseFloat(text);
+
+                // AB ya koi bhi non-numeric text - as-is, round mat karo
+                if (isNaN(num)) {
+                    return text;
+                }
+
+                // 0.00 -> 0, 5.00 -> 5, 15.00 -> 15, 10.50 -> 11
+                return Math.round(num).toString();
+
+            }
+
+
+            function formatMarks(value) {
+
+                return cleanMark(value);
+
+            }
 
 
             // ============================================================
@@ -1117,18 +1129,11 @@
 
          function formatViva(value, subjectName) {
 
-            if (
-                value === null ||
-                value === undefined ||
-                value === ""
-            ) {
+            let mark = cleanMark(value);
 
+            if (mark === "-") {
                 return "-";
-
             }
-
-            let mark =
-                value.toString().trim();
 
 
             // ========================================================
@@ -1179,31 +1184,55 @@
 
 
             // ============================================================
+            // ELECTIVE FORMAT
+            //
+            // A-4 = (Set-SA)
+            // A-5 = (Set-SB)
+            // A-6 = (Set-SC)
+            // ============================================================
+
+        function formatElective(value, subjectName) {
+
+            let mark = cleanMark(value);
+
+            if (mark === "-") {
+                return "-";
+            }
+
+            let subjectCode = getSubjectCode(subjectName);
+
+            switch (subjectCode) {
+
+                case "A-4":
+                    return mark + "<br/>(Set-SA)";
+
+                case "A-5":
+                    return mark + "<br/>(Set-SB)";
+
+                case "A-6":
+                    return mark + "<br/>(Set-SC)";
+
+                default:
+                    return mark;
+            }
+
+        }
+
+
+            // ============================================================
             // IA FORMAT
             //
             // A-5 = *12
             // बाकी normal
             // ============================================================
 
-           // A-5 = *value
-        // बाकी normal
-        // ============================================================
-
         function formatIA(value, subjectName) {
 
-            if (
-                value === null ||
-                value === undefined ||
-                value === ""
-            ) {
+            let mark = cleanMark(value);
 
+            if (mark === "-") {
                 return "-";
-
             }
-
-            let mark =
-                value.toString().trim();
-
 
             if (
                 mark.startsWith("@@") ||
@@ -1615,28 +1644,27 @@
                     practicalTotal > 0
                 ) {
 
+                    // theoryTotal/practicalTotal formatMarks() se
+                    // guzarte hain - taaki clean rounded number dikhe,
+                    // raw floating-point sum nahi.
                     distribution = `
 
-                        सै. ${displayValue(
-                            theoryTotal,
-                            ""
+                        सै. ${formatMarks(
+                            theoryTotal
                         )}
 
-                        Th ${displayValue(
-                            theoryTotal,
-                            ""
+                        Th ${formatMarks(
+                            theoryTotal
                         )}
 
                         <br>
 
-                        व्याव. ${displayValue(
-                            practicalTotal,
-                            ""
+                        व्याव. ${formatMarks(
+                            practicalTotal
                         )}
 
-                        Pr ${displayValue(
-                            practicalTotal,
-                            ""
+                        Pr ${formatMarks(
+                            practicalTotal
                         )}
 
                     `;
@@ -1734,6 +1762,17 @@
                                         );
 
                                 }
+
+
+                                // =========================================
+                                // NOTE: Theory I/II ke liye ab koi extra
+                                // override ki zaroorat nahi. Marksheet SQL
+                                // procedure ab Tr procedure jaisa hi seedha
+                                // 'AB' text bhejti hai jab student absent
+                                // hota hai (pehle '-' bhejti thi) - isliye
+                                // neeche formatMarks() khud hi 'AB' ko
+                                // as-is, bina tode, dikha deta hai.
+                                // =========================================
 
 
                                 // =========================================
@@ -1930,70 +1969,65 @@
                                 // =========================================
                                 // GRACE MARKS
                                 // =========================================
-        // =========================================================
-        // GRACE MARKS
-        // =========================================================
 
-        let grace = getValue(item, "GraceMarks");
+                                let grace = getValue(item, "GraceMarks");
 
-        let hasGrace = false;
-        let graceDisplay = "";
+                                let hasGrace = false;
+                                let graceDisplay = "";
 
-        // GraceMarks ko safely string me convert karo
-        let graceText = "";
+                                // GraceMarks ko safely string me convert karo
+                                let graceText = "";
 
-        if (grace !== null && grace !== undefined) {
+                                if (grace !== null && grace !== undefined) {
 
-            graceText = grace
-                .toString()
-                .replace(/<br\s*\/?>/gi, " ")
-                .replace(/<[^>]*>/g, " ")
-                .replace(/&nbsp;/gi, " ")
-                .replace(/\s+/g, " ")
-                .trim();
+                                    graceText = grace
+                                        .toString()
+                                        .replace(/<br\s*\/?>/gi, " ")
+                                        .replace(/<[^>]*>/g, " ")
+                                        .replace(/&nbsp;/gi, " ")
+                                        .replace(/\s+/g, " ")
+                                        .trim();
 
-            console.log("RAW GraceMarks:", grace);
-            console.log("CLEAN GraceMarks:", graceText);
+                                    console.log("RAW GraceMarks:", grace);
+                                    console.log("CLEAN GraceMarks:", graceText);
 
-            // G-A-1, G-A-2, G-A-3 etc.
-            let graceMatch = graceText.match(/G\s*-\s*A\s*-\s*\d+/i);
+                                    // G-A-1, G-A-2, G-A-3 etc.
+                                    let graceMatch = graceText.match(/G\s*-\s*A\s*-\s*\d+/i);
 
-            if (graceMatch) {
+                                    if (graceMatch) {
 
-                hasGrace = true;
+                                        hasGrace = true;
 
-                graceDisplay = graceMatch[0]
-                    .replace(/\s+/g, "")
-                    .toUpperCase();
+                                        graceDisplay = graceMatch[0]
+                                            .replace(/\s+/g, "")
+                                            .toUpperCase();
 
-                console.log(
-                    "GRACE FOUND:",
-                    subjectCode,
-                    graceDisplay
-                );
+                                        console.log(
+                                            "GRACE FOUND:",
+                                            subjectCode,
+                                            graceDisplay
+                                        );
 
-                graceMarks.push(
-                    subjectCode + " (" + graceDisplay + ")"
-                );
-            }
-        }
+                                        graceMarks.push(
+                                            subjectCode + " (" + graceDisplay + ")"
+                                        );
+                                    }
+                                }
 
 
-        // =========================================================
-        // FAILED
-        // =========================================================
+                                // =========================================
+                                // FAILED
+                                // =========================================
 
-        if (isFail(result)) {
+                                if (isFail(result)) {
 
-            failedSubjects.push(
-                subjectCode
-            );
+                                    failedSubjects.push(
+                                        subjectCode
+                                    );
 
-        }
+                                }
 
 
-
-                               
 
                                 // =================================================
                                 // APPEND ROW
@@ -2047,7 +2081,7 @@
 
                                         <td>
 
-                                            ${displayValue(
+                                            ${formatMarks(
                                                 maxMarks
                                             )}
 
@@ -2060,7 +2094,7 @@
 
                                         <td>
 
-                                            ${displayValue(
+                                            ${formatMarks(
                                                 minMarks
                                             )}
 
@@ -2071,26 +2105,22 @@
                                         <!-- THEORY I -->
                                         <!-- =============================== -->
 
-                                        <td>
-
-                                            ${formatMarks(
-                                                theoryI
-                                            )}
-
-                                        </td>
+                                                <td>
+            ${formatMarksZeroDash(
+                theoryI
+            )}
+        </td>
 
 
                                         <!-- =============================== -->
                                         <!-- THEORY II -->
                                         <!-- =============================== -->
 
-                                        <td>
-
-                                            ${formatMarks(
-                                                theoryII
-                                            )}
-
-                                        </td>
+                                             <td>
+            ${formatMarksZeroDash(
+                theoryII
+            )}
+        </td>
 
 
                                         <!-- =============================== -->
@@ -2478,234 +2508,7 @@
                     }
                 });
               }
-                   
 
-
-        
-        // ============================================================
-        // COMMON MARK FORMATTER
-        // ============================================================
-
-        function cleanMark(value) {
-
-            // --------------------------------------------------------
-            // NULL / UNDEFINED
-            // --------------------------------------------------------
-
-            if (value === null || value === undefined) {
-                return "-";
-            }
-
-
-            // --------------------------------------------------------
-            // STRING ME CONVERT
-            // --------------------------------------------------------
-
-            let text = value.toString().trim();
-
-
-            // --------------------------------------------------------
-            // EMPTY STRING
-            // --------------------------------------------------------
-
-            if (text === "") {
-                return "-";
-            }
-
-
-            // --------------------------------------------------------
-            // NUMBER
-            // --------------------------------------------------------
-
-            let num = parseFloat(text);
-
-
-            // --------------------------------------------------------
-            // AGAR NUMBER NAHI HAI
-            // ORIGINAL VALUE RETURN
-            // --------------------------------------------------------
-
-            if (isNaN(num)) {
-                return text;
-            }
-
-
-            // --------------------------------------------------------
-            // DECIMAL REMOVE
-            //
-            // 0.00  -> 0
-            // 5.00  -> 5
-            // 15.00 -> 15
-            //
-            // NOTE:
-            // Agar 10.50 hai to 11 hoga
-            // --------------------------------------------------------
-
-            return Math.round(num).toString();
-        }
-
-
-
-        // ============================================================
-        // FORMAT MARKS
-        // ============================================================
-
-        function formatMarks(value) {
-
-            return cleanMark(value);
-
-        }
-
-
-
-        // ============================================================
-        // FORMAT VIVA
-        // ============================================================
-
-        function formatViva(value, subjectName) {
-
-            // --------------------------------------------------------
-            // SUBJECT CODE
-            // --------------------------------------------------------
-
-            let subjectCode = getSubjectCode(subjectName);
-
-
-            // --------------------------------------------------------
-            // MARK
-            // --------------------------------------------------------
-
-            let mark = cleanMark(value);
-
-
-            // --------------------------------------------------------
-            // NULL / BLANK => -
-            // --------------------------------------------------------
-
-            if (mark === "-") {
-                return "-";
-            }
-
-
-            // --------------------------------------------------------
-            // VIVA SUBJECT-WISE FORMAT
-            // --------------------------------------------------------
-
-            switch (subjectCode) {
-
-                case "A-1":
-
-                    return mark + "<br/>(Viva)";
-
-
-                case "A-2":
-
-                    return mark + "<br/>(Viva)";
-
-
-                case "A-3":
-
-                    return mark + "<br/>(Viva)";
-
-
-                default:
-
-                    return mark;
-            }
-
-        }
-
-
-
-        // ============================================================
-        // FORMAT ELECTIVE
-        // ============================================================
-
-        function formatElective(value, subjectName) {
-
-            // --------------------------------------------------------
-            // SUBJECT CODE
-            // --------------------------------------------------------
-
-            let subjectCode = getSubjectCode(subjectName);
-
-
-            // --------------------------------------------------------
-            // MARK
-            // --------------------------------------------------------
-
-            let mark = cleanMark(value);
-
-
-            // --------------------------------------------------------
-            // NULL / BLANK => -
-            // --------------------------------------------------------
-
-            if (mark === "-") {
-                return "-";
-            }
-
-
-            // --------------------------------------------------------
-            // ELECTIVE SUBJECT-WISE FORMAT
-            // --------------------------------------------------------
-
-            switch (subjectCode) {
-
-                case "A-4":
-
-                    return mark + "<br/>(Set-SA)";
-
-
-                case "A-5":
-
-                    return mark + "<br/>(Set-SB)";
-
-
-                case "A-6":
-
-                    return mark + "<br/>(Set-SC)";
-
-
-                default:
-
-                    return mark;
-            }
-
-        }
-
-
-
-        // ============================================================
-        // FORMAT IA
-        // ============================================================
-
-        function formatIA(value, subjectName) {
-
-            // --------------------------------------------------------
-            // MARK
-            // --------------------------------------------------------
-
-            let mark = cleanMark(value);
-
-
-            // --------------------------------------------------------
-            // NULL / BLANK => -
-            // --------------------------------------------------------
-
-            if (mark === "-") {
-                return "-";
-            }
-
-
-            // --------------------------------------------------------
-            // IA MARK
-            // --------------------------------------------------------
-
-            return mark;
-
-        }
-        
 
 
             // ============================================================
@@ -2914,6 +2717,8 @@
 
 
     </script>
+
+
 </body>
 </html>
 
