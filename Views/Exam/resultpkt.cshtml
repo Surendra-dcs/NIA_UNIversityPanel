@@ -1,0 +1,782 @@
+﻿@{
+    ViewData["Title"] = "Resultpkt";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<script src="~/js/Printtrpkt.js"></script>
+
+<style>
+    @@page {
+        size: A4 landscape;
+        margin: 15mm 8mm 15mm 8mm;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #000;
+        background: #e8ecf1;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .no-print.toolbar {
+        text-align: right;
+        padding: 12px 0 8px 0;
+    }
+
+    .print-btn {
+        background-color: #1a73e8;
+        color: #ffffff;
+        border: 1px solid #1558b0;
+        padding: 8px 24px;
+        font-size: 13px;
+        font-weight: bold;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+        transition: background-color 0.15s ease;
+    }
+
+        .print-btn:hover {
+            background-color: #1557b0;
+        }
+
+        .print-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+    .page {
+        max-width: 98vw;
+        background: #fff;
+        margin: 15px auto 25px auto;
+        padding: 12mm 10mm 12mm 10mm;
+        position: relative;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        box-sizing: border-box;
+    }
+
+    .top-strip {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .page-box {
+        border: 1px solid #000;
+        padding: 2px 14px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .header-block {
+        text-align: center;
+        position: relative;
+        margin-bottom: 4px;
+    }
+
+    .logo {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 65px;
+        height: 65px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .logo img {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+        }
+
+    .inst-name {
+        font-size: 19px;
+        font-weight: bold;
+        letter-spacing: 0.3px;
+        margin: 0 0 2px 0;
+    }
+
+    .inst-sub {
+        font-size: 10.5px;
+        margin: 1px 0;
+    }
+
+    .exam-title-row {
+        position: relative;
+        margin-top: 5px;
+    }
+
+    .exam-title {
+        font-size: 11.5px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .register-title {
+        font-size: 11.5px;
+        font-weight: bold;
+        text-decoration: underline;
+        letter-spacing: 0.3px;
+    }
+
+    .issue-date {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        font-size: 10.5px;
+    }
+
+    table.ledger {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 6px;
+        font-size: 11.5px;
+        border: 1px solid #000;
+        line-height: 2;
+    }
+
+        table.ledger th, table.ledger td {
+            border: none;
+            padding: 4px 3px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        table.ledger thead th {
+            padding: 3.5px 2px;
+        }
+
+        table.ledger thead {
+            border-bottom: 1px solid #000;
+        }
+
+            table.ledger thead tr:last-child th,
+            table.ledger thead th[rowspan="3"],
+            table.ledger thead th[rowspan="2"] {
+                border-bottom: 1px solid #000;
+            }
+
+    .border-r {
+        border-right: 1px solid #000 !important;
+    }
+
+    .row-single-candidate td {
+        padding-top: 9px !important;
+        padding-bottom: 9px !important;
+    }
+
+    table.ledger tbody tr.group-end td,
+    table.ledger tbody tr.candidate-row td[rowspan] {
+        border-bottom: 1px solid #000;
+    }
+
+    .col-sno {
+        width: 2.5%;
+    }
+
+    .col-roll {
+        width: 13.5%;
+    }
+
+    .col-attempt {
+        width: 2.5%;
+    }
+
+    .col-subject {
+        width: 12%;
+        text-align: left;
+    }
+
+    .col-code {
+        width: 4.8%;
+    }
+
+    .col-mm {
+        width: 3.2%;
+    }
+
+    .col-tot-marks {
+        width: 3.8%;
+    }
+
+    .col-obt-val {
+        width: 3.8%;
+    }
+
+    .col-grace {
+        width: 2.8%;
+    }
+
+    .col-vert {
+        width: 3.8%;
+        padding: 2px 1px !important;
+    }
+
+    .col-distinction {
+        width: 2.8%;
+        padding: 2px 1px !important;
+    }
+
+    .col-grand {
+        width: 4.5%;
+    }
+
+    .col-result {
+        width: 4.5%;
+    }
+
+    .roll-cell {
+        text-align: center;
+        line-height: 1.38;
+        padding: 5px 3px !important;
+    }
+
+    .subject-row-inner {
+        text-align: left;
+        padding-left: 5px !important;
+    }
+
+    .vert-header-appear {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        display: inline-block;
+        font-size: 8px;
+        line-height: 1.15;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .vert-header-dist {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        display: inline-block;
+        font-size: 8px;
+        line-height: 1.15;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .footer-notes {
+        display: flex;
+        margin-top: 8px;
+        font-size: 9px;
+    }
+
+    .notes-col {
+        flex: 2;
+        border: 1px solid #000;
+        border-right: none;
+        padding: 3px 5px;
+    }
+
+        .notes-col p {
+            margin: 1px 0;
+        }
+
+    .signatories {
+        flex: 3;
+        display: flex;
+        border: 1px solid #000;
+    }
+
+    .sig-box {
+        flex: 1;
+        border-right: 1px solid #000;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding: 3px 4px 4px 4px;
+        font-size: 9.5px;
+        text-align: center;
+    }
+
+        .sig-box:last-child {
+            border-right: none;
+        }
+
+    .page-number-footer {
+        text-align: right;
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
+    .search-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: end;
+    }
+
+    .search-group {
+        min-width: 220px;
+        flex: 1;
+    }
+
+        .search-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .search-group select {
+            width: 100%;
+            height: 38px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 0 10px;
+        }
+
+    .btn-group button {
+        height: 38px;
+        padding: 0 25px;
+        border: none;
+        background: #0d6efd;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    @@media print {
+        html, body {
+            background: #fff !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        .page {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            box-shadow: none !important;
+            border: none !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+
+        table.ledger {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+    }
+
+</style>
+
+
+
+<div class="no-print toolbar">
+    <button class="print-btn" onclick="printLedger()">
+        <svg viewBox="0 0 16 16">
+            <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
+            <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
+        </svg>
+        Print Register
+    </button>
+</div>
+<div class="search-row">
+
+    <div class="search-group">
+        <label>Session</label>
+        <select id="sessionId">
+            <option value="">Select Session</option>
+        </select>
+    </div>
+
+    <div class="search-group">
+        <label>Program</label>
+        <select id="programId">
+            <option value="">Select Program</option>
+            <option value="2">Certificate</option>
+        </select>
+    </div>
+
+    <div class="search-group">
+        <label>Course</label>
+        <select id="courseId">
+            <option value="">Select Course</option>
+        </select>
+    </div>
+
+    <div class="search-group">
+        <label>Semester</label>
+        <select id="semester">
+            <option value="">Select Semester</option>
+        </select>
+    </div>
+    <div class="search-group">
+        <label>Batch </label>
+        <select id="BatchId">
+            <option value="">Select Batch</option>
+        </select>
+    </div>
+
+    <div class="search-group btn-group">
+        <button type="button" onclick="loadResultforpKT()">
+            Search Report
+        </button>
+    </div>
+
+
+</div>
+<div class="page">
+
+    <div class="top-strip">
+        <div class="page-box">Page:1</div>
+    </div>
+
+    <div class="header-block">
+        <div class="logo">
+            <img src="../Logo/nia_logo.png" alt="NIA Logo">
+
+        </div>
+        <div class="inst-name">NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</div>
+        <div class="inst-sub">Deemed to be University</div>
+        <div class="inst-sub">(Ministry of AYUSH, Govt. of India)</div>
+        <div class="inst-sub">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
+
+        <div class="exam-title-row">
+            <div class="exam-title" id="ExamnameId">PANCHKARMA TECHNICIAN ATTEMPT BATCH-2023 &amp;&amp; MAIN BATCH 2025 EXAM (March 2026)</div>
+            <div class="register-title">TABULATION REGISTER/LEDGER</div>
+            <div class="issue-date">Date of Issue :</div>
+        </div>
+    </div>
+
+    <table class="ledger">
+        <thead>
+            <tr>
+                <th rowspan="3" class="col-sno border-r">S.<br>No.</th>
+                <th rowspan="3" class="col-roll border-r">Roll NO<br>Enrollment No.<br>Candidate Name<br>Father's Name</th>
+                <th rowspan="3" class="col-attempt border-r">Attempt</th>
+                <th rowspan="3" class="col-subject">Name of Subjects<br>in which appearing</th>
+                <th rowspan="3" class="col-code">Unique Code</th>
+                <th colspan="5">Marks Scheme</th>
+                <th colspan="3">OBTAINED MARKS</th>
+                <th rowspan="3" class="col-grace">Grace</th>
+                <th rowspan="3" class="col-vert"><div class="vert-header-appear">Required to appear at the<br>Attempt Examinations</div></th>
+                <th rowspan="3" class="col-distinction border-r"><div class="vert-header-dist">Distinction</div></th>
+                <th rowspan="3" class="col-grand border-r">Grand<br>Total</th>
+                <th rowspan="3" class="col-result">Result</th>
+            </tr>
+            <tr>
+                <th colspan="2">Theory</th>
+                <th colspan="2">Practical</th>
+                <th rowspan="2" class="col-tot-marks">Total</th>
+                <th rowspan="2" class="col-obt-val">Theory</th>
+                <th rowspan="2" class="col-obt-val">Practical</th>
+                <th rowspan="2" class="col-obt-val">Total</th>
+            </tr>
+            <tr class="header-row-bottom">
+                <th class="col-mm">MAX</th>
+                <th class="col-mm">MIN</th>
+                <th class="col-mm">MAX</th>
+                <th class="col-mm">MIN</th>
+            </tr>
+        </thead>
+        <tbody id="resultBody2">
+            <!-- JS se populate hoga -->
+        </tbody>
+    </table>
+
+    <div class="footer-notes">
+        <div class="notes-col">
+            <p><strong>Note.</strong></p>
+            <p>1. For candidate to pass, he/she shall require to obtain a minimum of 50% marks in each of Theory and Practical examination.</p>
+            <p>2. The candidate securing 75% marks or above in a subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</p>
+            <p>3. A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</p>
+        </div>
+        <div class="signatories">
+            <div class="sig-box">Tabulator DCOE</div>
+            <div class="sig-box">Controller of Examinations</div>
+            <div class="sig-box">Registrar</div>
+            <div class="sig-box">Vice Chancellor.</div>
+        </div>
+    </div>
+
+    <div class="page-number-footer">Page 1</div>
+
+</div>
+
+<script>
+      $(document).ready(function () {
+       loadSession();
+       });
+        function loadSession() {
+          $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+              let session = '<option value="">Select Session</option>';
+              res.forEach(x => {
+                  session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+              });
+              $('#sessionId').html(session);
+          });
+        }
+        function loadPrograms() {
+          $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+              let opt = '<option value="">Select Program</option>';
+              res.forEach(x => {
+                  opt += `<option value="${x.programId}">${x.programName}</option>`;
+              });
+              $('#programId').html(opt);
+          });
+        }
+        document.getElementById("programId").addEventListener("change", function () {
+       let programId = this.value;
+       $("#courseId").val('');
+       $("#semester").val('');
+       $("#subjectId").val('');
+       fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+           .then(res => res.json())
+           .then(data => {
+               let courseDropdown = document.getElementById("courseId");
+               courseDropdown.innerHTML = '<option value="">Select Course</option>';
+               data.forEach(item => {
+                    courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+               });
+           });
+    });
+      document.getElementById("courseId").addEventListener("change", function () {
+       let courseId = this.value;
+       $("#semester").val('');
+       $("#BatchId").val('');
+       fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+           .then(res => res.json())
+           .then(data => {
+               let courseDropdown = document.getElementById("semester");
+               courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+               data.forEach(item => {
+                    courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+               });
+           });
+     });
+     $("#semester").on("change", function () {
+          let semId = this.value;
+          let courseId = $("#courseId").val();
+          $("#BatchId").html('<option value="">Select Batch</option>');
+          if (!semId) return;
+          $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+              let opt = '<option value="">Select Batch</option>';
+              data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+              $("#BatchId").html(opt);
+          });
+      });
+
+
+
+
+    async function loadResultforpKT() {
+
+           const courseId = $("#courseId").val();
+           const semester = $("#semester").val();
+           const sessionId = $("#sessionId").val();
+           let BatchId = $("#BatchId").val();
+
+           const response = await fetch(
+               ApiBaseUrl +
+               `Result/GetTabulationRegisterResultReportforPKT?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
+           );
+
+           const data = await response.json();
+
+           if (!data || data.length === 0) {
+               $("#ExamnameId").text('');
+               $("#resultBody2").html('');
+               alert("No records found for the selected Session, Course and Semester.");
+               return;
+           }
+
+           $("#ExamnameId").text(data[0].examname || '');
+
+           let grouped = {};
+           data.forEach(item => {
+
+               let key = item.rollNumber;
+
+               if (!grouped[key]) {
+                   grouped[key] = [];
+               }
+
+               grouped[key].push(item);
+           });
+
+           let html = '';
+           let sno = 1;
+
+           Object.keys(grouped).forEach(key => {
+
+               let student = grouped[key];
+               let first = student[0];
+               let rowClass = student.length === 1 ? 'candidate-row row-single-candidate' : 'candidate-row';
+
+               html += `
+               <tr class="${rowClass}" style="border:solid 1px #000;">
+
+                   <!-- S.No -->
+                   <td class="data-cell" style="border:solid 1px #000;">
+                       ${sno++}
+                   </td>
+
+                   <!-- Roll No / Enrollment No / Candidate Name / Father's Name -->
+
+                    <td class="roll-cell" style="border: solid 1px #000;">
+                        <div style="border-bottom: 1px solid #d3d3d3;">
+                            ${first.rollNumber}
+                        </div>
+                        <div style="border-bottom: 1px solid #d3d3d3;">
+                            ${first.enrollmentNumber}
+                        </div>
+                        <div style="border-bottom: 1px solid #d3d3d3;">
+                            ${first.candidateName}
+                        </div>
+                        <div>
+                            ${first.fatherName}
+                        </div>
+                    </td>
+
+
+
+                   <!-- Attempt -->
+                   <td class="data-cell" style="border:solid 1px #000;">
+                       ${first.attempt || ''}
+                   </td>
+
+                   <!-- Name of Subjects in which appearing -->
+                   <td class="subject-row-inner kk">
+                       ${student.map(x => wrapCell(x, x.subjectAppearing || '-')).join('<br>')}
+                   </td>
+
+                   <!-- Unique Code -->
+                   <td class="data-cell kk">
+                       ${student.map(x => wrapCell(x, x.uniqueCode || '-')).join('<br>')}
+                   </td>
+
+                   <!-- Theory MAX -->
+                   <td class="data-cell kk">
+                       ${student.map(x => wrapCell(x, fmtMark(x.theoryMax))).join('<br>')}
+                   </td>
+
+                   <!-- Theory MIN -->
+                   <td class="data-cell kk">
+                       ${student.map(x => wrapCell(x, fmtMark(x.theoryMin))).join('<br>')}
+                   </td>
+
+                   <!-- Practical MAX -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, fmtMark(x.practicalMax))).join('<br>')}
+                   </td>
+
+                   <!-- Practical MIN -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, fmtMark(x.practicalMin))).join('<br>')}
+                   </td>
+
+                   <!-- Marks Scheme Total -->
+                   <td class="data-cell kk">
+                       ${student.map(x => wrapCell(x, fmtMark(x.marksSchemeTotal))).join('<br>')}
+                   </td>
+
+                   <!-- Obtained Theory -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, fmtMark(x.theoryObtained))).join('<br>')}
+                   </td>
+
+                   <!-- Obtained Practical -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, fmtMark(x.practicalObtained))).join('<br>')}
+                   </td>
+
+                   <!-- Obtained Total -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, fmtMark(x.obtainedTotal))).join('<br>')}
+                   </td>
+
+                   <!-- Grace -->
+                   <td class="data-cell kk" >
+                       ${student.map(x => wrapCell(x, x.graceMarks || '&nbsp;')).join('<br>')}
+                   </td>
+
+                   <!-- Required To Appear -->
+                   <td class="data-cell" >
+                       ${student.map(x => wrapCell(x, x.required_To_Appear || '&nbsp;')).join('<br>')}
+                   </td>
+
+                   <!-- Distinction -->
+                   <td class="border-r" >
+                       ${student.map(x => wrapCell(x, x.distinction || '&nbsp;')).join('<br>')}
+                   </td>
+
+                   <!-- Grand Total (candidate-level, same for every subject row of this student) -->
+                   <td class="data-cell border-r" style="border:solid 1px #000;">
+                       ${fmtMark(first.grandTotal)}
+                   </td>
+
+                   <!-- Result (candidate-level) -->
+                   <td class="data-cell" style="border:solid 1px #000;">
+                       ${first.result || ''}
+                   </td>
+
+               </tr>`;
+           });
+
+           $("#resultBody2").html(html);
+       }
+
+       /* ============================================================
+          fmtMark — display helper
+          - Number aaye to nearest whole number tak ROUND karke dikhata
+            hai.
+          - 'AB' ya koi bhi non-numeric text ko bina tode/error diye
+            JAISA HAI WAISA hi dikha deta hai.
+          - null/undefined/khaali value ke liye '-' dikhata hai.
+          ============================================================ */
+       function fmtMark(v) {
+           if (v === null || v === undefined || v === '') return '-';
+           const num = parseFloat(v);
+           if (isNaN(num)) return v;   // e.g. 'AB' - as-is, round mat karo
+           return Math.round(num).toString();
+       }
+
+       /* ============================================================
+          subjectBg — us subject ke liye background color decide karta
+          hai:
+          - required_To_Appear bhara hua => subject FAIL => red
+          - graceMarks bhara hua          => subject GRACE => yellow
+          - warna                         => koi highlight nahi
+          ============================================================ */
+       function subjectBg(item) {
+           if (item.required_To_Appear) return '#ffd6d6';   // FAIL - red
+           if (item.graceMarks) return '#fff3b0';            // GRACE - yellow
+           return '';
+       }
+
+       /* ============================================================
+          wrapCell — Subject Name se lekar aage ki har per-subject
+          column ke value ko ek block-level <span> mein wrap karta hai,
+          jisse us subject ki poori "line" (is column ke andar) colored
+          dikhti hai.
+          ============================================================ */
+       function wrapCell(item, value) {
+           let bg = subjectBg(item);
+           if (!bg) return value;
+           return `<span style="display:block;background:${bg};padding:2px 4px;margin:-2px -4px;">${value}</span>`;
+       }
+
+</script>
