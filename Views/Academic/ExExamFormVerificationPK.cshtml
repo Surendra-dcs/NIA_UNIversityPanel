@@ -218,6 +218,7 @@
             <label>Program</label>
             <select id="programId">
                 <option value="">Select Program</option>
+                <option value="1">Under Graduate (UG)</option>
             </select>
         </div>
 
@@ -314,8 +315,7 @@
 <script>
     let table;
     let allData = [];
-    $(document).ready(function () {
-    loadPrograms();
+    $(document).ready(function () {  
     loadSession();
     $('#selectAll').on('change', function () {
             $('.rowCheckbox:not(:disabled)').prop(

@@ -100,12 +100,24 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult AttendanceSeetPnk()
+        {
+            return View();
+        }
+        
         public IActionResult StudentAttendance()
         {
             return View();
         }
-
+        public IActionResult StudentAttendancePnk()
+        {
+            return View();
+        }
         public IActionResult RollnumberSeet()
+        {
+            return View();
+        }
+        public IActionResult RollnumberSeetPnk()
         {
             return View();
         }
