@@ -429,7 +429,7 @@
         <div class="meta-row">
             <div>
                 <b>Name of Centre :</b>
-                NATIONAL INSTITUTE OF AYURVEDA, JAIPUR
+                Panchkula
             </div>
         </div>
         <div class="meta-row">
@@ -628,7 +628,7 @@
         function getAttendanceSheet(sessionId, courseId, semester,BatchId, subjectiddropdown) {
            
         $.ajax({
-            url: ApiBaseUrl + `Exam/GetRollNumberSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
+            url: ApiBaseUrl + `Exam/GetRollNumberSheetpnk?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
             type: "Get",          
 
             success: function (response) {
