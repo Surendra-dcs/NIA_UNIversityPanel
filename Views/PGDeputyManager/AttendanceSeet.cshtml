@@ -634,7 +634,6 @@
         }
 
         function getAttendanceSheet(sessionId, courseId, semester,BatchId, subjectiddropdown) {
-
         $.ajax({
             url: ApiBaseUrl + `Exam/GetAttendanceSheet?SessionId=${sessionId}&CourseId=${courseId}&Semester=${semester}&Batch=${BatchId}&SubjectId=${subjectiddropdown}`,
             type: "Get",
@@ -647,8 +646,6 @@
                 }else{
                   bindAttendanceSheet(response);
                 }
-
-
 
             },
             error: function (xhr) {

@@ -217,7 +217,10 @@
         <div class="search-group">
             <label>Program</label>
             <select id="programId">
-                <option>Select Program</option>
+                <option value="">Select Program</option>
+                <option value="4">Post Graduate (PG) IDS</option>
+                <option value="3">Post Graduate (PG)</option>
+
             </select>
         </div>
 
@@ -234,7 +237,12 @@
                 <option>Select Semester</option>
             </select>
         </div>
-
+        <div class="search-group">
+            <label for="Batch">Batch</label>
+            <select id="BatchId" class="form-control">
+                <option value="">Select Batch</option>
+            </select>
+        </div>
         <div class="search-btn">
             <button onclick="loadStudentFormList()">
                 Filter
@@ -309,8 +317,7 @@
 <script>
     let table;
     let allData = [];
-    $(document).ready(function () {
-    loadPrograms();
+    $(document).ready(function () {   
     loadSession();
     $('#selectAll').on('change', function () {
             $('.rowCheckbox:not(:disabled)').prop(
@@ -374,6 +381,19 @@
             });
      });
 
+
+    $("#semester").on("change", function () {
+        let semId = this.value;
+        let courseId = $("#courseId").val();
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!semId) return;
+        $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+            let opt = '<option value="">Select Batch</option>';
+            data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+            $("#BatchId").html(opt);
+        });
+    });
+
     function loadStudentFormList() {
         if ($.fn.DataTable.isDataTable('#studentformtbl')) {
             $('#studentformtbl').DataTable().destroy();
@@ -382,6 +402,7 @@
         let sessionId = $("#sessionId").val();
         let courseId = $("#courseId").val();
         let semester = $("#semester").val();
+        let batch = $("#BatchId").val();
            if (!sessionId) {
               alert("Please select Session.");
              return false;
@@ -396,10 +417,14 @@
                 alert("Please select Semester.");
                 return false;
             }
+            if (!batch) {
+                alert("Please select batch.");
+                return false;
+            }
         table = $('#studentformtbl').DataTable({
 
             ajax: {
-                url: ApiBaseUrl + `StudentEnrollment/GetStudentformList?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}`,
+                url: ApiBaseUrl + `StudentEnrollment/GetStudentformList?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}&batch=${batch}`,
                 type: 'Post',
                 dataSrc: function (json) {
                     allData = json;
