@@ -125,7 +125,7 @@
             <label>Program</label>
             <select id="programId">
                 <option value="">Select Program</option>
-                <option value="1">Under Graduate (UG)</option>
+                <option value="2">Certificate</option>
             </select>
         </div>
 
@@ -183,7 +183,8 @@
 <script>
     window._allApiRows = [];
     let table;
-    $(document).ready(function () {         
+    $(document).ready(function () {     
+    // loadPrograms();
     loadSession();
     });
     function loadSession() {
@@ -250,7 +251,7 @@
         let semester = $("#semester").val();
         let BatchId = $("#BatchId").val();
         $.ajax({
-              url: ApiBaseUrl + `Exam/getdataforresult?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}&Batch=${BatchId}`,
+              url: ApiBaseUrl + `Exam/getdataforresultpkt?sessionId=${sessionId}&courseId=${courseId}&semester=${semester}&Batch=${BatchId}`,
             method: 'GET',
             success: function (data) {
                 let tbody = $("#examTable tbody");
@@ -298,7 +299,7 @@
 
    function goToStudentResult(enrollmentNumber) {
         window.open(
-             '/Exam/Studentmarksheet?enrollmentNumber=' +
+              '/Exam/Studentmarksheetpkt?enrollmentNumber=' +
             encodeURIComponent(enrollmentNumber),
             '_blank'
         );

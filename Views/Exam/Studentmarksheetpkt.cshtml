@@ -1,0 +1,1600 @@
+﻿@{
+    ViewData["Title"] = "Marksheet";
+    Layout = null;
+}
+@inject IConfiguration Configuration
+<script>
+    var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Institute of Ayurveda - Mark Sheet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        @@page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #20232a;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ===== TOP PRINT CONTROLS (Only Print Button) ===== */
+        .print-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            background: rgba(24, 26, 32, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 12px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        }
+
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 32px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: Arial, Helvetica, sans-serif;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+            transition: all 0.2s ease;
+        }
+
+            .btn-print:hover {
+                background: linear-gradient(135deg, #1d4ed8, #1e40af);
+                box-shadow: 0 6px 20px rgba(37, 99, 235, 0.65);
+                transform: translateY(-1.5px);
+            }
+
+            .btn-print:active {
+                transform: translateY(0);
+            }
+
+        /* ===== A4 CONTAINER ===== */
+        .sheet-wrapper {
+            padding: 24px 0 48px 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            position: relative;
+            background-color: #ffffff;
+            box-shadow: 0 14px 45px rgba(0, 0, 0, 0.65), 0 0 1px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        /* Inner Light Green & Red Gradient Background inside border */
+        .sheet-inner-bg {
+            position: absolute;
+            top: 3mm;
+            left: 3mm;
+            width: calc(100% - 6mm);
+            height: calc(100% - 6mm);
+            z-index: 1;
+            background:
+            /* Subtle soft rose/red wash on right side */
+            radial-gradient(ellipse 65% 55% at 90% 26%, rgba(255, 205, 218, 0.6) 0%, rgba(254, 222, 230, 0.4) 45%, rgba(255, 245, 248, 0) 80%), radial-gradient(ellipse 60% 50% at 88% 82%, rgba(255, 210, 220, 0.5) 0%, rgba(255, 232, 238, 0.3) 50%, rgba(255, 250, 252, 0) 80%),
+            /* Fresh light pastel lime/green wash on left side */
+            radial-gradient(ellipse 70% 65% at 16% 36%, #f0ffd2bf 0%, rgba(246, 255, 222, 0.55) 45%, rgba(248, 252, 225, 0) 85%), radial-gradient(ellipse 65% 60% at 22% 76%, rgba(247, 255, 228, 0.65) 0%, rgba(248, 255, 225, 0.45) 50%, rgba(250, 253, 230, 0) 85%),
+            /* Base subtle diagonal blend from light green to soft red */
+            linear-gradient(115deg, #e8f6c5 0%, #f2f9d3 28%, #fefde0 54%, #fdefee 80%, #fde2e6 100%);
+        }
+
+        /* Authentic Ornamental Border Frame */
+        .border-frame {
+            position: absolute;
+            top: 3mm;
+            left: 3mm;
+            width: calc(100% - 6mm);
+            height: calc(100% - 6mm);
+            pointer-events: none;
+            z-index: 10;
+            background-image: url('../images/border_frame_tight.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        /* Central NIA Watermark Seal */
+        .watermark-seal {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130mm;
+            height: 130mm;
+            opacity: 0.085;
+            pointer-events: none;
+            z-index: 2;
+            background-image: url('../images/watermark_seal.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Inner printable content */
+        .page-content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            padding: 10mm 11mm 6mm 11mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== TOP META ROW ===== */
+        .top-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 13px;
+            font-weight: bold;
+            color: #1a1a1a;
+            line-height: 1.35;
+            padding-top: 2.5mm;
+            padding-left: 1.5mm;
+            padding-right: 1.5mm;
+        }
+
+        .serial-box {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .serial-line-1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12.5px;
+        }
+
+        .serial-barcode {
+            height: 14.5px;
+            object-fit: contain;
+            filter: contrast(1.2);
+        }
+
+        .serial-line-2 {
+            margin-top: 1px;
+            font-size: 13px;
+        }
+
+        .folio-box {
+            font-size: 13.5px;
+            font-weight: bold;
+            letter-spacing: 0.2px;
+        }
+
+        /* ===== HEADER ROW ===== */
+        .header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 2mm;
+            gap: 10px;
+        }
+
+        .header-left-logos {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .top-qr-img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+        }
+
+        .nia-logo-img {
+            width: 94px;
+            height: 94px;
+            object-fit: contain;
+        }
+
+        .header-center-info {
+            flex: 1;
+            text-align: center;
+            margin: 0 4px;
+        }
+
+        .inst-main-title {
+            margin: 0;
+            font-size: 26px;
+            font-weight: bold;
+            color: #701515;
+            letter-spacing: 0.2px;
+            line-height: 1.15;
+        }
+
+        .inst-subtitle-1 {
+            margin: 2px 0 0 0;
+            font-size: 14.5px;
+            font-weight: bold;
+            color: #111;
+            line-height: 1.25;
+        }
+
+        .inst-subtitle-2 {
+            margin: 1.5px 0 0 0;
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #222;
+            line-height: 1.25;
+        }
+
+        .inst-address {
+            margin: 2px 0 0 0;
+            font-size: 13px;
+            font-weight: bold;
+            color: #111;
+            line-height: 1.25;
+        }
+
+        .header-right-logos {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        .nabh-logo-img {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+        }
+
+        /* ===== COURSE & EXAM TITLE ===== */
+        .title-section {
+            text-align: center;
+            margin-top: 5mm;
+        }
+
+        .course-heading {
+            margin: 0;
+            font-size: 19.5px;
+            font-weight: 900;
+            letter-spacing: 0.3px;
+            color: #000;
+            line-height: 1.2;
+        }
+
+        .marksheet-heading {
+            margin: 3.5px 0 0 0;
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #000;
+        }
+
+        .exam-session {
+            margin: 2.5px 0 0 0;
+            font-size: 13.5px;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* ===== CANDIDATE DETAILS ===== */
+        .student-info-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6mm;
+            padding-left: 1.5mm;
+            padding-right: 1.5mm;
+            font-size: 14px;
+            line-height: 1.45;
+            color: #000;
+        }
+
+        .student-info-left p, .student-info-right p {
+            margin: 2px 0;
+        }
+
+        .student-info-left b, .student-info-right b {
+            font-weight: bold;
+        }
+
+        /* ===== MARKS TABLE ===== */
+        .marks-table-wrapper {
+            margin-top: 6mm;
+            padding-left: 1mm;
+            padding-right: 1mm;
+        }
+
+        table.marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            background-color: rgba(255, 255, 255, 0.35);
+            border: 1.2px solid #000;
+        }
+
+            table.marks-table th, table.marks-table td {
+                border: 1px solid #000;
+                padding: 4px 4px;
+                text-align: center;
+                vertical-align: middle;
+                color: #000;
+            }
+
+            table.marks-table th {
+                font-weight: bold;
+                font-size: 12.5px;
+                padding: 4.5px 2px;
+            }
+
+            table.marks-table td.paper-cell {
+                text-align: left;
+                font-weight: bold;
+                padding-left: 8px;
+                font-size: 12.5px;
+                white-space: nowrap;
+            }
+
+            table.marks-table td.num-cell {
+                font-size: 12.5px;
+                font-weight: bold;
+            }
+
+            table.marks-table td.fail-cell {
+                font-weight: bold;
+                font-size: 13px;
+            }
+
+        /* Table Total Row */
+        .total-marks-row {
+            display: flex;
+            border: 1px solid #000;
+            border-top: none;
+            font-size: 13px;
+            background-color: rgba(255, 255, 255, 0.35);
+            font-weight: bold;
+        }
+
+        .total-marks-label {
+            flex: 1;
+            padding: 5px 8px;
+            text-align: left;
+        }
+
+        .total-marks-value {
+            width: 154px;
+            padding: 5px 4px;
+            text-align: center;
+            border-left: 1px solid #000;
+        }
+
+        /* Table Status Row */
+        .status-summary-row {
+            display: flex;
+            border: 1px solid #000;
+            border-top: none;
+            font-size: 12.5px;
+            background-color: rgba(255, 255, 255, 0.35);
+            font-weight: bold;
+        }
+
+        .status-cell {
+            flex: 1;
+            padding: 4.5px 8px;
+            border-right: 1px solid #000;
+        }
+
+            .status-cell:last-child {
+                border-right: none;
+            }
+
+        /* Result status */
+        .result-display-row {
+            text-align: right;
+            margin-top: 4mm;
+            padding-right: 28mm;
+            font-size: 14px;
+            font-weight: bold;
+            color:#000;
+        }
+        /* ===== NOTES SECTION ===== */
+        .notes-section {
+            margin-top: 5mm;
+            padding-left: 1mm;
+            font-size: 11.5px;
+            line-height: 1.35;
+            color: #000;
+        }
+
+        .notes-heading {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+
+        .notes-list {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+            .notes-list li {
+                margin-bottom: 2px;
+                font-weight: bold;
+            }
+
+        /* ===== SIGNATURES & DATES SECTION ===== */
+        .signatures-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 7.5mm;
+            padding-left: 1.5mm;
+            padding-right: 1.5mm;
+            font-size: 12.5px;
+            color: #000;
+        }
+
+        .sign-left-col {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+            .sign-left-col .place-name {
+                font-weight: bold;
+                margin: 0;
+                font-size: 13px;
+            }
+
+            .sign-left-col .result-date {
+                margin: 18px 0 6px 0;
+                font-weight: bold;
+                font-size: 12.5px;
+            }
+
+        .bot-qr-img {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            margin-top: 2px;
+        }
+
+        .sign-middle-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .sign-item {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            margin-bottom: 7px;
+            font-weight: bold;
+            font-size: 12.5px;
+        }
+
+        .sign-img-container {
+            width: 94px;
+            height: 28px;
+            border-bottom: 1.2px solid #000;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            position: relative;
+        }
+
+        .sign-img-written {
+            width: 64px;
+            position: absolute;
+            bottom: 2px;
+        }
+
+        .sign-img-checked {
+            width: 86px;
+            position: absolute;
+            bottom: 2px;
+        }
+
+        .deputy-coe-title {
+            font-weight: bold;
+            font-size: 12.5px;
+            margin: 0;
+            margin-top: 2px;
+        }
+
+        .sign-right-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .coe-sign-wrapper {
+            position: relative;
+            width: 125px;
+            height: 38px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .sign-img-coe {
+            width: 102px;
+            position: absolute;
+            bottom: 4px;
+        }
+
+        .coe-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin: 2px 0 0 0;
+        }
+
+        /* ===== BOTTOM OFFICIAL RED SEAL ===== */
+        .bottom-seal-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 3.5mm;
+            position: relative;
+            z-index: 5;
+        }
+
+        .bottom-seal-img {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+
+        /* Bottom right small code */
+        .bottom-corner-code {
+            position: absolute;
+            bottom: 11mm;
+            right: 14mm;
+            font-size: 9.5px;
+            font-weight: bold;
+            color: #111;
+            z-index: 12;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+.print-modal {
+    display: none;                     /* JS: openPrintPopup() flex kar deta hai */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    align-items: center;
+    justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.print-modal-content {
+    width: 420px;
+    max-width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #111827;
+    border-radius: 10px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    animation: printModalOpen 0.2s ease;
+}
+
+
+@@keyframes printModalOpen {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ---------- HEADER ---------- */
+
+.print-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+    .print-modal-header h3 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+
+.print-modal-close {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 26px;
+    line-height: 1;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+    .print-modal-close:hover {
+        background: #e5e7eb;
+        color: #000000;
+    }
+
+
+/* ---------- BODY ---------- */
+
+.print-modal-body {
+    padding: 18px 20px 6px 20px;
+}
+
+
+.print-input-group {
+    margin-bottom: 14px;
+}
+
+    .print-input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+
+.print-input {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111827;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .print-input::placeholder {
+        color: #9ca3af;
+    }
+
+    .print-input:focus {
+        border-color: #254078;
+        box-shadow: 0 0 0 3px rgba(37, 64, 120, 0.18);
+    }
+
+
+/* ---------- FOOTER ---------- */
+
+.print-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 20px;
+    background: #f8fafc;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.print-cancel-btn,
+.print-save-btn {
+    padding: 9px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+
+.print-cancel-btn {
+    color: #374151;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+}
+
+    .print-cancel-btn:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+
+
+.print-save-btn {
+    color: #ffffff;
+    background: #254078;
+    border: 1px solid #254078;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+    .print-save-btn:hover {
+        background: #1a2f58;
+        border-color: #1a2f58;
+    }
+
+
+/* ---------- CHHOTI SCREEN ---------- */
+
+@@media (max-width: 480px) {
+
+    .print-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .print-cancel-btn,
+    .print-save-btn {
+        width: 100%;
+    }
+}
+
+
+/* ---------- PRINT ME POPUP KABHI NAHI ---------- */
+
+@@media print {
+
+    .print-modal {
+        display: none !important;
+    }
+}
+        /* ===== PRINT MEDIA STYLES ===== */
+        @@media print {
+            body {
+                background-color: transparent !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .print-bar {
+                display: none !important;
+            }
+
+            .sheet-wrapper {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            .page {
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+            }
+        }
+
+        .print-btn {
+            background-color: #254078;
+            color: #ffffff;
+            border: none;
+            padding: 8px 22px;
+            font-size: 13.5px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+            .print-btn:hover {
+                background-color: #1a2f58;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            }
+    </style>
+</head>
+<body>
+
+    <!-- Screen-Only Simple Print Bar (Only Print Button) -->
+    <div class="print-bar">
+        <button type="button" onclick="openPrintPopup()" class="print-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                <rect x="6" y="14" width="12" height="8"></rect>
+            </svg>
+            Print Marksheet / प्रिंट करें
+        </button>
+    </div>
+
+    <div class="sheet-wrapper">
+        <div class="page">
+            <!-- Inner Light Green & Red Gradient Background -->
+            <div class="sheet-inner-bg"></div>
+
+            <!-- Authentic PDF Frame Border -->
+            <div class="border-frame"></div>
+
+            <!-- Watermark Seal in Background -->
+            <div class="watermark-seal"></div>
+
+            <div class="page-content">
+                <!-- Top Meta Row -->
+                <div class="top-meta-row">
+                    <div class="serial-box">
+                        <div class="serial-line-1">
+                            <span>Serial No.:  <span id="Serialno"></span></span>
+                            <img src="@Url.Content("~/images/barcode.png")" alt="Barcode" class="serial-barcode">
+                        </div>
+                        <div class="serial-line-2">
+                            Serial No. <span id="Serialno"></span>
+                        </div>
+                    </div>
+                    <div class="folio-box">
+                        Folio No: <span id="Folio"></span>
+                    </div>
+                </div>
+
+                <!-- Header Row -->
+                <div class="header-section">
+                    <div class="header-left-logos">
+                        <img src="@Url.Content("~/images/top_qr_code.png")" alt="QR" class="top-qr-img">
+                        <img src="@Url.Content("~/images/nia_logo.png")" alt="NIA Logo" class="nia-logo-img">
+                    </div>
+
+                    <div class="header-center-info">
+                        <h1 class="inst-main-title">National Institute of Ayurveda</h1>
+                        <div class="inst-subtitle-1">Deemed To Be University (De Novo)</div>
+                        <div class="inst-subtitle-2">(Ministry of AYUSH, Govt. of India)</div>
+                        <div class="inst-address">Jorawar Singh Gate, Amer Road, Jaipur &ndash; 302002</div>
+                    </div>
+
+                    <div class="header-right-logos">
+                        <img src="@Url.Content("~/images/nabh_logo.png")" alt="NABH Accredited" class="nabh-logo-img">
+                    </div>
+                </div>
+
+                <!-- Course Title -->
+                <div class="title-section">
+                    <h2 class="course-heading">PANCHAKARMA TECHNICIAN CERTIFICATE COURSE</h2>
+                    <div class="marksheet-heading">MARK SHEET</div>
+                    <div class="exam-session" id="examSession"></div>
+                </div>
+
+                <!-- Candidate Info -->
+                <div class="student-info-section">
+                    <div class="student-info-left">
+                        <p><b>Name:</b> <span id="studentName"></span></p>
+                        <p><b>Father's Name:</b> <span id="fatherName"></span></p>
+                    </div>
+                    <div class="student-info-right">
+                        <p><b>Roll No.</b> <span id="rollNumber"></span></p>
+                        <p><b>Enrolment No.:</b> <span id="enrollmentNumber"></span></p>
+                        <p><b>Attempt:</b> <span id="attempt"></span></p>
+                    </div>
+                </div>
+
+                <!-- Marks Table -->
+                <div class="marks-table-wrapper">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" style="width: 25%;">Paper</th>
+                                <th colspan="3" style="width: 22.5%;">Max. Marks</th>
+                                <th colspan="3" style="width: 22.5%;">Min. Marks</th>
+                                <th colspan="3" style="width: 22.5%;">Marks Obtained</th>
+                                <th rowspan="2" style="width: 7.5%;">Remarks</th>
+                            </tr>
+                            <tr>
+                                <th style="width: 7.5%;">Theory</th>
+                                <th style="width: 7.5%;">Practical</th>
+                                <th style="width: 7.5%;">Total</th>
+                                <th style="width: 7.5%;">Theory</th>
+                                <th style="width: 7.5%;">Practical</th>
+                                <th style="width: 7.5%;">Total</th>
+                                <th style="width: 7.5%;">Theory</th>
+                                <th style="width: 7.5%;">Practical</th>
+                                <th style="width: 7.5%;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTableBody">
+                            <tr>
+                                <td colspan="11" style="text-align:center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Total Marks Row -->
+                    <div class="total-marks-row">
+                        <div class="total-marks-label">Total Marks obtained</div>
+                        <div class="total-marks-value" id="grandTotal"></div>
+                    </div>
+
+                    <!-- Status Row -->
+                    <div class="status-summary-row">
+                        <div class="status-cell">Distinction secured in: <span id="distinctionSubjects"></span></div>
+                        <div class="status-cell">Grace Marks in: <span id="graceSubjects"></span></div>
+                        <div class="status-cell">Failed in: <span id="failedSubjects"></span></div>
+                    </div>
+                </div>
+
+                <!-- Result Status -->
+                <div class="result-display-row">
+                    Result : <span id="resultText"></span>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="notes-section">
+                    <div class="notes-heading">Note:</div>
+                    <ol class="notes-list">
+                        <li>For candidate to pass, he/she shall require to obtain a minimum of 50% marks in each theory and practical examination.</li>
+                        <li>The candidate securing 75% marks or above in a paper shall be declared to have obtained distinction (Denoted by D) in that Subject provided he/she passes in all papers in the same examination.</li>
+                        <li>Remarks denoted by F Denoted failure in that paper.</li>
+                        <li>A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</li>
+                        <li style="list-style: none; margin-left: -18px; margin-top: 3px;">
+                            5. D- Distinction &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; G &ndash; Grace &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; F - Fail
+                        </li>
+                    </ol>
+                </div>
+
+                <!-- Signatures & Dates Section -->
+                <div class="signatures-section">
+                    <!-- Left Column -->
+                    <div class="sign-left-col">
+                        <p class="place-name">Jaipur</p>
+                        <p class="result-date">Result Date : 18.09.2026</p>
+                        <img src="@Url.Content("~/images/bottom_qr_code.png")" alt="Verification QR" class="bot-qr-img">
+                    </div>
+
+                    <!-- Center Column -->
+                    <div class="sign-middle-col">
+                        <div class="sign-item">
+                            <span>Written by</span>
+                            <div class="sign-img-container">
+                                <img src="@Url.Content("~/images/sig_written.png")" alt="Written by Signature" class="sign-img-written">
+                            </div>
+                        </div>
+
+                        <div class="sign-item" style="margin-top: 6px;">
+                            <span>Checked by</span>
+                            <div class="sign-img-container">
+                                <img src="@Url.Content("~/images/sig_checked.png")" alt="Checked by Signature" class="sign-img-checked">
+                            </div>
+                        </div>
+                        <p class="deputy-coe-title">Deputy COE</p>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="sign-right-col">
+                        <div class="coe-sign-wrapper">
+                            <img src="@Url.Content("~/images/sig_coe.png")" alt="COE Signature" class="sign-img-coe">
+                        </div>
+                        <p class="coe-title">Controller of Examinations</p>
+                    </div>
+                </div>
+
+                <!-- Bottom Red Seal -->
+                <div class="bottom-seal-container">
+                    <img src="@Url.Content("~/images/bottom_seal.png")" alt="Official Seal" class="bottom-seal-img">
+                </div>
+
+                <!-- Bottom right code -->
+                <div class="bottom-corner-code"><span id="serialbottom"></span></div>
+
+            </div>
+        </div>
+    </div>
+    <div id="printModal" class="print-modal">
+
+        <div class="print-modal-content">
+
+            <div class="print-modal-header">
+                <h3>Print Marksheet</h3>
+
+                <button type="button"
+                        class="print-modal-close"
+                        onclick="closePrintPopup()">
+                    &times;
+                </button>
+            </div>
+
+
+            <div class="print-modal-body">
+
+                <!-- Serial No -->
+                <div class="print-input-group">
+
+                    <label for="printSerialNo">
+                        Serial No.
+                    </label>
+
+                    <input type="text"
+                           id="printSerialNo"
+                           class="print-input"
+                           placeholder="Enter Serial No.">
+
+                </div>
+
+
+                <!-- Folio No -->
+                <div class="print-input-group">
+
+                    <label for="printFolioNo">
+                        Folio No.
+                    </label>
+
+                    <input type="text"
+                           id="printFolioNo"
+                           class="print-input"
+                           placeholder="Enter Folio No.">
+
+                </div>
+
+
+                <!-- Bottom Serial -->
+                <div class="print-input-group">
+
+                    <label for="printBottomSerial">
+                        Bottom Serial No.
+                    </label>
+
+                    <input type="text"
+                           id="printBottomSerial"
+                           class="print-input"
+                           placeholder="Enter Bottom Serial No.">
+
+                </div>
+
+            </div>
+
+
+            <div class="print-modal-footer">
+
+                <button type="button"
+                        class="print-cancel-btn"
+                        onclick="closePrintPopup()">
+                    Cancel
+                </button>
+
+                <button type="button"
+                        class="print-save-btn"
+                        onclick="saveAndPrint()">
+                    Save & Print
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+    <script>
+
+        $(document).ready(function () {
+            loadMarksheet();
+        });
+
+
+        // =====================================================
+        // HELPERS  (is file me hi hain - kisi aur file par depend nahi)
+        // =====================================================
+
+        // API se PascalCase (CandidateName) ya camelCase (candidateName)
+        // dono aaye to chalega
+        function getVal(obj, name) {
+
+            if (!obj) return "";
+
+            if (obj[name] !== undefined && obj[name] !== null) {
+                return obj[name];
+            }
+
+            var lower = name.toLowerCase();
+
+            for (var k in obj) {
+                if (k.toLowerCase() === lower &&
+                    obj[k] !== undefined &&
+                    obj[k] !== null) {
+                    return obj[k];
+                }
+            }
+
+            return "";
+        }
+
+        function isBlank(v) {
+            return v === null || v === undefined || String(v).trim() === "";
+        }
+
+        function esc(v) {
+            return String(v === null || v === undefined ? "" : v)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
+        function toNum(v) {
+            var n = parseFloat(v);
+            return isNaN(n) ? 0 : n;
+        }
+
+        // 31.00 -> 31 , 24.50 -> 24.5 , AB -> AB , blank -> ""
+        function fmt(v) {
+
+            if (isBlank(v)) return "";
+
+            var n = Number(v);
+
+            if (isNaN(n)) return esc(String(v).trim());
+
+            return Number.isInteger(n)
+                ? String(n)
+                : String(parseFloat(n.toFixed(2)));
+        }
+
+        // 1 -> 1st , 2 -> 2nd , 3 -> 3rd , 4 -> 4th
+        function ordinal(v) {
+
+            var n = parseInt(v, 10);
+
+            if (isNaN(n)) return "";
+
+            var s = ["th", "st", "nd", "rd"];
+            var r = n % 100;
+
+            return n + (s[(r - 20) % 10] || s[r] || s[0]);
+        }
+
+        // SubjectAppearing = "I  Fundamental of Ayurveda"
+        // (code + 2 spaces + name)  ->  { code: "I", name: "Fundamental of Ayurveda" }
+        function splitPaper(text) {
+
+            var s = String(text || "").trim();
+
+            var m = s.match(/^(\S+)\s{2,}(.*)$/);
+
+            if (m) {
+                return { code: m[1], name: m[2] };
+            }
+
+            return { code: "", name: s };
+        }
+
+
+        // =====================================================
+        // LOAD MARKSHEET
+        // =====================================================
+
+        function loadMarksheet() {
+
+            var enrollment = '@ViewBag.enrollment';
+
+            $.ajax({
+
+                url: ApiBaseUrl +
+                    `Result/getdataformarksheetpkt?enrollment=${encodeURIComponent(enrollment)}`,
+
+                method: "GET",
+
+                success: function (data) {
+
+                    console.log("Marksheet API Data:", data);
+
+                    renderMarksheet(data, enrollment);
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.error("Marksheet API Error:", error);
+                    console.error("API Response:", xhr.responseText);
+
+                    $("#marksTableBody").html(
+                        '<tr><td colspan="11" style="text-align:center;">Failed to load marksheet data.</td></tr>'
+                    );
+                }
+            });
+        }
+
+
+        // =====================================================
+        // BIND DATA
+        // =====================================================
+
+        function renderMarksheet(data, enrollment) {
+
+            var tbody = $("#marksTableBody");
+
+            if (!Array.isArray(data) || data.length === 0) {
+
+                tbody.html(
+                    '<tr><td colspan="11" style="text-align:center;">No record found</td></tr>'
+                );
+
+                return;
+            }
+
+
+            // ---------- STUDENT DETAILS (pehli row se) ----------
+
+            var student = data[0];
+
+            $("#studentName").text(String(getVal(student, "CandidateName")).trim());
+            $("#fatherName").text(String(getVal(student, "FatherName")).trim());
+            $("#rollNumber").text(String(getVal(student, "RollNumber")).trim());
+
+            $("#enrollmentNumber").text(
+                String(getVal(student, "EnrollmentNumber")).trim() || enrollment
+            );
+
+            $("#attempt").text(ordinal(getVal(student, "Attempt")));
+
+            var examName = String(getVal(student, "Examname")).trim();
+
+            if (examName !== "") {
+                $("#examSession").text("(Examination Held in July-August 2026)");
+            }
+
+
+            // ---------- SUBJECT ROWS ----------
+
+            var sumTotal = 0;
+
+            var distinctionList = [];
+            var graceList = [];
+            var failedList = [];
+
+            var rowsHtml = data.map(function (item) {
+
+                var paper = splitPaper(getVal(item, "SubjectAppearing"));
+
+                // --- Max / Min ---
+                var thMax = toNum(getVal(item, "TheoryMax"));
+                var thMin = toNum(getVal(item, "TheoryMin"));
+
+                var prMax = toNum(getVal(item, "PracticalMax"));
+                var prMin = toNum(getVal(item, "PracticalMin"));
+
+                var hasTheory = thMax > 0;
+                var hasPractical = prMax > 0;
+
+                var maxTotal = getVal(item, "MarksSchemeTotal");
+                var minTotal = thMin + prMin;
+
+                // --- Obtained ---
+                var thObt = getVal(item, "TheoryObtained");
+                var prObt = getVal(item, "PracticalObtained");     // number ya 'AB'
+                var obtTotal = getVal(item, "ObtainedTotal");
+
+                sumTotal += toNum(obtTotal);
+
+                // --- Remark : F (fail/absent) > G (grace) > D (distinction) ---
+                var required = String(getVal(item, "Required_To_Appear")).trim();
+                var graceRaw = String(getVal(item, "GraceMarks")).trim();
+                var dist = String(getVal(item, "Distinction")).trim().toUpperCase();
+
+                var remark = "";
+                var remarkClass = "";
+
+                if (required !== "") {
+
+                    remark = "F";
+                    remarkClass = "fail-cell";
+                    failedList.push(required);
+
+                }
+                else if (graceRaw !== "") {
+
+                    remark = "G";
+                    graceList.push(graceRaw.replace(/^G\s*-\s*/i, ""));
+
+                }
+                else if (dist === "D") {
+
+                    remark = "D";
+                    distinctionList.push(paper.code || paper.name);
+
+                }
+
+                return `
+                    <tr>
+                        <td class="paper-cell">${esc(paper.code)}&nbsp;&nbsp;&nbsp;&nbsp;${esc(paper.name)}</td>
+
+                        <td class="num-cell">${hasTheory ? fmt(thMax) : "-"}</td>
+                        <td class="num-cell">${hasPractical ? fmt(prMax) : "-"}</td>
+                        <td class="num-cell">${fmt(maxTotal)}</td>
+
+                        <td class="num-cell">${hasTheory ? fmt(thMin) : "-"}</td>
+                        <td class="num-cell">${hasPractical ? fmt(prMin) : "-"}</td>
+                        <td class="num-cell">${fmt(minTotal)}</td>
+
+                        <td class="num-cell">${hasTheory ? fmt(thObt) : "-"}</td>
+                        <td class="num-cell">${hasPractical ? fmt(prObt) : "-"}</td>
+                        <td class="num-cell">${fmt(obtTotal)}</td>
+
+                        <td class="${remarkClass}">${esc(remark)}</td>
+                    </tr>`;
+            });
+
+            tbody.html(rowsHtml.join(""));
+
+
+            // ---------- GRAND TOTAL ----------
+
+            var grandTotal = getVal(student, "GrandTotal");
+
+            $("#grandTotal").text(
+                !isBlank(grandTotal) ? fmt(grandTotal) : fmt(sumTotal)
+            );
+
+
+            // ---------- SUMMARY ----------
+
+            $("#distinctionSubjects").text(distinctionList.join(", "));
+            $("#graceSubjects").text(graceList.join(", "));
+            $("#failedSubjects").text(failedList.join(", "));
+
+
+            // ---------- RESULT ----------
+
+            $("#resultText").text(String(getVal(student, "Result")).trim());
+        }
+
+
+          function openPrintPopup() {
+
+                $("#printModal").css(
+                    "display",
+                    "flex"
+                );
+
+
+                $("#printSerialNo").val(
+                    $("#Serialno")
+                        .text()
+                        .trim()
+                );
+
+
+                $("#printFolioNo").val(
+                    $("#Folio")
+                        .text()
+                        .trim()
+                );
+
+
+                $("#printBottomSerial").val(
+                    $("#serialbottom")
+                        .text()
+                        .trim()
+                );
+
+
+                $("#printSerialNo").focus();
+
+            }
+
+
+            // ============================================================
+            // CLOSE PRINT POPUP
+            // ============================================================
+
+            function closePrintPopup() {
+
+                $("#printModal").hide();
+
+            }
+
+            function saveAndPrint() {
+
+                let serialNo =
+                    $("#printSerialNo")
+                        .val()
+                        .trim();
+
+
+                let folioNo =
+                    $("#printFolioNo")
+                        .val()
+                        .trim();
+
+
+                let bottomSerialNo =
+                    $("#printBottomSerial")
+                        .val()
+                        .trim();
+
+
+                // ========================================================
+                // SERIAL VALIDATION
+                // ========================================================
+
+                if (serialNo === "") {
+
+                    alert(
+                        "Please enter Serial No."
+                    );
+
+                    $("#printSerialNo").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // FOLIO VALIDATION
+                // ========================================================
+
+                if (folioNo === "") {
+
+                    alert(
+                        "Please enter Folio No."
+                    );
+
+                    $("#printFolioNo").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // BOTTOM SERIAL VALIDATION
+                // ========================================================
+
+                if (bottomSerialNo === "") {
+
+                    alert(
+                        "Please enter Bottom Serial No."
+                    );
+
+                    $("#printBottomSerial").focus();
+
+                    return;
+
+                }
+
+
+                // ========================================================
+                // SET VALUES IN MARKSHEET
+                // ========================================================
+
+                $("#Serialno").text(
+                    serialNo
+                );
+
+
+                $("#Folio").text(
+                    folioNo
+                );
+
+
+                $("#serialbottom").text(
+                    bottomSerialNo
+                );
+
+
+                // ========================================================
+                // CLOSE POPUP
+                // ========================================================
+
+                closePrintPopup();
+
+
+                // ========================================================
+                // PRINT AFTER DOM UPDATE
+                // ========================================================
+
+                setTimeout(function () {
+
+                    window.print();
+
+                }, 200);
+
+            }
+
+
+            // ============================================================
+            // ESC KEY - CLOSE PRINT POPUP
+            // ============================================================
+
+            $(document).on(
+                "keydown",
+                function (e) {
+
+                    if (
+                        e.key === "Escape" &&
+                        $("#printModal").is(":visible")
+                    ) {
+
+                        closePrintPopup();
+
+                    }
+
+                }
+            );
+
+
+            // ============================================================
+            // CLICK OUTSIDE POPUP TO CLOSE
+            // ============================================================
+
+            $(document).on(
+                "click",
+                "#printModal",
+                function (e) {
+
+                    if (
+                        e.target === this
+                    ) {
+
+                        closePrintPopup();
+
+                    }
+
+                }
+            );
+
+
+    </script>
+</body>
+</html>
