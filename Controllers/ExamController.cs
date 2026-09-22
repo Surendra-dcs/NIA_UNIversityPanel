@@ -156,12 +156,21 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult dataforresultpkt()
+        {
+            return View();
+        }
 
         public IActionResult Studentmarksheet(string enrollmentNumber)
         {
             ViewBag.enrollment=enrollmentNumber;
             return View();
-        }        
+        }
 
+        public IActionResult Studentmarksheetpkt(string enrollmentNumber)
+        {
+            ViewBag.enrollment=enrollmentNumber;
+            return View();
+        }
     }
 }
