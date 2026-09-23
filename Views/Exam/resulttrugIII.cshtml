@@ -753,12 +753,12 @@
 
                  <!-- Marks Scheme: Theory II (max) -->
                  <td class="data-cell kk">
-                     ${student.map(x => wrapCell(x, fmtMark(x.theoryII))).join('<br>')}
+                     ${student.map(x => wrapCell(x, fmtMark(x.theoryII || '-'))).join('<br>')}
                  </td>
 
                  <!-- Marks Scheme: Theory III (max) -->
                  <td class="data-cell kk">
-                     ${student.map(x => wrapCell(x, fmtMark(x.theoryIII))).join('<br>')}
+                     ${student.map(x => wrapCell(x, fmtMark(x.theoryIII || '-'))).join('<br>')}
                  </td>
 
                  <!-- Marks Scheme: Practical (max) -->
@@ -908,10 +908,9 @@
                      ${student.map(x => wrapCell(x, fmtMark(x.finalTheoryIMarks))).join('<br>')}
                  </td>
 
-                 <!-- Final Theory II -->
-                 <td class="data-cell kk">
-                     ${student.map(x => wrapCell(x, fmtMarkZeroDash(x.finalTheoryIIMarks))).join('<br>')}
-                 </td>
+               
+
+               <td class="data-cell kk"> ${student.map(x => wrapCell( x, String(x.scriptIdII).trim() === '203383' ? '0' : fmtMarkZeroDash(x.finalTheoryIIMarks) ) ).join('<br>')} </td>
 
                  <!-- Final Theory III -->
                  <td class="data-cell kk">
