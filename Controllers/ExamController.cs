@@ -160,6 +160,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult dataforresultIIIBAMS()
+        {
+            return View();
+        }
+        
         public IActionResult dataforresultpkt()
         {
             return View();
@@ -172,6 +177,12 @@ namespace NIAUNIVERSITYPANEL.Controllers
         }
 
         public IActionResult Studentmarksheetpkt(string enrollmentNumber)
+        {
+            ViewBag.enrollment=enrollmentNumber;
+            return View();
+        }
+
+        public IActionResult StudentmarksheetIIIBAMS(string enrollmentNumber)
         {
             ViewBag.enrollment=enrollmentNumber;
             return View();
