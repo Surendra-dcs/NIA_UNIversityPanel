@@ -1,0 +1,1214 @@
+﻿@{
+    ViewData["Title"] = "Marksheet";
+    Layout = null;
+}
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Institute of Ayurveda - Marks Statement</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+Devanagari:wght@400;600;700;800;900&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- jQuery (pehle load nahi ho raha tha, isliye $(document).ready chal hi nahi raha tha) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            background-color: #4a4d50;
+            font-family: 'PT Serif', 'Lora', 'Noto Serif Devanagari', 'Times New Roman', serif;
+            color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 0 30px 0;
+        }
+
+        .print-button {
+            position: fixed;
+            top: 18px;
+            right: 25px;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            transition: all 0.2s ease;
+        }
+
+            .print-button:hover {
+                background: #1d4ed8;
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            }
+
+        .marksheet-page {
+            width: 210mm;
+            height: 297mm;
+            min-height: 297mm;
+            max-height: 297mm;
+            background: #ffffff;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            padding: 3.5mm 4.5mm;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .outer-frame {
+            width: 100%;
+            height: 100%;
+            border: 5px solid #555555;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .top-meta-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 6px 1px 6px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .meta-field {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+            .meta-field .val {
+                min-width: 60px;
+                display: inline-block;
+            }
+
+        .content-body {
+            padding: 2px 6px 4px 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-grow: 1;
+        }
+
+        .header-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 2px;
+        }
+
+        .header-hi-col {
+            width: 38%;
+            text-align: center;
+        }
+
+            .header-hi-col .univ-name-hi {
+                font-size: 19.5px;
+                font-weight: 800;
+                line-height: 1.15;
+                letter-spacing: -0.2px;
+            }
+
+            .header-hi-col .sub-hi-1 {
+                font-size: 13px;
+                font-weight: 700;
+                margin-top: 2px;
+                line-height: 1.15;
+            }
+
+            .header-hi-col .sub-hi-2,
+            .header-hi-col .sub-hi-3 {
+                font-size: 11.5px;
+                font-weight: 600;
+                margin-top: 1.5px;
+                line-height: 1.15;
+            }
+
+        .header-seal-col {
+            width: 16%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .inst-seal-img {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .header-en-col {
+            width: 44%;
+            text-align: center;
+        }
+
+            .header-en-col .univ-name-en {
+                font-size: 18.5px;
+                font-weight: 800;
+                line-height: 1.15;
+                font-family: 'PT Serif', 'Times New Roman', serif;
+            }
+
+            .header-en-col .sub-en-1 {
+                font-size: 12.5px;
+                font-weight: 700;
+                margin-top: 2px;
+                line-height: 1.15;
+            }
+
+            .header-en-col .sub-en-2,
+            .header-en-col .sub-en-3 {
+                font-size: 11.5px;
+                font-weight: 600;
+                margin-top: 1.5px;
+                line-height: 1.15;
+            }
+
+        .course-exam-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 5px 0 4px 0;
+            line-height: 1.25;
+        }
+
+        .course-hi {
+            width: 49%;
+            text-align: left;
+        }
+
+            .course-hi .degree-hi {
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+            .course-hi .desc-hi-1,
+            .course-hi .desc-hi-2 {
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .course-hi .statement-hi {
+                font-size: 15px;
+                font-weight: 800;
+                margin-top: 3px;
+            }
+
+            .course-hi .exam-date-hi {
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+        .course-en {
+            width: 49%;
+            text-align: right;
+        }
+
+            .course-en .degree-en {
+                font-size: 14px;
+                font-weight: 800;
+            }
+
+                .course-en .degree-en sup {
+                    font-size: 9px;
+                }
+
+            .course-en .desc-en-1,
+            .course-en .desc-en-2 {
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .course-en .statement-en {
+                font-size: 15px;
+                font-weight: 800;
+                margin-top: 3px;
+                letter-spacing: 0.3px;
+            }
+
+            .course-en .exam-date-en {
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+        .candidate-details-grid {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0 6px 0;
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1.5;
+        }
+
+        .cand-left {
+            width: 49%;
+        }
+
+        .cand-right {
+            width: 48%;
+            padding-left: 15px;
+        }
+
+        .cand-item {
+            display: flex;
+            align-items: baseline;
+        }
+
+            .cand-item .lbl {
+                white-space: nowrap;
+            }
+
+            .cand-item .val {
+                flex-grow: 1;
+                padding-left: 5px;
+                min-height: 17px;
+            }
+
+        .marks-table-box {
+            width: 100%;
+            margin-top: 3px;
+        }
+
+        .marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 8.8px;
+            border: 1.2px solid #000;
+        }
+
+            .marks-table th, .marks-table td {
+                border: 1px solid #000;
+                padding: 2px 1.5px;
+                text-align: center;
+                vertical-align: middle;
+                line-height: 1.15;
+                color: #000;
+            }
+
+            .marks-table thead th {
+                font-weight: 700;
+                background-color: #fff;
+                padding: 2.5px 1px;
+            }
+
+        .th-title-hi {
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .th-title-en {
+            font-size: 8px;
+            font-weight: 700;
+        }
+
+        .th-sub-head {
+            font-size: 7.5px;
+            line-height: 1.1;
+            padding: 2.5px 1px;
+            font-weight: 700;
+        }
+
+        .col-subject-name {
+            width: 23%;
+            text-align: left !important;
+            padding-left: 4px !important;
+        }
+
+        .col-distrib {
+            width: 7.5%;
+            font-size: 7.8px;
+        }
+
+        .col-max-val {
+            width: 5.5%;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .col-min-val {
+            width: 5.5%;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .col-th-1, .col-th-2, .col-th-3 {
+            width: 6.8%;
+        }
+
+        .col-prac {
+            width: 7.5%;
+        }
+
+        .col-viva {
+            width: 8.5%;
+        }
+
+        .col-elec {
+            width: 6.0%;
+        }
+
+        .col-ia {
+            width: 5.8%;
+        }
+
+        .col-total-val {
+            width: 6.0%;
+            font-weight: 700;
+        }
+
+        .col-remark-val {
+            width: 6.8%;
+            font-weight: 700;
+        }
+
+        .sub-name-hi {
+            font-size: 8.2px;
+            font-weight: 700;
+            display: block;
+            line-height: 1.15;
+        }
+
+        .sub-name-en {
+            font-size: 7.8px;
+            font-weight: 800;
+            display: block;
+            line-height: 1.12;
+            margin-top: 1px;
+        }
+
+        .th-pr-block {
+            display: block;
+            font-weight: 700;
+        }
+
+        .body-row td {
+            height: 33px;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .body-row.grace-row td {
+            background-color: yellow !important;
+        }
+
+        .total-row td {
+            font-weight: 800;
+            font-size: 9.5px;
+            height: 22px;
+        }
+
+        .summary-container {
+            margin-top: 4px;
+            width: 100%;
+        }
+
+        .summary-grid {
+            display: flex;
+            width: 100%;
+            border: 1px solid #000;
+        }
+
+        .summary-col {
+            flex: 1;
+            border-right: 1px solid #000;
+            padding: 3px 5px;
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 1.2;
+            min-height: 30px;
+        }
+
+            .summary-col:last-child {
+                border-right: none;
+            }
+
+        .summary-hi, .summary-en {
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .summary-val {
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .result-line {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            padding: 3px 6px 0 0;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .notes-container {
+            margin-top: 3px;
+            font-size: 7.8px;
+            line-height: 1.25;
+            font-weight: 700;
+        }
+
+        .notes-label {
+            font-weight: 800;
+            font-size: 8.5px;
+        }
+
+        .notes-list-ol {
+            margin-left: 15px;
+        }
+
+            .notes-list-ol li {
+                margin-bottom: 2px;
+                text-align: justify;
+            }
+
+        .abbreviations-list {
+            width: 100%;
+            margin-top: 3px;
+            font-size: 7.8px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .abbrev-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            text-align: left;
+        }
+
+        .ab-item {
+            font-size: 7.5px;
+            line-height: 1.15;
+        }
+
+        .abbrev-minmax {
+            display: flex;
+            gap: 30px;
+            margin-top: 2px;
+            font-size: 7.5px;
+        }
+
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-top: 2px;
+            margin-top: auto;
+        }
+
+        .footer-left-col {
+            width: 25%;
+            font-size: 9px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .footer-center-col {
+            width: 25%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .qr-frame {
+           /*  border: 1px solid #000; */
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9.5px;
+            font-weight: 700;
+            background: #fff;
+        }
+
+        .footer-right-col {
+            width: 45%;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .controller-block {
+            text-align: center;
+            display: inline-block;
+            min-width: 180px;
+            font-size: 8.5px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+            .controller-block .hi-title {
+                font-size: 9px;
+                display: block;
+            }
+
+            .controller-block .en-title {
+                font-size: 8.5px;
+                display: block;
+                letter-spacing: 0.2px;
+            }
+
+        [contenteditable="true"] {
+            outline: 1px dashed #3b82f6 !important;
+            background-color: rgba(59, 130, 246, 0.08) !important;
+        }
+
+        @@media print {
+            @@page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            *, *:before, *:after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                overflow: hidden !important;
+            }
+
+            .print-button, .no-print {
+                display: none !important;
+            }
+
+            .marksheet-page {
+                margin: 0 !important;
+                padding: 3.5mm 4.5mm !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                min-height: 297mm !important;
+                max-height: 297mm !important;
+                box-shadow: none !important;
+                page-break-inside: avoid !important;
+                page-break-after: avoid !important;
+                page-break-before: avoid !important;
+            }
+
+            .outer-frame {
+                border: 5px solid #555555 !important;
+            }
+
+            [contenteditable="true"] {
+                outline: none !important;
+                background-color: transparent !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-button no-print" onclick="window.print()">
+        🖨️ Print
+    </button>
+
+    <div class="marksheet-page">
+        <div class="outer-frame">
+
+            <!-- Serial / Folio (API mein nahi hain - print se pehle click karke likh sakte ho) -->
+            <div class="top-meta-bar">
+                <div class="meta-field">
+                    <span>क्रम संख्या /Serial No.</span>
+                    <span id="Serialno" class="val" contenteditable="true"></span>
+                </div>
+                <div class="meta-field">
+                    <span>फोलियो संख्या /Folio No.:</span>
+                    <span id="Folio" class="val" contenteditable="true"></span>
+                </div>
+            </div>
+
+            <div class="content-body">
+
+                <div class="header-grid">
+                    <div class="header-hi-col">
+                        <div class="univ-name-hi">राष्ट्रीय आयुर्वेद संस्थान</div>
+                        <div class="sub-hi-1">मानद विश्वविद्यालय</div>
+                        <div class="sub-hi-2">(आयुष मंत्रालय, भारत सरकार)</div>
+                        <div class="sub-hi-3">आमेर रोड, जयपुर—302002</div>
+                    </div>
+                    <div class="header-seal-col">
+                        <img src="~/Logo/nia_logo.png" alt="NIA Seal" class="inst-seal-img">
+                    </div>
+                    <div class="header-en-col">
+                        <div class="univ-name-en">National Institute of Ayurveda</div>
+                        <div class="sub-en-1">Deemed to be University</div>
+                        <div class="sub-en-2">(Ministry of AYUSH, Govt. of India)</div>
+                        <div class="sub-en-3">Amer Road, Jaipur – 302002</div>
+                    </div>
+                </div>
+
+                <div class="course-exam-section">
+                    <div class="course-hi">
+                        <div class="degree-hi">आयुर्वेदाचार्य—तृतीय व्यावसायिक</div>
+                        <div class="desc-hi-1">(आयुर्वेदिक चिकित्सा एंव शल्य चिकित्सा में स्नातक</div>
+                        <div class="desc-hi-2">बैचलर ऑफ आयुर्वेदिक मेडिसिन एण्ड सर्जरी– बी.ए.एम.एस.)</div>
+                        <div class="statement-hi">अंक विवरणिका</div>
+                        <div class="exam-date-hi">(परीक्षा सम्पादित अगस्त–सितम्बर 2026)</div>
+                    </div>
+                    <div class="course-en">
+                        <div class="degree-en">B.A.M.S. III<sup>rd</sup> Professional</div>
+                        <div class="desc-en-1">(Bachelor of Ayurvedic Medicine and</div>
+                        <div class="desc-en-2">Surgery-B.A.M.S.)</div>
+                        <div class="statement-en">MARKS STATEMENT</div>
+                        <div class="exam-date-en">(Examination Held In August-September 2026)</div>
+                    </div>
+                </div>
+
+                <!-- Candidate details -->
+                <div class="candidate-details-grid">
+                    <div class="cand-left">
+                        <div class="cand-item">
+                            <span class="lbl">नाम /Name :</span>
+                            <span id="studentName" class="val"></span>
+                        </div>
+                        <div class="cand-item">
+                            <span class="lbl">पिता का नाम /Father's Name :</span>
+                            <span id="fatherName" class="val"></span>
+                        </div>
+                        <div class="cand-item">
+                            <span class="lbl">माता का नाम /Mother's Name :</span>
+                            <span id="motherName" class="val"></span>
+                        </div>
+                    </div>
+                    <div class="cand-right">
+                        <div class="cand-item">
+                            <span class="lbl">अनुक्रमांक / Roll No.:</span>
+                            <span id="rollNumber" class="val"></span>
+                        </div>
+                        <div class="cand-item">
+                            <span class="lbl">नामांकन संख्या /Enrollment No.:</span>
+                            <span id="enrollmentNumber" class="val"></span>
+                        </div>
+                        <div class="cand-item">
+                            <span class="lbl">प्रयास / Attempt :</span>
+                            <span id="attempt" class="val"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Marks table -->
+                <div class="marks-table-box">
+                    <table class="marks-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2" class="col-subject-name">
+                                    <div class="th-title-hi">विषय/पत्र</div>
+                                    <div class="th-title-en">Subjects / Paper</div>
+                                </th>
+                                <th rowspan="2" class="col-distrib">
+                                    <div class="th-title-hi">अंक वितरण</div>
+                                    <div class="th-title-en">Marks<br>Distribution</div>
+                                </th>
+                                <th rowspan="2" class="col-max-val">
+                                    <div class="th-title-hi">अधिकतम<br>अंक</div>
+                                    <div class="th-title-en">Max.<br>Marks</div>
+                                    <div style="font-size:7px; font-weight:700;">(<span id="headMaxTotal"></span>)</div>
+                                </th>
+                                <th rowspan="2" class="col-min-val">
+                                    <div class="th-title-hi">न्यूनतम<br>अंक</div>
+                                    <div class="th-title-en">Min.<br>Marks</div>
+                                    <div style="font-size:7px; font-weight:700;">(<span id="headMinTotal"></span>)</div>
+                                </th>
+                                <th colspan="7" class="col-obt-group">
+                                    <div class="th-title-hi">प्राप्तांक</div>
+                                    <div class="th-title-en" style="font-size:8px;">Marks Obtained</div>
+                                    <div style="font-size:6.8px; border-top:1px solid #000; margin-top:1px; padding-top:1px;">
+                                        व्यावहारिक या नैदानिक मूल्यांकन<br>Practical / Clinical Assessment
+                                    </div>
+                                </th>
+                                <th rowspan="2" class="col-total-val">
+                                    <div class="th-title-hi">विषय योग</div>
+                                    <div class="th-title-en">Subject<br>Total</div>
+                                </th>
+                                <th rowspan="2" class="col-remark-val">
+                                    <div class="th-title-hi">टिप्पणी</div>
+                                    <div class="th-title-en">Remark</div>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="col-th-1 th-sub-head">
+                                    <div>सैद्धांतिक प्रथम</div>
+                                    <div>Theory I</div>
+                                    <div>(100)</div>
+                                    <div>(*50)</div>
+                                </th>
+                                <th class="col-th-2 th-sub-head">
+                                    <div>सैद्धांतिक द्वितीय</div>
+                                    <div>Theory II</div>
+                                    <div>(100)</div>
+                                </th>
+                                <th class="col-th-3 th-sub-head">
+                                    <div>सैद्धांतिक तृतीय</div>
+                                    <div>Theory III</div>
+                                    <div>(100)</div>
+                                </th>
+                                <th class="col-prac th-sub-head">
+                                    <div>व्यावहारिक या नैदानिक</div>
+                                    <div>Practical/ Clinical</div>
+                                    <div>(100)</div>
+                                </th>
+                                <th class="col-viva th-sub-head">
+                                    <div>साक्षात्कार</div>
+                                    <div>Viva</div>
+                                    <div>(*70)</div>
+                                    <div>(#60)</div>
+                                    <div>(@@75)</div>
+                                </th>
+                                <th class="col-elec th-sub-head">
+                                    <div>ऐच्छिक</div>
+                                    <div>Electives</div>
+                                    <div>(10)</div>
+                                </th>
+                                <th class="col-ia th-sub-head">
+                                    <div>आई. ए.</div>
+                                    <div>IA</div>
+                                    <div>(30)</div>
+                                    <div>(*15)</div>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <!-- Subject rows API se yahan bante hain -->
+                        <tbody id="marksTableBody">
+                            <tr><td colspan="13" style="text-align:center;">Loading...</td></tr>
+                        </tbody>
+
+                        <tfoot>
+                            <tr class="total-row">
+                                <td colspan="2" style="text-align:right; padding-right:12px;">
+                                    <span>कुल योग /GRAND TOTAL</span>
+                                </td>
+                                <td id="footMaxTotal"></td>
+                                <td id="footMinTotal"></td>
+                                <td colspan="7"></td>
+                                <td id="grandTotal"></td>
+                                <td id="grandTotalRemark"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Summary -->
+                <div class="summary-container">
+                    <div class="summary-grid">
+                        <div class="summary-col">
+                            <div class="summary-hi">डिस्टिक्शन प्राप्ति</div>
+                            <div class="summary-en">Distinction secured:</div>
+                            <div id="summaryDistinction" class="summary-val"></div>
+                        </div>
+                        <div class="summary-col">
+                            <div class="summary-hi">प्रथम श्रेणी प्राप्ति:</div>
+                            <div class="summary-en">First Class secured:</div>
+                            <div id="summaryFirstClass" class="summary-val"></div>
+                        </div>
+                        <div class="summary-col">
+                            <div class="summary-hi">कृपांक प्राप्ति</div>
+                            <div class="summary-en">Grace Marks Awarded:</div>
+                            <div id="summaryGrace" class="summary-val"></div>
+                        </div>
+                        <div class="summary-col">
+                            <div class="summary-hi">अनुत्तीर्ण</div>
+                            <div class="summary-en">Failed:</div>
+                            <div id="summaryFailed" class="summary-val"></div>
+                        </div>
+                    </div>
+                    <div class="result-line">
+                        <span>परिणाम / RESULT:</span>
+                        <span id="resultText" style="min-width:140px; display:inline-block;"></span>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="notes-container">
+                    <div class="notes-label">टिप्पणी Note:</div>
+                    <ol class="notes-list-ol">
+                        <li>एक विषय में उत्तीर्ण होने के लिए उम्मीदवार को सैद्धांतिक और व्यावहारिक परीक्षा में से प्रत्येक में न्यूनतम 50% अंक प्राप्त करना आवश्यक है।<br>To pass a subject candidate requires to obtain a minimum of 50% marks in each of Theory and Practical Examination.</li>
+                        <li>किसी विषय में 65% या उससे अधिक अंक प्राप्त करने वाले उम्मीदवार को उस विषय में प्रथम श्रेणी (I द्वारा चिह्नित) प्राप्त से उत्तीर्ण दिखाया जायेगा।<br>Candidate securing 65% marks or above in a Subject shall be declared to have obtained First Class (Denoted by I ) in that Subject.</li>
+                        <li>किसी विषय में 75% या उससे अधिक अंक प्राप्त करने वाले उम्मीदवार को उस विषय में डिस्टिंक्शन (D द्वारा चिह्नित) प्राप्त दिखाया जायेगा।<br>Candidate securing 75% marks or above in a Subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</li>
+                        <li>किसी पेपर के सैद्धांतिक या व्यावहारिक भाग में फेल होने वाले उम्मीदवार को उस विषय में फेल माना जाएगा।<br>Candidate failing in the Theory or Practical of a paper will be considered fail in that subject.</li>
+                        <li>अंक-विवरणिका तैयार करने के दौरान यदि कोई त्रुटि हो जाती है और बाद में ध्यान में लाई जाती है, तो उसे ठीक करने का पूर्ण अधिकार विश्वविद्यालय के पास होगा।<br>In case of any mistake occurred during the preparation of marks-statement brought to notice afterwards, the University will be fully empowered to correct the same.</li>
+                    </ol>
+
+                    <div class="abbreviations-list">
+                        <div class="abbrev-grid">
+                            <div class="ab-item"><strong>6. D- डिस्टिक्शन</strong><br>D- Distinction</div>
+                            <div class="ab-item"><strong>I- प्रथम श्रेणी</strong><br>I-First Class</div>
+                            <div class="ab-item"><strong>G- कृपांक</strong><br>G - Grace</div>
+                            <div class="ab-item"><strong>F - अनुत्तीर्ण</strong><br>F - Fail</div>
+                            <div class="ab-item"><strong>Ab-अनुपस्थित</strong><br>Ab-Absent</div>
+                            <div class="ab-item"><strong>सै.- सैद्धांतिक</strong><br>Th-Theory</div>
+                            <div class="ab-item"><strong>व्याव.- व्यावहारिक</strong><br>Pr- Practical</div>
+                            <div class="ab-item"><strong>आई.ए.- आंतरिक मूल्यांकन</strong><br>IA-Internal Assessment</div>
+                        </div>
+                        <div class="abbrev-minmax">
+                            <div><strong>7. Max. —Maximum</strong></div>
+                            <div><strong>Min.-Minimum</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer-grid">
+                    <div class="footer-left-col">
+                        <div>जयपुर</div>
+                        <div>Jaipur</div>
+                        <div style="margin-top:2px;">परिणाम दिनांक:</div>
+                        <div>Result date: <span id="resultDate" contenteditable="true"></span></div>
+                    </div>
+                    <div class="footer-center-col">
+                        <div class="qr-frame">
+                            <img src="~/Logo/qr.svg" alt="QR Code" style="height:100px;width:100px">
+                        </div>
+                    </div>
+                    <div class="footer-right-col">
+                        <div class="controller-block">
+                            <img src="~/Logo/AdminSignatur.jpg" alt="Signature" style="height:50px;width:150px"><br>
+                            <span class="hi-title">परीक्षा नियंत्रक</span>
+                            <span class="en-title">CONTROLLER OF EXAMINATIONS</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        $(document).ready(function () {
+            loadmarksheet();
+        });
+
+        // ============================================================
+        // SUBJECT NAMES (Hindi + full English) - API sirf short
+        // English naam deti hai (jaise "A-1-KAYACHIKITSA"), isliye
+        // marksheet wale poore naam yahan se aate hain.
+        // ============================================================
+        var SUBJECT_NAMES = {
+            "A-1": { hi: "(ए-1) मानस रोग , रसायन एवं वाजीकरण सहित कायचिकित्सा", en: "(A-1) KAYACHIKITSA INCLUDING MANASA ROGA, RASAYANA AND VAJIKARANA" },
+            "A-2": { hi: "(ए-2) पंचकर्म एवं उपकर्म", en: "(A-2) PANCHAKARMA & UPAKARMA" },
+            "A-3": { hi: "(ए-3) शल्य तंत्र", en: "(A-3) SHALYA TANTRA" },
+            "A-4": { hi: "(ए-4) शालाक्य तंत्र", en: "(A-4) SHALAKYA TANTRA" },
+            "A-5": { hi: "(ए-5) प्रसूति तंत्र एवं स्त्री रोग", en: "(A-5) PRASUTI TANTRA EVAM STREE ROGA" },
+            "A-6": { hi: "(ए-6) कौमारभृत्य", en: "(A-6) KAUMARABHRITYA" },
+            "A-7": { hi: "(ए-7) संहिता अध्ययन-3", en: "(A-7) SAMHITA ADHYAYAN-3" },
+            "A-8": { hi: "(ए-8) अनुसंधान पद्धति और चिकित्सा सांख्यिकी", en: "(A-8) RESEARCH METHODOLOGY AND MEDICAL - STATISTICS" }
+        };
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+
+        // Case-insensitive property read (API camelCase / PascalCase dono chalega)
+        function getValue(obj, propertyName) {
+            if (!obj) return "";
+            var key = Object.keys(obj).find(function (k) {
+                return k.toLowerCase() === propertyName.toLowerCase();
+            });
+            if (key === undefined || obj[key] === null || obj[key] === undefined) return "";
+            return obj[key];
+        }
+
+        // Number mein badlo; khaali / text ho to 0
+        function toNum(value) {
+            var n = parseFloat(value);
+            return isNaN(n) ? 0 : n;
+        }
+
+        // Mark ko clean dikhao: number -> round, 'AB' jaisa text -> as-is
+        function cleanMark(value) {
+            if (value === null || value === undefined) return "-";
+            var text = value.toString().trim();
+            if (text === "") return "-";
+            var num = parseFloat(text);
+            if (isNaN(num)) return text.toUpperCase() === "AB" ? "Ab" : text;
+            return Math.round(num).toString();
+        }
+
+        function isAbsentStatus(value) {
+            var v = (value || "").toString().trim().toUpperCase();
+            return v === "A" || v === "AB" || v === "ABSENT";
+        }
+
+        // "A-1-KAYACHIKITSA" / "(A-1) KAYA..." -> "A-1"
+        function getSubjectCode(subjectName) {
+            if (!subjectName) return "";
+            var text = subjectName.toString().trim();
+            var m = text.match(/\(([A-Za-z]-\d+)\)/) || text.match(/^([A-Za-z]-\d+)/);
+            return m ? m[1].toUpperCase() : "";
+        }
+
+        // "A-1-KAYACHIKITSA" -> "KAYACHIKITSA"
+        function stripSubjectCode(subjectName) {
+            return (subjectName || "").toString().replace(/^\s*[A-Za-z]-\d+\s*-?\s*/, "").trim();
+        }
+
+        // ------------------------------------------------------------
+        // Viva / Elective / IA ke prefix (pehle wala logic hi)
+        // ------------------------------------------------------------
+        function formatViva(value, subjectCode) {
+            var mark = cleanMark(value);
+            if (mark === "-" || mark === "Ab") return mark;
+            switch (subjectCode) {
+                case "A-1":
+                case "A-2":
+                case "A-3": return "@@" + mark;
+                case "A-4": return "#" + mark;
+                case "A-5": return "*" + mark;
+                case "A-6": return "#" + mark;
+                default: return mark;
+            }
+        }
+
+        function formatElective(value, subjectCode) {
+            var mark = cleanMark(value);
+            if (mark === "-" || mark === "Ab") return mark;
+            switch (subjectCode) {
+                case "A-4": return mark + "<br/>(Set-SA)";
+                case "A-5": return mark + "<br/>(Set-SB)";
+                case "A-6": return mark + "<br/>(Set-SC)";
+                default: return mark;
+            }
+        }
+
+        function formatIA(value, subjectCode) {
+            var mark = cleanMark(value);
+            if (mark === "-" || mark === "Ab") return mark;
+            return subjectCode === "A-5" ? "*" + mark : mark;
+        }
+
+        // Theory cell: jis paper ka max 0 hai uske liye '-'
+        function theoryCell(obtained, max) {
+            if (toNum(max) <= 0) return "-";
+            return cleanMark(obtained);
+        }
+
+        // Practical-side cell: max 0 -> '-'; practical absent -> 'Ab'
+        function practicalCell(obtained, max, isAbsent, formatter, subjectCode) {
+            if (toNum(max) <= 0) return "-";
+            if (isAbsent) return "Ab";
+            return formatter ? formatter(obtained, subjectCode) : cleanMark(obtained);
+        }
+
+        function resultHindi(result) {
+            var r = (result || "").toString().trim().toUpperCase();
+            if (r === "PASS") return "उत्तीर्ण";
+            if (r === "PASS BY GRACE") return "कृपांक से उत्तीर्ण";
+            if (r === "FAIL") return "अनुत्तीर्ण";
+            return "";
+        }
+
+        function showMessage(msg) {
+            $("#marksTableBody").html('<tr><td colspan="13" style="text-align:center;">' + msg + '</td></tr>');
+        }
+
+        // ============================================================
+        // LOAD MARKSHEET
+        // ============================================================
+        function loadmarksheet() {
+
+            var enrollment = '@ViewBag.enrollment';
+
+            $.ajax({
+                url: ApiBaseUrl + "Result/getdataformarksheetIIIBAMS?enrollment=" + encodeURIComponent(enrollment),
+                method: "GET",
+
+                success: function (data) {
+
+                    if (!data || !Array.isArray(data) || data.length === 0) {
+                        showMessage("No record found");
+                        return;
+                    }
+
+                    var student = data[0];
+
+                    // ---------------- Student details ----------------
+                    $("#studentName").text(getValue(student, "FirstName"));
+                    $("#fatherName").text(getValue(student, "FatherName"));
+                    $("#motherName").text(getValue(student, "MotherName"));  
+                    $("#rollNumber").text(getValue(student, "RollNumber"));
+                    $("#enrollmentNumber").text(getValue(student, "EnrollmentNumber") || enrollment);
+                    $("#attempt").text(getValue(student, "Attempt"));
+
+                    // ---------------- Subject rows ----------------
+                    var tbody = $("#marksTableBody");
+                    tbody.empty();
+
+                    var totalMax = 0, totalMin = 0, calculatedGrandTotal = 0;
+                    var distinctionSubjects = [], firstClassSubjects = [], graceSubjects = [], failedSubjects = [];
+
+                    $.each(data, function (index, item) {
+
+                        var apiSubjectName = getValue(item, "subjectName");
+                        var code = getSubjectCode(apiSubjectName);
+                        var names = SUBJECT_NAMES[code] || {
+                            hi: "",
+                            en: (code ? "(" + code + ") " : "") + stripSubjectCode(apiSubjectName)
+                        };
+
+                        // --- Max marks of each part ---
+                        var thIMax   = toNum(getValue(item, "TheoryI"));
+                        var thIIMax  = toNum(getValue(item, "TheoryII"));
+                        var thIIIMax = toNum(getValue(item, "TheoryIII"));
+                        var prMax    = toNum(getValue(item, "Practical"));
+                        var vivaMax  = toNum(getValue(item, "VivaMarks"));
+                        var elecMax  = toNum(getValue(item, "ElectiveMarks"));
+                        var iaMax    = toNum(getValue(item, "IAMarks"));
+
+                        var theoryMaxTotal    = thIMax + thIIMax + thIIIMax;
+                        var practicalMaxTotal = prMax + vivaMax + elecMax + iaMax;
+
+                        // --- Marks distribution ---
+                        var distribution = "";
+                        if (theoryMaxTotal > 0) {
+                            distribution += '<span class="th-pr-block">सै. ' + theoryMaxTotal + '<br>Th ' + theoryMaxTotal + '</span>';
+                        }
+                        if (practicalMaxTotal > 0) {
+                            distribution += '<span class="th-pr-block">व्याव. ' + practicalMaxTotal + '<br>Pr ' + practicalMaxTotal + '</span>';
+                        }
+
+                        // --- Max / Min of subject ---
+                        // MaxMarks / MinMarks (tbl_PracticalMarkSubjectMaster) pehle,
+                        // na ho to GrandTotalMarks aur uska 50%
+                        var maxMarks = toNum(getValue(item, "MaxMarks"));
+                        if (maxMarks <= 0) maxMarks = toNum(getValue(item, "GrandTotalMarks"));
+                        if (maxMarks <= 0) maxMarks = theoryMaxTotal + practicalMaxTotal;
+
+                        var minMarks = toNum(getValue(item, "MinMarks"));
+                        if (minMarks <= 0) minMarks = maxMarks / 2;
+
+                        totalMax += maxMarks;
+                        totalMin += minMarks;
+
+                        // --- Obtained marks ---
+                        var practicalAbsent = isAbsentStatus(getValue(item, "PracticalAttendanceStatus"));
+
+                        var thI   = theoryCell(getValue(item, "FinalTheoryIMarks"), thIMax);
+                        var thII  = theoryCell(getValue(item, "FinalTheoryIIMarks"), thIIMax);
+                        var thIII = theoryCell(getValue(item, "FinalTheoryIIIMarks"), thIIIMax);
+
+                        var practical = practicalCell(getValue(item, "ObtenPracticalMarks"), prMax, practicalAbsent);
+                        var viva      = practicalCell(getValue(item, "ObtenVivaMarks"), vivaMax, practicalAbsent, formatViva, code);
+                        var elective  = practicalCell(getValue(item, "ObtenElativeMarks"), elecMax, false, formatElective, code);
+                        var ia        = practicalCell(getValue(item, "ObtenIAMarks"), iaMax, false, formatIA, code);
+
+                        // --- Subject total (SQL se hi - GrandTotal isi ka jod hai) ---
+                        var subjectTotal = getValue(item, "subjectTotal");
+                        calculatedGrandTotal += toNum(subjectTotal);
+
+                        // --- Subject status ---
+                        var isAbsent   = toNum(getValue(item, "IsSubjectAbsent")) === 1;
+                        var isFailed   = getValue(item, "Required_To_Appear").toString().trim() !== "";
+                        var hasGrace   = getValue(item, "GraceMarks").toString().trim() !== "";
+                        var distinction = getValue(item, "Distinction").toString().trim().toUpperCase();
+
+                        // Remark: Ab > F > G > D / I
+                        var remark = "";
+                        if (isAbsent) {
+                            remark = "Ab";
+                            failedSubjects.push(code);
+                        } else if (isFailed) {
+                            remark = "F";
+                            failedSubjects.push(code);
+                        } else if (hasGrace) {
+                            remark = "G";
+                            graceSubjects.push(code);
+                        } else if (distinction === "D") {
+                            remark = "D";
+                            distinctionSubjects.push(code);
+                        } else if (distinction === "I") {
+                            remark = "I";
+                            firstClassSubjects.push(code);
+                        }
+
+                        tbody.append(
+                            '<tr class="body-row' + (hasGrace ? ' grace-row' : '') + '">' +
+                                '<td class="col-subject-name">' +
+                                    (names.hi ? '<span class="sub-name-hi">' + names.hi + '</span>' : '') +
+                                    '<span class="sub-name-en">' + names.en + '</span>' +
+                                '</td>' +
+                                '<td class="col-distrib">' + distribution + '</td>' +
+                                '<td class="col-max-val">' + cleanMark(maxMarks) + '</td>' +
+                                '<td class="col-min-val">' + cleanMark(minMarks) + '</td>' +
+                                '<td>' + thI + '</td>' +
+                                '<td>' + thII + '</td>' +
+                                '<td>' + thIII + '</td>' +
+                                '<td>' + practical + '</td>' +
+                                '<td>' + viva + '</td>' +
+                                '<td>' + elective + '</td>' +
+                                '<td>' + ia + '</td>' +
+                                '<td>' + cleanMark(subjectTotal) + '</td>' +
+                                '<td>' + remark + '</td>' +
+                            '</tr>'
+                        );
+                    });
+
+                    // ---------------- Totals ----------------
+                    $("#headMaxTotal, #footMaxTotal").text(cleanMark(totalMax));
+                    $("#headMinTotal, #footMinTotal").text(cleanMark(totalMin));
+
+                    var apiGrandTotal = getValue(student, "GrandTotal");
+                    $("#grandTotal").text(cleanMark(apiGrandTotal !== "" ? apiGrandTotal : calculatedGrandTotal));
+
+                    // ---------------- Summary ----------------
+                    $("#summaryDistinction").text(distinctionSubjects.join(", "));
+                    $("#summaryFirstClass").text(firstClassSubjects.join(", "));
+                    $("#summaryGrace").text(graceSubjects.join(", "));
+                    $("#summaryFailed").text(failedSubjects.join(", "));
+
+                    // ---------------- Result ----------------
+                    var finalResult = getValue(student, "Result").toString().trim();
+                    var hi = resultHindi(finalResult);
+                    $("#resultText").text(hi ? hi + " / " + finalResult : finalResult);
+                },
+
+                error: function (xhr, status, error) {
+                    console.error("Marksheet API Error:", error, xhr.responseText);
+                    showMessage("Failed to load marksheet data.");
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
