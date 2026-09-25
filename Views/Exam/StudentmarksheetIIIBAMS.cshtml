@@ -14,11 +14,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+Devanagari:wght@400;600;700;800;900&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 
-    <!-- jQuery (pehle load nahi ho raha tha, isliye $(document).ready chal hi nahi raha tha) -->
+    <!-- QR Code library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <script>
-        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+        var ApiBaseUrl = "@Configuration["ApiSettings:BaseUrl"]";
     </script>
 
     <style>
@@ -41,31 +44,31 @@
             padding: 15px 0 30px 0;
         }
 
-        .print-button {
-            position: fixed;
-            top: 18px;
-            right: 25px;
-            background: #2563eb;
+        /* =====================================================
+           PRINT BUTTON (screen par dikhega, print mein nahi)
+           ===================================================== */
+        .print-btn {
+            background-color: #254078;
             color: #ffffff;
             border: none;
-            padding: 10px 22px;
-            font-size: 14px;
-            font-weight: 600;
-            border-radius: 6px;
+            padding: 8px 22px;
+            margin-bottom: 12px;
+            font-size: 13.5px;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
-            display: flex;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+            transition: all 0.2s ease;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            z-index: 99999;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            transition: all 0.2s ease;
         }
 
-            .print-button:hover {
-                background: #1d4ed8;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            .print-btn:hover {
+                background-color: #1a2f58;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.25);
             }
 
         .marksheet-page {
@@ -545,7 +548,6 @@
         }
 
         .qr-frame {
-           /*  border: 1px solid #000; */
             width: 100px;
             height: 100px;
             display: flex;
@@ -554,6 +556,13 @@
             font-size: 9.5px;
             font-weight: 700;
             background: #fff;
+        }
+
+        #qrcode img,
+        #qrcode canvas {
+            width: 80px !important;
+            height: 80px !important;
+            display: block;
         }
 
         .footer-right-col {
@@ -588,6 +597,138 @@
             background-color: rgba(59, 130, 246, 0.08) !important;
         }
 
+        /* =====================================================
+           PRINT POPUP
+           ===================================================== */
+        .print-modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .print-modal-content {
+            width: 420px;
+            max-width: 90%;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: printModalOpen 0.2s ease;
+        }
+
+        @@keyframes printModalOpen {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .print-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .print-modal-header h3 {
+                margin: 0;
+                font-size: 19px;
+                font-weight: 600;
+            }
+
+        .print-modal-close {
+            border: none;
+            background: transparent;
+            font-size: 27px;
+            line-height: 1;
+            cursor: pointer;
+            color: #666;
+        }
+
+            .print-modal-close:hover {
+                color: #000;
+            }
+
+        .print-modal-body {
+            padding: 20px;
+        }
+
+        .print-input-group {
+            margin-bottom: 16px;
+        }
+
+            .print-input-group label {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+            }
+
+        .print-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+            .print-input:focus {
+                border-color: #555;
+            }
+
+        .print-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        .print-cancel-btn,
+        .print-save-btn {
+            padding: 9px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .print-cancel-btn {
+            background: #e5e5e5;
+            color: #333;
+        }
+
+        .print-save-btn {
+            background: #222;
+            color: #fff;
+        }
+
+            .print-save-btn:hover {
+                opacity: 0.9;
+            }
+
+        /* =====================================================
+           PRINT
+           Button aur popup sirf print mein chhupte hain,
+           print ke baad screen par wapas dikhte hain
+           ===================================================== */
         @@media print {
             @@page {
                 size: A4 portrait;
@@ -608,7 +749,9 @@
                 overflow: hidden !important;
             }
 
-            .print-button, .no-print {
+            .print-btn,
+            .print-modal,
+            .no-print {
                 display: none !important;
             }
 
@@ -638,14 +781,21 @@
 </head>
 <body>
 
-    <button class="print-button no-print" onclick="window.print()">
-        🖨️ Print
+    <button type="button" onclick="openPrintPopup()" class="print-btn no-print">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Print Marksheet / प्रिंट करें
     </button>
 
     <div class="marksheet-page">
         <div class="outer-frame">
 
-            <!-- Serial / Folio (API mein nahi hain - print se pehle click karke likh sakte ho) -->
+            <!-- Serial / Folio -->
             <div class="top-meta-bar">
                 <div class="meta-field">
                     <span>क्रम संख्या /Serial No.</span>
@@ -892,12 +1042,12 @@
                     <div class="footer-left-col">
                         <div>जयपुर</div>
                         <div>Jaipur</div>
-                        <div style="margin-top:2px;">परिणाम दिनांक:</div>
-                        <div>Result date: <span id="resultDate" contenteditable="true"></span></div>
+                        <div style="margin-top:2px;">परिणाम दिनांक: 22/09/2026 </div>
+                        <div>Result date: <span id="resultDate"> 22/09/2026</span></div>
                     </div>
                     <div class="footer-center-col">
                         <div class="qr-frame">
-                            <img src="~/Logo/qr.svg" alt="QR Code" style="height:100px;width:100px">
+                            <div id="qrcode"></div>
                         </div>
                     </div>
                     <div class="footer-right-col">
@@ -906,10 +1056,44 @@
                             <span class="hi-title">परीक्षा नियंत्रक</span>
                             <span class="en-title">CONTROLLER OF EXAMINATIONS</span>
                         </div>
-                    </div>
+                    </div>                   
+                </div>
+            </div>            
+        </div>
+        <div class="serial-bottom" style="height:14px;margin-top:-8px;text-align:right;padding: -1px;"><span id="serialbottom" style="font-size:6px"></span></div>
+    </div>
+    
+    <!-- PRINT POPUP -->
+    <div id="printModal" class="print-modal no-print">
+        <div class="print-modal-content">
+
+            <div class="print-modal-header">
+                <h3>Print Marksheet</h3>
+                <button type="button" class="print-modal-close" onclick="closePrintPopup()">&times;</button>
+            </div>
+
+            <div class="print-modal-body">
+                <div class="print-input-group">
+                    <label for="printSerialNo">Serial No.</label>
+                    <input type="text" id="printSerialNo" class="print-input" placeholder="Enter Serial No.">
                 </div>
 
+                <div class="print-input-group">
+                    <label for="printFolioNo">Folio No.</label>
+                    <input type="text" id="printFolioNo" class="print-input" placeholder="Enter Folio No.">
+                </div>
+
+                <div class="print-input-group">
+                    <label for="printBottomSerial">Bottom Serial No.</label>
+                    <input type="text" id="printBottomSerial" class="print-input" placeholder="Enter Bottom Serial No.">
+                </div>
             </div>
+
+            <div class="print-modal-footer">
+                <button type="button" class="print-cancel-btn" onclick="closePrintPopup()">Cancel</button>
+                <button type="button" class="print-save-btn" onclick="saveAndPrint()">Save & Print</button>
+            </div>
+
         </div>
     </div>
 
@@ -920,9 +1104,7 @@
         });
 
         // ============================================================
-        // SUBJECT NAMES (Hindi + full English) - API sirf short
-        // English naam deti hai (jaise "A-1-KAYACHIKITSA"), isliye
-        // marksheet wale poore naam yahan se aate hain.
+        // SUBJECT NAMES (Hindi + full English)
         // ============================================================
         var SUBJECT_NAMES = {
             "A-1": { hi: "(ए-1) मानस रोग , रसायन एवं वाजीकरण सहित कायचिकित्सा", en: "(A-1) KAYACHIKITSA INCLUDING MANASA ROGA, RASAYANA AND VAJIKARANA" },
@@ -936,10 +1118,32 @@
         };
 
         // ============================================================
+        // COLUMN SYMBOLS (header ke hisaab se)
+        // Symbol us column ke MAX marks se tay hota hai:
+        //   Theory I : (100) normal,  (*50) -> *
+        //   Viva     : (*70) -> *,  (#60) -> #,  (@@75) -> @@
+        //   IA       : (30)  normal,  (*15) -> *
+        // Note: Razor view mein "@@" likhne par page par "@@" dikhta hai.
+        // Naya max aaye to sirf yahi table badlo.
+        // ============================================================
+        var COLUMN_SYMBOLS = {
+            theoryI: { 50: "*" },
+            viva:    { 70: "*", 60: "#", 75: "@@" },
+            ia:      { 15: "*" }
+        };
+
+        function getSymbol(column, maxMarks) {
+            var map = COLUMN_SYMBOLS[column];
+            if (!map) return "";
+            var key = Math.round(toNum(maxMarks));
+            return map[key] || "";
+        }
+
+        // ============================================================
         // HELPERS
         // ============================================================
 
-        // Case-insensitive property read (API camelCase / PascalCase dono chalega)
+        // Case-insensitive property read
         function getValue(obj, propertyName) {
             if (!obj) return "";
             var key = Object.keys(obj).find(function (k) {
@@ -949,13 +1153,12 @@
             return obj[key];
         }
 
-        // Number mein badlo; khaali / text ho to 0
         function toNum(value) {
             var n = parseFloat(value);
             return isNaN(n) ? 0 : n;
         }
 
-        // Mark ko clean dikhao: number -> round, 'AB' jaisa text -> as-is
+        // number -> round, 'AB' -> 'Ab'
         function cleanMark(value) {
             if (value === null || value === undefined) return "-";
             var text = value.toString().trim();
@@ -983,51 +1186,36 @@
             return (subjectName || "").toString().replace(/^\s*[A-Za-z]-\d+\s*-?\s*/, "").trim();
         }
 
-        // ------------------------------------------------------------
-        // Viva / Elective / IA ke prefix (pehle wala logic hi)
-        // ------------------------------------------------------------
-        function formatViva(value, subjectCode) {
-            var mark = cleanMark(value);
-            if (mark === "-" || mark === "Ab") return mark;
+        // Mark ke aage symbol lagao ('-' / 'Ab' par nahi)
+        function withSymbol(mark, symbol) {
+            if (mark === "-" || mark === "Ab" || !symbol) return mark;
+            return symbol + mark;
+        }
+
+        // Elective ke saath Set label (pehle jaisa)
+        function electiveLabel(subjectCode) {
             switch (subjectCode) {
-                case "A-1":
-                case "A-2":
-                case "A-3": return "@@" + mark;
-                case "A-4": return "#" + mark;
-                case "A-5": return "*" + mark;
-                case "A-6": return "#" + mark;
-                default: return mark;
+                case "A-4": return "<br/>(Set-SA)";
+                case "A-5": return "<br/>(Set-SB)";
+                case "A-6": return "<br/>(Set-SC)";
+                default: return "";
             }
         }
 
-        function formatElective(value, subjectCode) {
-            var mark = cleanMark(value);
-            if (mark === "-" || mark === "Ab") return mark;
-            switch (subjectCode) {
-                case "A-4": return mark + "<br/>(Set-SA)";
-                case "A-5": return mark + "<br/>(Set-SB)";
-                case "A-6": return mark + "<br/>(Set-SC)";
-                default: return mark;
-            }
-        }
-
-        function formatIA(value, subjectCode) {
-            var mark = cleanMark(value);
-            if (mark === "-" || mark === "Ab") return mark;
-            return subjectCode === "A-5" ? "*" + mark : mark;
-        }
-
-        // Theory cell: jis paper ka max 0 hai uske liye '-'
-        function theoryCell(obtained, max) {
+        // Theory cell: max 0 -> '-'; column ke max se symbol
+        function theoryCell(obtained, max, column) {
             if (toNum(max) <= 0) return "-";
-            return cleanMark(obtained);
+            return withSymbol(cleanMark(obtained), getSymbol(column, max));
         }
 
-        // Practical-side cell: max 0 -> '-'; practical absent -> 'Ab'
-        function practicalCell(obtained, max, isAbsent, formatter, subjectCode) {
+        // Practical-side cell: max 0 -> '-'; absent -> 'Ab'; column ke max se symbol
+        function practicalCell(obtained, max, isAbsent, column, suffix) {
             if (toNum(max) <= 0) return "-";
             if (isAbsent) return "Ab";
-            return formatter ? formatter(obtained, subjectCode) : cleanMark(obtained);
+            var mark = cleanMark(obtained);
+            var text = withSymbol(mark, getSymbol(column, max));
+            if (suffix && mark !== "-") text += suffix;
+            return text;
         }
 
         function resultHindi(result) {
@@ -1041,6 +1229,64 @@
         function showMessage(msg) {
             $("#marksTableBody").html('<tr><td colspan="13" style="text-align:center;">' + msg + '</td></tr>');
         }
+
+        // ============================================================
+        // QR CODE
+        // ============================================================
+        var qrData = { roll: "", name: "", result: "", verify: "" };
+
+        // dd-MM-yyyy
+        function formatDate(d) {
+            var dd = ("0" + d.getDate()).slice(-2);
+            var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+            return dd + "-" + mm + "-" + d.getFullYear();
+        }
+
+        // API mein VerifyCode na ho to roll + enrollment se fixed code
+        function makeVerifyCode(roll, enrollment) {
+            var text = (roll || "") + "|" + (enrollment || "");
+            var hash = 0;
+            for (var i = 0; i < text.length; i++) {
+                hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+            }
+            hash = Math.abs(hash);
+            var year = new Date().getFullYear().toString().slice(-2);
+            var letter = String.fromCharCode(65 + (hash % 26));
+            var num = ("0000" + (hash % 10000)).slice(-4);
+            return year + letter + num;
+        }
+
+        function generateQRCode() {
+            if (!qrData.roll) return;   // data abhi load nahi hua
+
+            var dateText = $("#resultDate").text().trim();
+            if (dateText === "") dateText = formatDate(new Date());
+
+            var qrText =
+                "National Institute of Ayurveda\n" +
+                "Roll No: " + qrData.roll + "\n" +
+                "Name: " + qrData.name + "\n" +
+                "Result: " + qrData.result + "\n" +
+                "Date: " + dateText + "\n" +
+                "Verify: " + qrData.verify;
+
+            var box = document.getElementById("qrcode");
+            box.innerHTML = "";
+
+            new QRCode(box, {
+                text: qrText,
+                width: 100,
+                height: 100,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // Result date badalte hi QR update
+        $(document).on("blur", "#resultDate", function () {
+            generateQRCode();
+        });
 
         // ============================================================
         // LOAD MARKSHEET
@@ -1065,7 +1311,7 @@
                     // ---------------- Student details ----------------
                     $("#studentName").text(getValue(student, "FirstName"));
                     $("#fatherName").text(getValue(student, "FatherName"));
-                    $("#motherName").text(getValue(student, "MotherName"));  
+                    $("#motherName").text(getValue(student, "MotherName"));
                     $("#rollNumber").text(getValue(student, "RollNumber"));
                     $("#enrollmentNumber").text(getValue(student, "EnrollmentNumber") || enrollment);
                     $("#attempt").text(getValue(student, "Attempt"));
@@ -1108,8 +1354,6 @@
                         }
 
                         // --- Max / Min of subject ---
-                        // MaxMarks / MinMarks (tbl_PracticalMarkSubjectMaster) pehle,
-                        // na ho to GrandTotalMarks aur uska 50%
                         var maxMarks = toNum(getValue(item, "MaxMarks"));
                         if (maxMarks <= 0) maxMarks = toNum(getValue(item, "GrandTotalMarks"));
                         if (maxMarks <= 0) maxMarks = theoryMaxTotal + practicalMaxTotal;
@@ -1120,26 +1364,26 @@
                         totalMax += maxMarks;
                         totalMin += minMarks;
 
-                        // --- Obtained marks ---
+                        // --- Obtained marks (symbol column ke max se) ---
                         var practicalAbsent = isAbsentStatus(getValue(item, "PracticalAttendanceStatus"));
 
-                        var thI   = theoryCell(getValue(item, "FinalTheoryIMarks"), thIMax);
-                        var thII  = theoryCell(getValue(item, "FinalTheoryIIMarks"), thIIMax);
-                        var thIII = theoryCell(getValue(item, "FinalTheoryIIIMarks"), thIIIMax);
+                        var thI   = theoryCell(getValue(item, "FinalTheoryIMarks"),   thIMax,   "theoryI");
+                        var thII  = theoryCell(getValue(item, "FinalTheoryIIMarks"),  thIIMax,  "theoryII");
+                        var thIII = theoryCell(getValue(item, "FinalTheoryIIIMarks"), thIIIMax, "theoryIII");
 
-                        var practical = practicalCell(getValue(item, "ObtenPracticalMarks"), prMax, practicalAbsent);
-                        var viva      = practicalCell(getValue(item, "ObtenVivaMarks"), vivaMax, practicalAbsent, formatViva, code);
-                        var elective  = practicalCell(getValue(item, "ObtenElativeMarks"), elecMax, false, formatElective, code);
-                        var ia        = practicalCell(getValue(item, "ObtenIAMarks"), iaMax, false, formatIA, code);
+                        var practical = practicalCell(getValue(item, "ObtenPracticalMarks"), prMax,   practicalAbsent, "practical");
+                        var viva      = practicalCell(getValue(item, "ObtenVivaMarks"),      vivaMax, practicalAbsent, "viva");
+                        var elective  = practicalCell(getValue(item, "ObtenElativeMarks"),   elecMax, false, "elective", electiveLabel(code));
+                        var ia        = practicalCell(getValue(item, "ObtenIAMarks"),        iaMax,   false, "ia");
 
-                        // --- Subject total (SQL se hi - GrandTotal isi ka jod hai) ---
+                        // --- Subject total (SQL se) ---
                         var subjectTotal = getValue(item, "subjectTotal");
                         calculatedGrandTotal += toNum(subjectTotal);
 
                         // --- Subject status ---
-                        var isAbsent   = toNum(getValue(item, "IsSubjectAbsent")) === 1;
-                        var isFailed   = getValue(item, "Required_To_Appear").toString().trim() !== "";
-                        var hasGrace   = getValue(item, "GraceMarks").toString().trim() !== "";
+                        var isAbsent    = toNum(getValue(item, "IsSubjectAbsent")) === 1;
+                        var isFailed    = getValue(item, "Required_To_Appear").toString().trim() !== "";
+                        var hasGrace    = getValue(item, "GraceMarks").toString().trim() !== "";
                         var distinction = getValue(item, "Distinction").toString().trim().toUpperCase();
 
                         // Remark: Ab > F > G > D / I
@@ -1200,6 +1444,17 @@
                     var finalResult = getValue(student, "Result").toString().trim();
                     var hi = resultHindi(finalResult);
                     $("#resultText").text(hi ? hi + " / " + finalResult : finalResult);
+
+                    // ---------------- QR Code ----------------
+                    var rollNo   = getValue(student, "RollNumber").toString();
+                    var enrollNo = (getValue(student, "EnrollmentNumber") || enrollment).toString();
+
+                    qrData.roll   = rollNo;
+                    qrData.name   = getValue(student, "FirstName").toString();
+                    qrData.result = finalResult;
+                    qrData.verify = getValue(student, "VerifyCode").toString() || makeVerifyCode(rollNo, enrollNo);
+
+                    generateQRCode();
                 },
 
                 error: function (xhr, status, error) {
@@ -1208,6 +1463,77 @@
                 }
             });
         }
+
+        // ============================================================
+        // PRINT POPUP
+        // ============================================================
+        function openPrintPopup() {
+            $("#printModal").css("display", "flex");
+
+            $("#printSerialNo").val($("#Serialno").text().trim());
+            $("#printFolioNo").val($("#Folio").text().trim());
+            $("#printBottomSerial").val($("#serialbottom").text().trim());
+
+            $("#printSerialNo").focus();
+        }
+
+        function closePrintPopup() {
+            $("#printModal").hide();
+        }
+
+        function saveAndPrint() {
+
+            var serialNo       = $("#printSerialNo").val().trim();
+            var folioNo        = $("#printFolioNo").val().trim();
+            var bottomSerialNo = $("#printBottomSerial").val().trim();
+
+            if (serialNo === "") {
+                alert("Please enter Serial No.");
+                $("#printSerialNo").focus();
+                return;
+            }
+
+            if (folioNo === "") {
+                alert("Please enter Folio No.");
+                $("#printFolioNo").focus();
+                return;
+            }
+
+            if (bottomSerialNo === "") {
+                alert("Please enter Bottom Serial No.");
+                $("#printBottomSerial").focus();
+                return;
+            }
+
+            $("#Serialno").text(serialNo);
+            $("#Folio").text(folioNo);
+            $("#serialbottom").text(bottomSerialNo);
+
+            // Print se pehle QR latest date ke saath
+            generateQRCode();
+
+            closePrintPopup();
+
+            // Button ko hide NAHI karte - @@media print CSS usse sirf
+            // print mein chhupati hai, print ke baad screen par wapas dikhta hai
+            setTimeout(function () {
+                window.print();
+            }, 300);
+        }
+
+        // ESC -> popup band
+        $(document).on("keydown", function (e) {
+            if (e.key === "Escape" && $("#printModal").is(":visible")) {
+                closePrintPopup();
+            }
+        });
+
+        // Bahar click -> popup band
+        $(document).on("click", "#printModal", function (e) {
+            if (e.target === this) {
+                closePrintPopup();
+            }
+        });
 
     </script>
 </body>
