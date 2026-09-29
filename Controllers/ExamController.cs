@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace NIAUNIVERSITYPANEL.Controllers
-{   
+{
     public class ExamController : Controller
     {
         //public override void OnActionExecuting(ActionExecutingContext context)
@@ -104,7 +103,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-        
+
         public IActionResult StudentAttendance()
         {
             return View();
@@ -146,6 +145,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult resulttrugIV()
+        {
+            return View();
+        }
         public IActionResult resulttrugIII()
         {
             return View();
@@ -164,7 +167,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-        
+
         public IActionResult dataforresultpkt()
         {
             return View();
@@ -185,6 +188,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         public IActionResult StudentmarksheetIIIBAMS(string enrollmentNumber)
         {
             ViewBag.enrollment=enrollmentNumber;
+            return View();
+        }
+
+        public IActionResult StudentResultSheet()
+        {           
             return View();
         }
     }

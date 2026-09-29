@@ -105,11 +105,7 @@
         font-family: Arial, Helvetica, sans-serif;
         padding: 20px;
         background: #f5f5f5;
-        overflow-x: hidden; /* *** FIX: backstop so the page itself can
-                never scroll sideways - only the ledger's own wrapper div
-                (overflow-x:auto) can. Without this, if anything inside ever
-                pushes wider than the viewport again, the whole page (footer
-                included) would scroll instead of just the table area. */
+        overflow-x: hidden; 
     }
 
     table.ledger {
@@ -198,17 +194,6 @@
         border-right: none !important;
     }
 
-    /* ================================================================
-           *** FIX: Script ID I / II / III specifically ***
-           .kk (used above) force-removes left/right borders on every data
-           column, including these three - that's why scriptIdI/II/III run
-           together with no visible gap between them ("203517" + "203400"
-           reading as one number). Scoped ONLY to Script ID as asked, using
-           an inline !important style on those three <td>s below rather than
-           editing .kk itself, so no other column's styling changes. Inline
-           !important beats .kk's !important regardless of what TrStyleSheet.css
-           (which I can't see) might also be doing to these cells.
-           ================================================================ */
 </style>
 
 
@@ -300,14 +285,6 @@
 
 
 
-    <!-- ================================================================
-         *** FIX: scroll wasn't actually contained - the whole page was
-         scrolling sideways (footer included), not just the table.
-         width:100% alone on the wrapper wasn't a hard enough boundary.
-         Added max-width:100% and display:block explicitly so this div
-         can't be pushed wider than its own parent by the 2067px-wide
-         table inside it - only ITS OWN inner content scrolls now.
-         ================================================================ -->
     <div style="display:block; width:100%; max-width:100%; overflow-x:auto;">
         <table class="ledger" style="min-width:2067px;">
             <colgroup>
