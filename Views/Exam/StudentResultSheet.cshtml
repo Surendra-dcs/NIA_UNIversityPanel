@@ -1,0 +1,864 @@
+﻿@{
+    ViewData["Title"] = "Result Sheet";
+    Layout = null;
+}
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Institute of Ayurveda - Result Sheet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;600;700&family=PT+Serif:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS (jQuery ke baad) -->
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <!-- Excel export (SheetJS) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        var ApiBaseUrl = "@Configuration["ApiSettings:BaseUrl"]";
+    </script>
+
+    <style>
+        :root {
+            --ink: #1b2a24;
+            --green: #1f4d3a;
+            --green-soft: #e8f0ec;
+            --rule: #9fb3a8;
+            --muted: #5b6b64;
+            --pass: #1f6b3a;
+            --fail: #a3261c;
+            --grace: #8a5a00;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: "PT Serif", "Noto Serif Devanagari", Georgia, serif;
+            color: var(--ink);
+            background: #f3f5f4;
+        }
+
+        /* ---------- Search bar ---------- */
+        .search-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+            background: #fff;
+            border: 1px solid #d5ddd9;
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 170px;
+            flex: 1 1 170px;
+        }
+
+            .search-group label {
+                font-family: "Roboto Condensed", Arial, sans-serif;
+                font-size: 13px;
+                color: var(--muted);
+            }
+
+            .search-group select {
+                height: 36px;
+                padding: 0 8px;
+                border: 1px solid #c3cec8;
+                border-radius: 4px;
+                font-family: inherit;
+                font-size: 14px;
+                background: #fff;
+            }
+
+        .btn-group {
+            flex-direction: row;
+            flex: 0 0 auto;
+            min-width: auto;
+            gap: 8px;
+        }
+
+        .btn {
+            height: 36px;
+            padding: 0 16px;
+            border-radius: 4px;
+            border: 1px solid var(--green);
+            font-family: "Roboto Condensed", Arial, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            background: #fff;
+            color: var(--green);
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .btn:focus-visible, select:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+        }
+
+        /* ---------- Sheet ---------- */
+        .sheet {
+            background: #fff;
+            border: 1px solid #d5ddd9;
+            padding: 20px 22px 28px;
+        }
+
+        .sheet-title {
+            text-align: center;
+            border-bottom: 2px solid var(--green);
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+            .sheet-title h1 {
+                margin: 0;
+                font-family: "Noto Serif Devanagari", "PT Serif", serif;
+                font-size: 22px;
+                color: var(--green);
+            }
+
+            .sheet-title .sub {
+                margin-top: 2px;
+                font-size: 14px;
+                color: var(--muted);
+            }
+
+        .sheet-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .exam-name {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .exam-meta {
+            margin-top: 4px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .count-box {
+            text-align: right;
+            border: 1px solid var(--rule);
+            background: var(--green-soft);
+            padding: 8px 14px;
+            min-width: 170px;
+        }
+
+            .count-box .big {
+                font-family: "Roboto Condensed", Arial, sans-serif;
+                font-size: 26px;
+                font-weight: 700;
+                color: var(--green);
+                line-height: 1;
+            }
+
+            .count-box .lbl {
+                font-size: 12px;
+                color: var(--muted);
+            }
+
+            .count-box .split {
+                margin-top: 6px;
+                font-family: "Roboto Condensed", Arial, sans-serif;
+                font-size: 13px;
+            }
+
+                .count-box .split .p {
+                    color: var(--pass);
+                }
+
+                .count-box .split .f {
+                    color: var(--fail);
+                }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        /* ---------- Table ---------- */
+        table.result {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 13px;
+        }
+
+            table.result th,
+            table.result td {
+                border: 1px solid var(--rule) !important;
+                padding: 6px 7px !important;
+                vertical-align: middle;
+            }
+
+            table.result thead th {
+                background-color: var(--green);
+                color: #fff;
+                font-family: "Roboto Condensed", Arial, sans-serif;
+                font-weight: 700;
+                text-align: center;
+                white-space: nowrap;
+            }
+
+            table.result tbody tr:nth-child(even) {
+                background: #f7faf8;
+            }
+
+        td.num {
+            text-align: right;
+            font-family: "Roboto Condensed", Arial, sans-serif;
+        }
+
+        td.ctr {
+            text-align: center;
+        }
+
+        td.nowrap {
+            white-space: nowrap;
+        }
+
+        .res {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .res-pass {
+            color: var(--pass);
+        }
+
+        .res-grace {
+            color: var(--grace);
+        }
+
+        .res-fail {
+            color: var(--fail);
+        }
+
+        /* ---------- DataTables controls ---------- */
+        .dataTables_wrapper {
+            font-family: "Roboto Condensed", Arial, sans-serif;
+            font-size: 13px;
+        }
+
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 10px;
+            }
+
+                .dataTables_wrapper .dataTables_filter input,
+                .dataTables_wrapper .dataTables_length select {
+                    border: 1px solid #c3cec8;
+                    border-radius: 4px;
+                    padding: 4px 6px;
+                }
+
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_paginate {
+                margin-top: 10px;
+            }
+
+                .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+                .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                    background: var(--green) !important;
+                    border-color: var(--green) !important;
+                    color: #fff !important;
+                }
+
+        table.dataTable.no-footer {
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .sign-row {
+            display: none;
+            justify-content: space-between;
+            margin-top: 60px;
+            font-size: 13px;
+        }
+
+            .sign-row div {
+                border-top: 1px solid var(--ink);
+                padding-top: 4px;
+                min-width: 180px;
+                text-align: center;
+            }
+
+        /* ---------- Print ---------- */
+        @@media print {
+            @@page {
+                size: A4 landscape;
+                margin: 10mm;
+            }
+
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .search-row,
+            .no-print,
+            .dataTables_length,
+            .dataTables_filter,
+            .dataTables_info,
+            .dataTables_paginate {
+                display: none !important;
+            }
+
+            .sheet {
+                border: 0;
+                padding: 0;
+            }
+
+            .table-wrap {
+                overflow: visible;
+            }
+
+            table.result {
+                font-size: 10.5px;
+            }
+
+                table.result th, table.result td {
+                    padding: 4px 5px !important;
+                }
+
+                table.result thead {
+                    display: table-header-group;
+                }
+
+                table.result tr {
+                    page-break-inside: avoid;
+                }
+
+                table.result thead th {
+                    background-color: #e3ebe7 !important;
+                    background-image: none !important;
+                    color: #000 !important;
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+            /* sort arrows print mein nahi */
+            table.dataTable thead th:before,
+            table.dataTable thead th:after {
+                display: none !important;
+            }
+
+            .count-box {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .sign-row {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= SEARCH ================= -->
+    <div class="search-row">
+
+        <div class="search-group">
+            <label for="sessionId">Session</label>
+            <select id="sessionId">
+                <option value="">Select Session</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="programId">Program</label>
+            <select id="programId">
+                <option value="">Select Program</option>
+                <option value="1">Under Graduate (UG)</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="courseId">Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="semester">Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="BatchId">Batch</label>
+            <select id="BatchId">
+                <option value="">Select Batch</option>
+            </select>
+        </div>
+
+        <div class="search-group btn-group">
+            <button type="button" id="btnSearch" class="btn btn-primary" onclick="loadResultsheetforUg()">Search report</button>
+            <button type="button" id="btnPrint" class="btn" onclick="printSheet()" disabled>Print</button>
+            <button type="button" id="btnExcel" class="btn" onclick="downloadExcel()" disabled>Download Excel</button>
+        </div>
+    </div>
+
+    <!-- ================= SHEET ================= -->
+    <div class="sheet" id="printArea">
+
+        <div class="sheet-title">
+            <h1>National Institute of Ayurveda</h1>
+            <div class="sub">Result Sheet</div>
+        </div>
+
+        <div class="sheet-head">
+            <div>
+                <div class="exam-name" id="ExamnameId">Select filters and search to view the result sheet</div>
+                <div class="exam-meta" id="examMeta"></div>
+            </div>
+
+            <div class="count-box">
+                <div class="lbl">Total students</div>
+                <div class="big" id="totalCount">0</div>
+                <div class="split">
+                    <span class="p">Pass: <b id="passCount">0</b></span>
+                    &nbsp;|&nbsp;
+                    <span class="f">Fail: <b id="failCount">0</b></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table class="result" id="resultTable">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Enrollment Number</th>
+                        <th>Student Name</th>
+                        <th>Father Name</th>
+                        <th>Email</th>
+                        <th>DOB</th>
+                        <th>Mobile No.</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>Total Marks</th>
+                        <th>Marks Obtained</th>
+                        <th>Percentage</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody id="studentresulrsheetdata"></tbody>
+            </table>
+        </div>
+
+        <div class="sign-row">
+            <div>Prepared by</div>
+            <div>Checked by</div>
+            <div>Controller of Examination</div>
+        </div>
+    </div>
+
+
+    <script>
+        /* ---------- state ---------- */
+        let resultData = [];
+        let dt = null;
+        let sheetInfo = { examName: '', session: '', course: '', semester: '', batch: '' };
+
+        $(document).ready(function () {
+            loadSession();
+            initDataTable([]);
+        });
+
+        /* ---------- dropdowns ---------- */
+        function loadSession() {
+            $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+                let session = '<option value="">Select Session</option>';
+                res.forEach(x => {
+                    session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+                });
+                $('#sessionId').html(session);
+            });
+        }
+
+        function loadPrograms() {
+            $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+                let opt = '<option value="">Select Program</option>';
+                res.forEach(x => {
+                    opt += `<option value="${x.programId}">${x.programName}</option>`;
+                });
+                $('#programId').html(opt);
+            });
+        }
+
+        $("#programId").on("change", function () {
+            let programId = this.value;
+            $("#courseId").html('<option value="">Select Course</option>');
+            $("#semester").html('<option value="">Select Semester</option>');
+            $("#BatchId").html('<option value="">Select Batch</option>');
+            if (!programId) return;
+
+            fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+                .then(res => res.json())
+                .then(data => {
+                    let opt = '<option value="">Select Course</option>';
+                    data.forEach(item => {
+                        opt += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                    });
+                    $("#courseId").html(opt);
+                });
+        });
+
+        $("#courseId").on("change", function () {
+            let courseId = this.value;
+            $("#semester").html('<option value="">Select Semester</option>');
+            $("#BatchId").html('<option value="">Select Batch</option>');
+            if (!courseId) return;
+
+            fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+                .then(res => res.json())
+                .then(data => {
+                    let opt = '<option value="">Select Semester</option>';
+                    data.forEach(item => {
+                        opt += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                    });
+                    $("#semester").html(opt);
+                });
+        });
+
+        $("#semester").on("change", function () {
+            let semId = this.value;
+            let courseId = $("#courseId").val();
+            $("#BatchId").html('<option value="">Select Batch</option>');
+            if (!semId) return;
+
+            $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+                let opt = '<option value="">Select Batch</option>';
+                data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+                $("#BatchId").html(opt);
+            });
+        });
+
+        /* ---------- helpers ---------- */
+
+        // JSON key ko case-insensitive dhoondhta hai ("DOB" -> "dob")
+        function val(item, key) {
+            if (!item) return '';
+            let v = item[key];
+            if (v === undefined) {
+                const lower = key.toLowerCase();
+                const found = Object.keys(item).find(k => k.toLowerCase() === lower);
+                v = found !== undefined ? item[found] : undefined;
+            }
+            return (v === null || v === undefined) ? '' : String(v);
+        }
+
+        function esc(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function toNum(s) {
+            const n = parseFloat(s);
+            return isNaN(n) ? '' : n;
+        }
+
+        function resultClass(r) {
+            const u = (r || '').toUpperCase();
+            if (u === 'PASS BY GRACE') return 'res-grace';
+            if (u === 'PASS') return 'res-pass';
+            if (u === 'FAIL') return 'res-fail';
+            return '';
+        }
+
+        function selText(id) {
+            const el = document.getElementById(id);
+            return el.value ? el.options[el.selectedIndex].text : '';
+        }
+
+        function setButtons(hasData) {
+            $("#btnPrint").prop("disabled", !hasData);
+            $("#btnExcel").prop("disabled", !hasData);
+        }
+
+        /* ---------- DataTable ---------- */
+        function initDataTable(rows, emptyMessage) {
+            if (dt) {
+                dt.clear().destroy();
+                $("#studentresulrsheetdata").empty();
+            }
+
+            dt = $("#resultTable").DataTable({
+                data: rows,
+                autoWidth: false,
+                pageLength: 25,
+                lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                order: [],                      // proc wala order (topper upar) hi rahe
+                language: {
+                    emptyTable: emptyMessage || "No data yet. Choose Session, Course, Semester and Batch, then select Search report.",
+                    zeroRecords: "No matching students found",
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ students",
+                    info: "Showing _START_ to _END_ of _TOTAL_ students",
+                    infoEmpty: "Showing 0 students",
+                    infoFiltered: "(filtered from _MAX_)"
+                },
+                columns: [
+                    { data: 'sno', className: 'ctr' },
+                    { data: 'enrollment', className: 'nowrap', render: renderText },
+                    { data: 'name', render: renderText },
+                    { data: 'father', render: renderText },
+                    { data: 'email', render: renderText },
+                    { data: 'dob', className: 'nowrap', render: renderText },
+                    { data: 'mobile', className: 'nowrap', render: renderText },
+                    { data: 'course', render: renderText },
+                    { data: 'semester', className: 'ctr', render: renderText },
+                    { data: 'totalMarks', className: 'num', type: 'num', render: renderNum },
+                    { data: 'obtained', className: 'num', type: 'num', render: renderNum },
+                    {
+                        data: 'percentage', className: 'num', type: 'num',
+                        render: function (d, type) {
+                            if (type === 'display') return d === '' ? '' : esc(d) + '%';
+                            return d === '' ? -1 : d;
+                        }
+                    },
+                    {
+                        data: 'result', className: 'ctr',
+                        render: function (d, type) {
+                            if (type === 'display') return `<span class="res ${resultClass(d)}">${esc(d)}</span>`;
+                            return d;
+                        }
+                    }
+                ]
+            });
+        }
+
+        function renderText(d, type) {
+            return type === 'display' ? esc(d) : d;
+        }
+
+        function renderNum(d, type) {
+            if (type === 'display') return esc(d);
+            return d === '' ? -1 : d;
+        }
+
+        function resetSheet(message) {
+            resultData = [];
+            $("#ExamnameId").text(message || 'Select filters and search to view the result sheet');
+            $("#examMeta").text('');
+            $("#totalCount").text(0);
+            $("#passCount").text(0);
+            $("#failCount").text(0);
+            initDataTable([], message);
+            setButtons(false);
+        }
+
+        /* ---------- search + bind ---------- */
+        async function loadResultsheetforUg() {
+            const sessionId = $("#sessionId").val();
+            const courseId  = $("#courseId").val();
+            const semester  = $("#semester").val();
+            const batch     = $("#BatchId").val();
+
+            if (!sessionId || !courseId || !semester) {
+                alert("Select Session, Course and Semester first.");
+                return;
+            }
+
+            const btn = $("#btnSearch");
+            btn.prop("disabled", true).text("Loading...");
+
+            try {
+                const url = ApiBaseUrl +
+                    `Exam/ResultSheetdata_ug?sessionId=${encodeURIComponent(sessionId)}` +
+                    `&courseId=${encodeURIComponent(courseId)}` +
+                    `&semester=${encodeURIComponent(semester)}` +
+                    `&Batch=${encodeURIComponent(batch)}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Server returned " + response.status);
+
+                const data = await response.json();
+
+                if (!data || data.length === 0) {
+                    resetSheet("No records found for the selected Session, Course, Semester and Batch.");
+                    return;
+                }
+
+                resultData = data;
+                sheetInfo = {
+                    examName: val(data[0], 'ExamName'),
+                    session:  selText('sessionId'),
+                    course:   val(data[0], 'CourseName') || selText('courseId'),
+                    semester: selText('semester') || val(data[0], 'Semester'),
+                    batch:    batch
+                };
+
+                bindTable(data);
+            }
+            catch (err) {
+                console.error(err);
+                resetSheet("Could not load the result sheet. Check the API and try again.");
+            }
+            finally {
+                btn.prop("disabled", false).text("Search report");
+            }
+        }
+
+        function bindTable(data) {
+            let pass = 0, fail = 0;
+
+            const rows = data.map((item, i) => {
+                const result = val(item, 'Result');
+                const u = result.toUpperCase();
+                if (u === 'PASS' || u === 'PASS BY GRACE') pass++;
+                else if (u === 'FAIL') fail++;
+
+                return {
+                    idx:        i,                         // resultData ka index (Excel ke liye)
+                    sno:        i + 1,
+                    enrollment: val(item, 'EnrollmentNumber'),
+                    name:       val(item, 'StudentName'),
+                    father:     val(item, 'FatherName'),
+                    email:      val(item, 'Email'),
+                    dob:        val(item, 'DOB'),
+                    mobile:     val(item, 'MobileNo'),
+                    course:     val(item, 'CourseName'),
+                    semester:   val(item, 'Semester'),
+                    totalMarks: toNum(val(item, 'TotalMarks')),
+                    obtained:   toNum(val(item, 'TotalObtainedMarks')),
+                    percentage: toNum(val(item, 'Percentage')),
+                    result:     result
+                };
+            });
+
+            initDataTable(rows);
+
+            // Header: exam name (left) + count (right)
+            $("#ExamnameId").text(sheetInfo.examName || 'Result Sheet');
+            const meta = [];
+            if (sheetInfo.session)  meta.push('Session: ' + sheetInfo.session);
+            if (sheetInfo.course)   meta.push('Course: ' + sheetInfo.course);
+            if (sheetInfo.semester) meta.push('Semester: ' + sheetInfo.semester);
+            if (sheetInfo.batch)    meta.push('Batch: ' + sheetInfo.batch);
+            $("#examMeta").text(meta.join('   |   '));
+
+            $("#totalCount").text(data.length);
+            $("#passCount").text(pass);
+            $("#failCount").text(fail);
+
+            setButtons(true);
+        }
+
+        /* ---------- print ---------- */
+        // Print mein saare (search ke baad bache hue) students aayenge, sirf current page nahi
+        function printSheet() {
+            if (!dt || !resultData.length) return;
+
+            const oldLen = dt.page.len();
+            dt.page.len(-1).draw(false);
+
+            setTimeout(function () {
+                window.print();
+                dt.page.len(oldLen).draw(false);
+            }, 100);
+        }
+
+        /* ---------- excel ---------- */
+        // DataTable mein jo search/sort laga hai, wahi rows Excel mein jaayengi
+        function downloadExcel() {
+            if (!dt || !resultData.length) return;
+
+            const rows = dt.rows({ search: 'applied', order: 'applied' }).data().toArray();
+            if (!rows.length) {
+                alert("No students to export for the current search.");
+                return;
+            }
+
+            const headers = ['S.No.', 'Enrollment Number', 'Student Name', 'Father Name', 'Email',
+                             'DOB', 'Mobile No.', 'Course', 'Semester', 'Total Marks',
+                             'Marks Obtained', 'Percentage', 'Result'];
+
+            const aoa = [
+                ['National Institute of Ayurveda - Result Sheet'],
+                [sheetInfo.examName],
+                [$("#examMeta").text()],
+                [`Total students: ${resultData.length}    Pass: ${$("#passCount").text()}    Fail: ${$("#failCount").text()}`],
+                [],
+                headers
+            ];
+
+            rows.forEach(r => {
+                aoa.push([
+                    r.sno,
+                    r.enrollment,        // text - leading zero nahi katega
+                    r.name,
+                    r.father,
+                    r.email,
+                    r.dob,
+                    r.mobile,            // text
+                    r.course,
+                    r.semester,
+                    r.totalMarks,
+                    r.obtained,
+                    r.percentage,
+                    r.result
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+            const lastCol = headers.length - 1;
+            ws['!merges'] = [0, 1, 2, 3].map(r => ({ s: { r: r, c: 0 }, e: { r: r, c: lastCol } }));
+
+            ws['!cols'] = [
+                { wch: 6 }, { wch: 18 }, { wch: 26 }, { wch: 26 }, { wch: 28 },
+                { wch: 12 }, { wch: 14 }, { wch: 22 }, { wch: 10 }, { wch: 11 },
+                { wch: 14 }, { wch: 11 }, { wch: 15 }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Result Sheet');
+
+            const safe = s => (s || '').replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+            const fileName = ['ResultSheet', safe(sheetInfo.course), safe(sheetInfo.semester), safe(sheetInfo.batch)]
+                                .filter(Boolean).join('_') + '.xlsx';
+
+            XLSX.writeFile(wb, fileName);
+        }
+
+
+    </script>
+</body>
+</html>
