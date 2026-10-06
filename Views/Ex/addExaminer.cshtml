@@ -398,11 +398,16 @@
                         </label>
                         <div class="input-icon-wrap">
                             <i class="fa fa-id-badge field-icon"></i>
-                            <input type="text"
-                                   class="form-ctrl"
-                                   id="role"
-                                   value="examiner"
-                                   readonly />
+
+                            <div class="input-icon-wrap">
+                                <i class="fa fa-calendar field-icon"></i>
+                                <select class="form-sel" id="role">
+                                    <option value="">Select Examiner</option>
+                                    <option value="intenalexaminer">Intenalexaminer</option>
+                                    <option value="extenalexaminer">Extenalexaminer</option>
+                                </select>
+                            </div>
+                           
                         </div>
                     </div>
 
