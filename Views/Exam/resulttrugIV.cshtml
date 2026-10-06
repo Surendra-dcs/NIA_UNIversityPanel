@@ -2,461 +2,694 @@
     ViewData["Title"] = "Result";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
 }
+@inject IConfiguration Configuration
 
-
-<link href="~/css/TrStyleSheetugIII.css" rel="stylesheet" />
-<script src="~/js/PrinttrugIII.js"></script>
-<style>
-    .search-panel {
-        background: #fff;
-        border: 1px solid #dcdcdc;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.08);
+<style id="ledgerStyle">
+    @@page {
+        size: A4 landscape;
+        margin: 5mm;
     }
 
-    .search-title {
-        font-size: 20px;
-        font-weight: 600;
-        color: #0d3b66;
-        margin-bottom: 15px;
+    * {
+        box-sizing: border-box;
     }
 
-    .search-row {
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 8px;
+        color: #000;
+        background-color: #f1f5f9;
+        margin: 0;
+        padding: 12px 10px;
+    }
+
+    /* ================= Search bar (print mein nahi aayega) ================= */
+    .filter-bar {
+        max-width: 1380px;
+        margin: 0 auto 10px auto;
         display: flex;
         flex-wrap: wrap;
-        gap: 15px;
-        align-items: end;
+        gap: 10px;
+        align-items: flex-end;
+        background: #fff;
+        border: 1px solid #d6dde6;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-family: Arial, sans-serif;
+        font-size: 13px;
     }
 
-    .search-group {
-        min-width: 220px;
-        flex: 1;
-    }
-
-        .search-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-
-        .search-group select {
-            width: 100%;
-            height: 38px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 0 10px;
-        }
-
-    .btn-group {
-        flex: 0;
-    }
-
-        .btn-group button {
-            height: 38px;
-            padding: 0 25px;
-            border: none;
-            background: #0d6efd;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-            .btn-group button:hover {
-                background: #0b5ed7;
-            }
-
-    .download-btn:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    .search-title {
+    .filter-group {
         display: flex;
-        justify-content: space-between;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1 1 160px;
+        min-width: 150px;
+    }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .filter-group select {
+            height: 34px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 0 6px;
+            font-size: 13px;
+            background: #fff;
+        }
+
+    .filter-actions {
+        display: flex;
+        gap: 8px;
         align-items: center;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 10px;
+    .btn-print,
+    .btn-search {
+        color: #ffffff;
+        padding: 8px 18px;
+        border-radius: 5px;
+        border: none;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
 
-    .print-page {
-        position: relative;
-        page-break-after: always;
-        min-height: 190mm;
+    .btn-search {
+        background-color: #0f766e;
     }
 
-        .print-page:last-child {
-            page-break-after: auto;
-        }
-
-    .s1 {
-        padding: 5px;
+    .btn-print {
+        background-color: #2563eb;
     }
 
-</style>
-
-<style>
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        padding: 20px;
-        background: #f5f5f5;
-        overflow-x: hidden; /* *** FIX: backstop so the page itself can
-                never scroll sideways - only the ledger's own wrapper div
-                (overflow-x:auto) can. Without this, if anything inside ever
-                pushes wider than the viewport again, the whole page (footer
-                included) would scroll instead of just the table area. */
+    .btn-search:hover {
+        background-color: #115e59;
     }
 
-    table.ledger {
-        border-collapse: collapse;
-        width: 100%;
-        background: #fff;
-        font-size: 12px;
+    .btn-print:hover {
+        background-color: #1d4ed8;
     }
 
-        table.ledger th, table.ledger td {
-            border: 1px solid #000;
-            padding: 3px 4px;
-            text-align: center;
-            vertical-align: middle;
-        }
-
-        table.ledger thead th {
-            background: #fff;
-            font-weight: bold;
-        }
-
-    .group-head {
-        font-size: 12px;
+    .btn-print:disabled,
+    .btn-search:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
-    .subject-head {
-        min-width: 140px;
-    }
-
-    .roll-head {
-        min-width: 150px;
-        text-align: left;
-    }
-
-    .vertical {
+    .candidate-count {
+        font-weight: bold;
+        color: #0f172a;
         white-space: nowrap;
     }
 
-    .vertical-col {
-        writing-mode: vertical-rl;
-        transform: rotate(180deg);
-        padding: 6px 2px;
-        height: 130px;
+    /* ================= Sheet ================= */
+    .container {
+        width: 100%;
+        max-width: 1380px;
+        margin: 0 auto;
+        border: 2px solid #000;
+        padding: 8px 10px 10px 10px;
+        background-color: #ffffff;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-        .vertical-col.tall {
-            height: 232px;
+    .page-header {
+        position: relative;
+        margin-bottom: 4px;
+        min-height: 88px;
+    }
+
+    .logo-box {
+        position: absolute;
+        left: 10px;
+        top: 2px;
+        width: 75px;
+        height: 75px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .logo-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
         }
 
-    td.data-cell {
-        height: 34px;
-        line-height: 20px;
+    .logo-placeholder-text {
+        width: 100%;
+        height: 100%;
+        border: 1px dashed #999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 8px;
+        color: #777;
+        background: #fafafa;
+        line-height: 1.2;
+        padding: 2px;
     }
 
-    .border-none {
-        border: none !important;
+    .header-center-text {
+        text-align: center;
+        line-height: 1.25;
+        padding: 0 90px;
     }
 
-    .k {
-        border: none !important;
+    .header-inst {
+        font-size: 12.5px;
+        font-weight: bold;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
     }
 
-    .no-right-border {
-        border-right: none !important;
+    .header-normal {
+        font-size: 9.5px;
     }
 
-    .no-bottom-border {
-        border-bottom: none !important;
+    .header-title-main {
+        font-size: 10.5px;
+        font-weight: bold;
+        margin-top: 3px;
+        min-height: 13px;
     }
 
-    .kk {
-        border-left: none !important;
-        border-right: none !important;
-        padding: 4px 10px !important;
+    .header-title-sub {
+        font-size: 10.5px;
+        font-weight: bold;
+        margin-top: 1px;
     }
 
-
-    .kkk {
-        border-left: none !important;
-        border-bottom: none !important;
+    .meta-date-row {
+        display: flex;
+        justify-content: flex-end;
+        font-weight: bold;
+        font-size: 9px;
+        margin-bottom: 3px;
+        padding-right: 2px;
     }
 
-    .kkkk {
-        border-left: none !important;
-        border-bottom: none !important;
-        border-right: none !important;
+    /* ================= Main table ================= */
+    table.ledger {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        font-size: 8px;
+        line-height: 1.15;
+        table-layout: fixed;
+    }
+
+        table.ledger th,
+        table.ledger td {
+            padding: 2px 1px;
+            overflow: hidden;
+            text-overflow: clip;
+        }
+
+        table.ledger thead th {
+            border: none;
+            font-weight: bold;
+            vertical-align: middle;
+            background-color: #fff;
+            padding: 1.5px 0.5px;
+        }
+
+        table.ledger thead tr.header-top-border th {
+            border-top: 1.5px solid #000 !important;
+        }
+
+        table.ledger thead tr:last-child th,
+        table.ledger thead tr th[rowspan="4"],
+        table.ledger thead tr th[rowspan="3"] {
+            border-bottom: 1.5px solid #000 !important;
+        }
+
+    .border-left-major {
+        border-left: 1.5px solid #000 !important;
+    }
+
+    .border-right-major {
+        border-right: 1.5px solid #000 !important;
+    }
+
+    table.ledger tbody td {
+        border: none;
+        padding: 1.5px 1px;
+    }
+
+    /* Har candidate ka alag tbody - upar line, aur page ke beech mein na kate */
+    tbody.candidate {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+        tbody.candidate tr:first-child td {
+            border-top: 1.5px solid #000 !important;
+        }
+
+        /* Aakhri candidate ke neeche line */
+        tbody.candidate:last-of-type tr:last-child td,
+        tbody.candidate:last-of-type td[rowspan] {
+            border-bottom: 1.5px solid #000 !important;
+        }
+
+    .student-info-cell {
+        padding: 4px 4px !important;
+        line-height: 1.35;
+        font-size: 7.5px;
+        word-break: break-word;
+    }
+
+    .student-roll {
+        font-weight: bold;
+        font-size: 8px;
+        margin-bottom: 2px;
+    }
+
+    .student-enroll {
+        font-size: 7.5px;
+    }
+
+    .student-name {
+        font-size: 7.5px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .student-father {
+        font-size: 7.5px;
+        text-transform: uppercase;
+        color: #222;
+    }
+
+    .vertical-text,
+    .vertical-header-text,
+    .vertical-multi-line {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .vertical-text {
+        white-space: nowrap;
+        line-height: 1.1;
+    }
+
+    .vertical-header-text {
+        white-space: nowrap;
+        font-size: 7.5px;
+        font-weight: bold;
+        line-height: 1.1;
+        letter-spacing: 0.2px;
+    }
+
+    .vertical-multi-line {
+        white-space: normal;
+        font-size: 7px;
+        font-weight: bold;
+        line-height: 1.15;
+        letter-spacing: 0.1px;
+    }
+
+    .align-left {
+        text-align: left;
+    }
+
+    .font-bold {
+        font-weight: bold;
+    }
+
+    .v-top {
+        vertical-align: top;
+    }
+
+    .v-middle {
+        vertical-align: middle;
+    }
+
+    .v-bottom {
+        vertical-align: bottom;
+    }
+
+    td.subject-name {
+        text-align: left;
+        padding-left: 3px !important;
+        word-break: break-word;
+    }
+
+    .result-extra {
+        display: block;
+        font-weight: normal;
+        font-size: 6.5px;
+        margin-top: 2px;
+        word-break: break-word;
+    }
+
+    /* Grand Total + Result - sirf value, bade akshar */
+    td.grand-cell,
+    td.result-cell {
+        font-size: 10px;
+        font-weight: normal;
+        color: #000;
+    }
+
+    /* Fail / grace subject highlight - screen aur print dono mein */
+    tr.sub-fail td.sc {
+        background: #ffe1e1 !important;
+    }
+
+    tr.sub-grace td.sc {
+        background: #fff3b0 !important;
+    }
+
+    /* Print mein bhi background color chhape (browser default mein hata deta hai) */
+    html, body, table.ledger, table.ledger td, table.ledger th {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    .empty-row td {
+        padding: 18px !important;
+        font-size: 11px;
+        color: #64748b;
+        border-top: 1.5px solid #000 !important;
+        border-bottom: 1.5px solid #000 !important;
+    }
+
+    .notes-section {
+        margin-top: 8px;
+        font-size: 8px;
+        line-height: 1.35;
+    }
+
+    .notes-title {
+        font-weight: bold;
+        text-decoration: underline;
+        margin-bottom: 2px;
+    }
+
+    .footer-signatures {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 32px;
+        font-weight: bold;
+        font-size: 8.5px;
+        text-align: center;
+        padding: 0 10px;
+        break-inside: avoid;
+    }
+
+        .footer-signatures > div {
+            flex: 1;
+        }
+
+    /* ================= Print ================= */
+    @@media print {
+        .filter-bar,
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            background: #fff;
+        }
+
+        .container {
+            max-width: 100% !important;
+            border: 2px solid #000 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        /* Har page par table header dobara */
+        table.ledger thead {
+            display: table-header-group;
+        }
+    }
+</style>
+
+<!-- ================= FILTERS (print mein nahi) ================= -->
+<div class="filter-bar no-print">
+    <div class="filter-group">
+        <label for="sessionId">Session</label>
+        <select id="sessionId"><option value="">Select Session</option></select>
+    </div>
+    <div class="filter-group">
+        <label for="programId">Program</label>
+        <select id="programId">
+            <option value="">Select Program</option>
+            <option value="1">Under Graduate (UG)</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="courseId">Course</label>
+        <select id="courseId"><option value="">Select Course</option></select>
+    </div>
+    <div class="filter-group">
+        <label for="semester">Semester</label>
+        <select id="semester"><option value="">Select Semester</option></select>
+    </div>
+    <div class="filter-group">
+        <label for="BatchId">Batch</label>
+        <select id="BatchId"><option value="">Select Batch</option></select>
+    </div>
+    <div class="filter-actions">
+        <button type="button" class="btn-search" id="btnSearch" onclick="loadResultforBamsIV()">🔍 Search</button>
+        <button type="button" class="btn-print" id="btnPrint" onclick="printMarksheet()" disabled>🖨️ Print</button>
+        <span class="candidate-count" id="candidateCount"></span>
+    </div>
+</div>
+
+<!-- ================= SHEET ================= -->
+<div class="container" id="marksheet-container">
+
+    <div class="page-header">
+        <div class="logo-box" id="logoContainer">
+            <img id="universityLogo" src="~/Logo/nia_logo.png" alt="University Logo" onerror="handleLogoError(this)">
+            <div id="logoPlaceholderText" class="logo-placeholder-text" style="display: none;">
+                <span>Logo Area<br><small>(logo.png)</small></span>
+            </div>
+        </div>
+
+        <div class="header-center-text">
+            <div class="header-inst">NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</div>
+            <div class="header-normal">Deemed to be University</div>
+            <div class="header-normal">(Ministry of AYUSH, Govt. of India)</div>
+            <div class="header-normal">Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
+            <div class="header-title-main" id="ExamnameId"></div>
+            <div class="header-title-sub">TABULATION REGISTER/LEDGER</div>
+        </div>
+    </div>
+
+    <div class="meta-date-row">
+        Date of Issue: <span id="issueDate">&nbsp;</span>
+    </div>
+
+    <table class="ledger">
+        <colgroup>
+            <col style="width: 18px;">  <!-- 1: S.No -->
+            <col style="width: 100px;"> <!-- 2: Student Details -->
+            <col style="width: 16px;">  <!-- 3: Attempt -->
+            <col style="width: 175px;"> <!-- 4: Subject Name -->
+            <col style="width: 32px;">  <!-- 5: Unique Code First -->
+            <col style="width: 32px;">  <!-- 6: Unique Code Second -->
+            <col style="width: 18px;">  <!-- 7: MS Theory 1 EXT -->
+            <col style="width: 15px;">  <!-- 8: MS Theory 1 IA -->
+            <col style="width: 18px;">  <!-- 9: MS Theory 2 EXT -->
+            <col style="width: 15px;">  <!-- 10: MS Theory 2 IA -->
+            <col style="width: 18px;">  <!-- 11: MS Practical EXT -->
+            <col style="width: 15px;">  <!-- 12: MS Practical IA -->
+            <col style="width: 22px;">  <!-- 13: MS Total -->
+            <col style="width: 18px;">  <!-- 14: Obt Theory 1 EXT -->
+            <col style="width: 15px;">  <!-- 15: Obt Theory 1 IA -->
+            <col style="width: 18px;">  <!-- 16: Obt Theory 2 EXT -->
+            <col style="width: 15px;">  <!-- 17: Obt Theory 2 IA -->
+            <col style="width: 22px;">  <!-- 18: Obt Theory Total -->
+            <col style="width: 18px;">  <!-- 19: Obt Pract EXT -->
+            <col style="width: 15px;">  <!-- 20: Obt Pract IA -->
+            <col style="width: 20px;">  <!-- 21: Obt Pract Total -->
+            <col style="width: 24px;">  <!-- 22: Subject Total -->
+            <col style="width: 20px;">  <!-- 23: Grace -->
+            <col style="width: 22px;">  <!-- 24: Required to appear -->
+            <col style="width: 24px;">  <!-- 25: Distinction / First Class -->
+            <col style="width: 22px;">  <!-- 26: Grand Total -->
+            <col style="width: 24px;">  <!-- 27: Result -->
+        </colgroup>
+
+        <thead>
+            <tr class="header-top-border">
+                <th rowspan="4" class="border-left-major">S.<br>No.</th>
+                <th rowspan="4" class="border-left-major border-right-major">
+                    Roll NO<br><br>
+                    Enrollment No.<br>
+                    Candidate Name<br>
+                    Father's Name
+                </th>
+                <th rowspan="4" class="border-right-major">
+                    <div class="vertical-header-text">Attempt</div>
+                </th>
+                <th rowspan="4">Name of Subjects<br>in which appearing</th>
+                <th colspan="2">Unique Code</th>
+                <th colspan="7">Marks Scheme</th>
+                <th colspan="9">OBTAINED MARKS</th>
+                <th rowspan="4">Grace</th>
+                <th rowspan="4">
+                    <div class="vertical-multi-line">Required to appear at the<br>Attempt Examinations</div>
+                </th>
+                <th rowspan="4">
+                    <div class="vertical-header-text">Distinction - D / First Class - I</div>
+                </th>
+                <th rowspan="4" class="border-left-major border-right-major">Grand<br>Total</th>
+                <th rowspan="4" class="border-right-major">Result</th>
+            </tr>
+            <tr>
+                <th rowspan="3" class="v-bottom">First</th>
+                <th rowspan="3" class="v-bottom">Second</th>
+                <th colspan="4">Theory</th>
+                <th colspan="2" rowspan="2">Practical</th>
+                <th rowspan="3">Total</th>
+                <th colspan="5">Theory</th>
+                <th colspan="3" rowspan="2">Practical</th>
+                <th rowspan="3">Subject<br>Total</th>
+            </tr>
+            <tr>
+                <th colspan="2">First</th>
+                <th colspan="2">Second</th>
+                <th colspan="2">First</th>
+                <th colspan="2">Second</th>
+                <th rowspan="2" class="v-bottom">Total</th>
+            </tr>
+            <tr>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>EXT</th>
+                <th>IA</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+
+        <!-- Data yahan bind hota hai (har candidate ka ek tbody) -->
+        <tbody id="resultBody2">
+            <tr class="empty-row"><td colspan="27">Select Session, Course, Semester and Batch, then click Search.</td></tr>
+        </tbody>
+    </table>
+
+    <div class="notes-section">
+        <div class="notes-title">Note</div>
+        <div>1. For candidate to pass, he/she shall require to obtain a minimum of 50% marks in each of Theory and Practical examination.</div>
+        <div>2. The candidate securing 65% marks or above in a subject shall be declared to have obtained First Class (Denoted by I) in that Subject.</div>
+        <div>3. The candidate securing 75% marks or above in a subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</div>
+        <div>4. A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</div>
+    </div>
+
+    <div class="footer-signatures">
+        <div>Tabulator</div>
+        <div>DCOE</div>
+        <div>Controller of Examinations</div>
+        <div>Registrar</div>
+        <div>Vice Chancellor</div>
+    </div>
+</div>
+
+
+<script>
+    // Layout mein ApiBaseUrl pehle se ho to wahi, warna appsettings se
+    var ApiBaseUrl = window.ApiBaseUrl || "@Configuration["ApiSettings:BaseUrl"]";
+
+    function handleLogoError(img) {
+        img.style.display = 'none';
+        const placeholder = document.getElementById('logoPlaceholderText');
+        if (placeholder) placeholder.style.display = 'flex';
     }
 
     /* ================================================================
-           *** FIX: Script ID I / II / III specifically ***
-           .kk (used above) force-removes left/right borders on every data
-           column, including these three - that's why scriptIdI/II/III run
-           together with no visible gap between them ("203517" + "203400"
-           reading as one number). Scoped ONLY to Script ID as asked, using
-           an inline !important style on those three <td>s below rather than
-           editing .kk itself, so no other column's styling changes. Inline
-           !important beats .kk's !important regardless of what TrStyleSheet.css
-           (which I can't see) might also be doing to these cells.
-           ================================================================ */
-</style>
+       PRINT
+       Sirf marksheet (container) ko ek alag chhupe iframe mein daal kar
+       print karta hai - layout ka header, menu, "Admin" button, filters
+       kuch bhi print mein nahi aata.
+       ================================================================ */
+    function printMarksheet() {
+        const sheet = document.getElementById('marksheet-container');
+        if (!sheet) return;
 
+        const old = document.getElementById('printFrame');
+        if (old) old.remove();
 
+        // Khaali chhupa iframe (is code mein koi HTML tag string nahi hai,
+        // warna Razor / browser script ko beech mein tod deta hai)
+        const iframe = document.createElement('iframe');
+        iframe.id = 'printFrame';
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+        document.body.appendChild(iframe);
 
-<div class="search-panel">
+        const win = iframe.contentWindow;
+        const doc = win.document;
+        doc.title = 'Tabulation Register';
 
-    <div class="search-title">
-        🔍 Tabulation Register Search
-        <div class="action-buttons">
-            <button type="button"
-                    onclick="printTable()"
-                    style="width:98px; height:38px; font-weight:800; background:#3b8508; color:white; cursor:pointer;">
-                Print
-            </button>
-        </div>
-    </div>
+        // Page ki styling copy
+        const st1 = doc.createElement('style');
+        st1.textContent = document.getElementById('ledgerStyle').textContent;
+        doc.head.appendChild(st1);
 
-    <div class="search-row">
+        const st2 = doc.createElement('style');
+        st2.textContent =
+            'body{background:#fff;padding:0;margin:0;}' +
+            '.container{max-width:100%!important;box-shadow:none!important;margin:0!important;}';
+        doc.head.appendChild(st2);
 
-        <div class="search-group">
-            <label>Session</label>
-            <select id="sessionId">
-                <option value="">Select Session</option>
-            </select>
-        </div>
+        // Sirf marksheet copy; logo ka poora URL
+        const clone = doc.importNode(sheet, true);
+        const srcImgs = sheet.querySelectorAll('img');
+        clone.querySelectorAll('img').forEach((img, i) => {
+            if (srcImgs[i]) img.src = srcImgs[i].src;
+        });
+        doc.body.appendChild(clone);
 
-        <div class="search-group">
-            <label>Program</label>
-            <select id="programId">
-                <option value="">Select Program</option>
-                <option value="1">Under Graduate (UG)</option>
-            </select>
-        </div>
+        let printed = false;
+        const go = () => {
+            if (printed) return;
+            printed = true;
+            win.focus();
+            win.print();
+        };
 
-        <div class="search-group">
-            <label>Course</label>
-            <select id="courseId">
-                <option value="">Select Course</option>
-            </select>
-        </div>
+        // Logo load hone ka wait (max 1.5 sec)
+        const logo = doc.querySelector('img');
+        if (logo && !logo.complete) {
+            logo.onload = go;
+            logo.onerror = go;
+            setTimeout(go, 1500);
+        } else {
+            setTimeout(go, 200);
+        }
+    }
 
-        <div class="search-group">
-            <label>Semester</label>
-            <select id="semester">
-                <option value="">Select Semester</option>
-            </select>
-        </div>
-
-        <div class="search-group">
-            <label>Batch </label>
-            <select id="BatchId">
-                <option value="">Select Batch</option>
-            </select>
-        </div>
-
-        <div class="search-group btn-group">
-            <button type="button" onclick="loadResultforBamsIV()">
-                Search Report
-            </button>
-        </div>
-
-    </div>
-</div>
-
-
-<div class="page" id="ledgerPage">
-    <div class="top">
-        <div class="logo">
-            <img src="~/Logo/nia_logo.png" />
-        </div>
-        <div class="heading">
-            <h2>NATIONAL INSTITUTE OF AYURVEDA, JAIPUR</h2>
-            <p>Deemed to be University</p>
-            <p>(Ministry of AYUSH, Govt. of India)</p>
-            <p>Jorawar Singh Gate, Amer Road, Jaipur-302002</p>
-            <h4>
-                <span id="ExamnameId"></span>
-            </h4>
-            <h3>TABULATION REGISTER/LEDGER</h3>
-        </div>
-
-        <div class="page-no">Page: 1</div>
-    </div>
-
-    <div class="issue-date">Date of Issue : 03-09-2026</div>
-
-    <!-- ================================================================
-         BAMS IV LAYOUT (38 columns)
-         - Theory III hata diya (BAMS IV me nahi hota)
-         - Theory I / Theory II ke saath unka IA (10%) alag column
-         - Practical/Viva + Practical IA (marksheet jaisa)
-         ================================================================ -->
-    <div style="display:block; width:100%; max-width:100%; overflow-x:auto;">
-        <table class="ledger" style="min-width:1810px;">
-            <colgroup>
-                <col style="width:35px">   <!-- 1  S.No -->
-                <col style="width:140px">  <!-- 2  Roll/Enroll/Name/Father -->
-                <col style="width:35px">   <!-- 3  Attempt -->
-                <col style="width:250px">  <!-- 4  Subject -->
-                <col style="width:80px">   <!-- 5  Script ID I -->
-                <col style="width:80px">   <!-- 6  Script ID II -->
-
-                <col style="width:34px">   <!-- 7  MS Theory I -->
-                <col style="width:34px">   <!-- 8  MS Theory I IA -->
-                <col style="width:34px">   <!-- 9  MS Theory II -->
-                <col style="width:34px">   <!-- 10 MS Theory II IA -->
-                <col style="width:34px">   <!-- 11 MS Prac/Viva -->
-                <col style="width:34px">   <!-- 12 MS Prac IA -->
-                <col style="width:34px">   <!-- 13 MS Total -->
-                <col style="width:34px">   <!-- 14 MS Min -->
-
-                <col style="width:28px">   <!-- 15 Th I Eval 1 -->
-                <col style="width:28px">   <!-- 16 Th I Eval 2 -->
-                <col style="width:38px">   <!-- 17 Th I Diff -->
-                <col style="width:28px">   <!-- 18 Th I Eval 3 -->
-                <col style="width:38px">   <!-- 19 Th I Avg -->
-
-                <col style="width:28px">   <!-- 20 Th II Eval 1 -->
-                <col style="width:28px">   <!-- 21 Th II Eval 2 -->
-                <col style="width:38px">   <!-- 22 Th II Diff -->
-                <col style="width:28px">   <!-- 23 Th II Eval 3 -->
-                <col style="width:38px">   <!-- 24 Th II Avg -->
-
-                <col style="width:34px">   <!-- 25 Obt Theory I -->
-                <col style="width:34px">   <!-- 26 Obt Theory I IA -->
-                <col style="width:34px">   <!-- 27 Obt Theory II -->
-                <col style="width:34px">   <!-- 28 Obt Theory II IA -->
-                <col style="width:38px">   <!-- 29 Obt Theory Total -->
-                <col style="width:36px">   <!-- 30 Obt Prac/Viva -->
-                <col style="width:34px">   <!-- 31 Obt Prac IA -->
-                <col style="width:38px">   <!-- 32 Obt Practical Total -->
-                <col style="width:40px">   <!-- 33 Subject Total -->
-                <col style="width:45px">   <!-- 34 Grace -->
-
-                <col style="width:36px">   <!-- 35 Required to Appear -->
-                <col style="width:32px">   <!-- 36 Distinction -->
-                <col style="width:70px">   <!-- 37 Grand Total -->
-                <col style="width:90px">   <!-- 38 Result -->
-            </colgroup>
-            <thead>
-                <tr>
-                    <th rowspan="3">S.<br>No.</th>
-                    <th rowspan="3" class="roll-head">
-                        Roll NO<br>Enrollment No.<br>Candidate Name<br>Father`s Name
-                    </th>
-                    <th rowspan="3" class="vertical vertical-col">Attempt</th>
-                    <th rowspan="3" class="subject-head">
-                        Name of Subjects<br><small>in which appearing</small>
-                    </th>
-
-                    <th colspan="2" class="group-head no-bottom-border">Unique Code</th>
-                    <th colspan="8" class="group-head no-bottom-border">Marks Scheme</th>
-                    <th colspan="5" class="group-head no-bottom-border">Theory I</th>
-                    <th colspan="5" class="group-head no-bottom-border">Theory II</th>
-                    <th colspan="10" class="group-head no-bottom-border">OBTAINED MARKS</th>
-
-                    <th rowspan="3" class="vertical vertical-col tall kkkk">
-                        Required to appear at the<br>Attempt Examinations
-                    </th>
-                    <th rowspan="3" class="vertical vertical-col kkk">
-                        Distinction - D / First Class - I
-                    </th>
-                    <th rowspan="3">Grand<br>Total</th>
-                    <th rowspan="3">Result</th>
-                </tr>
-
-                <tr>
-                    <!-- Unique Code -->
-                    <th rowspan="2" class="k" style="border-left:1px solid #000 !important; border-right:1px solid #000 !important;">I</th>
-                    <th rowspan="2" class="k" style="border-left:1px solid #000 !important; border-right:1px solid #000 !important;">II</th>
-
-                    <!-- Marks Scheme -->
-                    <th colspan="4" class="k">Theory</th>
-                    <th colspan="2" class="k">Practical / Viva</th>
-                    <th rowspan="2" class="k">Total</th>
-                    <th rowspan="2" class="k">Min</th>
-
-                    <!-- Theory I evaluators -->
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator I</th>
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator II</th>
-                    <th class="vertical vertical-col k" rowspan="2">Difference between Evaluator<br> I &amp; II</th>
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator III</th>
-                    <th class="vertical vertical-col tall k" rowspan="2">Average of Two Higher marks<br> among three evaluator Theory I Total</th>
-
-                    <!-- Theory II evaluators -->
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator I</th>
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator II</th>
-                    <th class="vertical vertical-col k" rowspan="2">Difference between Evaluator<br> I &amp; II</th>
-                    <th class="vertical vertical-col k" rowspan="2">Marks of Evaluator III</th>
-                    <th class="vertical vertical-col tall k" rowspan="2">Average of Two Higher marks<br> among three evaluator Theory II Total</th>
-
-                    <!-- Obtained -->
-                    <th colspan="5" class="k">Theory</th>
-                    <th colspan="3" class="k">Practical / Viva</th>
-                    <th rowspan="2" class="k">Subject<br>Total</th>
-                    <th rowspan="2" class="k"><br /><br />Grace</th>
-                </tr>
-
-                <tr>
-                    <!-- Marks Scheme -> Theory -->
-                    <th class="k">I</th>
-                    <th class="k">IA</th>
-                    <th class="k">II</th>
-                    <th class="k">IA</th>
-                    <!-- Marks Scheme -> Practical -->
-                    <th class="k">Prac/<br>Viva</th>
-                    <th class="k">IA</th>
-
-                    <!-- Obtained -> Theory -->
-                    <th class="k">I</th>
-                    <th class="k">IA</th>
-                    <th class="k">II</th>
-                    <th class="k">IA</th>
-                    <th class="k">Total</th>
-                    <!-- Obtained -> Practical -->
-                    <th class="k">Prac/<br>Viva</th>
-                    <th class="k">IA</th>
-                    <th class="k">Total</th>
-                </tr>
-            </thead>
-
-            <tbody id="resultBody2"></tbody>
-        </table>
-    </div>
-
-    <div class="footer">
-        <div class="notes">
-            <b>Note.</b><br />
-            1. For candidate to pass, he/she shall require to obtain a minimum of
-            50% marks in each of Theory examination.<br />
-            2. The candidate securing 65% marks or above in a subject shall be
-            declared to have obtained First Class(Denoted by I) in that
-            Subject.<br />
-            3. The candidate securing 75% marks or above in a subject shall be
-            declared to have obtained distinction(Denoted by D)in that Subject.<br />
-            4. A candidate failing in the Theory part of a paper will be
-            considered fail in Theory.
-        </div>
-
-        <div class="sign">Tabulator</div>
-        <div class="sign1">DCOE</div>
-        <div class="sign">Controller of Examinations</div>
-        <div class="sign2">Registrar</div>
-        <div class="sign2">Vice Chancellor</div>
-    </div>
-</div>
-
-<script>
+    /* ================================================================
+       DROPDOWNS
+       ================================================================ */
     $(document).ready(function () {
         loadSession();
     });
@@ -471,51 +704,43 @@
         });
     }
 
-    function loadPrograms() {
-        $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
-            let opt = '<option value="">Select Program</option>';
-            res.forEach(x => {
-                opt += `<option value="${x.programId}">${x.programName}</option>`;
-            });
-            $('#programId').html(opt);
-        });
-    }
+    $("#programId").on("change", function () {
+        const programId = this.value;
+        $("#courseId").html('<option value="">Select Course</option>');
+        $("#semester").html('<option value="">Select Semester</option>');
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!programId) return;
 
-    document.getElementById("programId").addEventListener("change", function () {
-        let programId = this.value;
-        $("#courseId").val('');
-        $("#semester").val('');
         fetch(ApiBaseUrl + `Subject/courses/${programId}`)
             .then(res => res.json())
             .then(data => {
-                let dd = document.getElementById("courseId");
-                dd.innerHTML = '<option value="">Select Course</option>';
-                data.forEach(item => {
-                    dd.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
-                });
+                let opt = '<option value="">Select Course</option>';
+                data.forEach(item => opt += `<option value="${item.course_Id}">${item.course_Name}</option>`);
+                $("#courseId").html(opt);
             });
     });
 
-    document.getElementById("courseId").addEventListener("change", function () {
-        let courseId = this.value;
-        $("#semester").val('');
-        $("#BatchId").val('');
+    $("#courseId").on("change", function () {
+        const courseId = this.value;
+        $("#semester").html('<option value="">Select Semester</option>');
+        $("#BatchId").html('<option value="">Select Batch</option>');
+        if (!courseId) return;
+
         fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
             .then(res => res.json())
             .then(data => {
-                let dd = document.getElementById("semester");
-                dd.innerHTML = '<option value="">Select Semester</option>';
-                data.forEach(item => {
-                    dd.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
-                });
+                let opt = '<option value="">Select Semester</option>';
+                data.forEach(item => opt += `<option value="${item.semesterId}">${item.semesterName}</option>`);
+                $("#semester").html(opt);
             });
     });
 
     $("#semester").on("change", function () {
-        let semId = this.value;
-        let courseId = $("#courseId").val();
+        const semId = this.value;
+        const courseId = $("#courseId").val();
         $("#BatchId").html('<option value="">Select Batch</option>');
         if (!semId) return;
+
         $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
             let opt = '<option value="">Select Batch</option>';
             data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
@@ -528,7 +753,6 @@
        LOAD + BIND
        ================================================================ */
     async function loadResultforBamsIV() {
-
         const courseId  = $("#courseId").val();
         const semester  = $("#semester").val();
         const sessionId = $("#sessionId").val();
@@ -539,140 +763,185 @@
             return;
         }
 
-        $("#resultBody2").html('<tr><td colspan="38" style="text-align:center;padding:10px;">Loading...</td></tr>');
+        setEmpty('Loading...');
+        $("#btnSearch").prop("disabled", true);
+        $("#btnPrint").prop("disabled", true);
+        $("#candidateCount").text('');
 
         let data;
         try {
             const response = await fetch(
                 ApiBaseUrl +
-                `Result/GetTabulationRegisterResultReportforbamsIV?courseId=${courseId}&semester=${semester}` +
-                `&sessionId=${sessionId}&btcId=${encodeURIComponent(batchId || '')}`
+                `Result/GetTabulationRegisterResultReportforbamsIV?courseId=${encodeURIComponent(courseId)}` +
+                `&semester=${encodeURIComponent(semester)}` +
+                `&sessionId=${encodeURIComponent(sessionId)}` +
+                `&btcId=${encodeURIComponent(batchId || '')}`
             );
             if (!response.ok) throw new Error(response.status);
             data = await response.json();
         } catch (e) {
-            $("#resultBody2").html('');
-            alert("Report load nahi ho payi. Please try again.");
+            console.error(e);
+            setEmpty('Report load nahi ho payi. Please try again.');
+            $("#btnSearch").prop("disabled", false);
             return;
         }
+
+        $("#btnSearch").prop("disabled", false);
 
         if (!data || data.length === 0) {
             $("#ExamnameId").text('');
-            $("#resultBody2").html('');
-            alert("No records found for the selected Session, Course, Semester and Batch.");
+            setEmpty('No records found for the selected Session, Course, Semester and Batch.');
             return;
         }
 
-        $("#ExamnameId").text(data[0].examname || '');
+        bindLedger(data);
+    }
 
-        /* Student-wise group (order SP se aata hai: RollNumber, SubjectCode) */
+    function setEmpty(message) {
+        $("#resultBody2").replaceWith(
+            `<tbody id="resultBody2"><tr class="empty-row"><td colspan="27">${esc(message)}</td></tr></tbody>`);
+        $("tbody.candidate").remove();
+    }
+
+    function bindLedger(data) {
+        $("#ExamnameId").text(g(data[0], 'examname'));
+        $("#issueDate").html('&nbsp;');
+
+        /* Student-wise group (SP ka order: RollNumber, SubjectCode) */
         const grouped = {};
         const order = [];
         data.forEach(item => {
-            const key = item.rollNumber;
+            const key = String(g(item, 'rollNumber'));
             if (!grouped[key]) { grouped[key] = []; order.push(key); }
             grouped[key].push(item);
         });
 
         let html = '';
-        let sno = 1;
+        order.forEach((key, i) => { html += candidateBlock(grouped[key], i + 1); });
 
-        const scriptIdCellStyle = 'border-left:2px solid #000 !important; border-right:2px solid #000 !important; padding:4px 10px !important; white-space:nowrap !important;';
+        // Purana tbody hata kar har candidate ka alag tbody lagao
+        $("tbody.candidate").remove();
+        $("#resultBody2").replaceWith(`<tbody id="resultBody2" style="display:none"></tbody>` + html);
 
-        order.forEach(key => {
+        $("#candidateCount").text(`Total candidates: ${order.length}`);
+        console.log('API pehli row:', data[0]);
+        $("#btnPrint").prop("disabled", false);
+    }
 
-            const s = grouped[key];
-            const first = s[0];
+    /* Ek candidate = ek tbody; pehli row mein rowspan wale cells */
+    function candidateBlock(subjects, sno) {
+        const first = subjects[0];
+        const n = subjects.length;
 
-            html += `
-            <tr>
-                <td class="data-cell">${sno++}</td>
+        const result = String(g(first, 'result') || '');
 
-                <td>
-                    ${first.rollNumber || ''}
-                    <hr/>
-                    ${first.enrollmentNumber || ''}
-                    <hr/>
-                    ${first.firstName || ''}
-                    <hr/>
-                    ${first.fatherName || ''}
-                </td>
+        let rows = '';
+        subjects.forEach((x, idx) => {
+            rows += `<tr class="${subjectRowClass(x)}">`;
 
-                <td class="data-cell">${first.attempt || ''}</td>
+            if (idx === 0) {
+                rows += `
+                    <td rowspan="${n}" class="font-bold v-top border-left-major">${sno}</td>
+                    <td rowspan="${n}" class="align-left v-top border-left-major border-right-major student-info-cell">
+                        <div class="student-roll">${esc(g(first, 'rollNumber'))}</div>
+                        <div class="student-enroll">${esc(g(first, 'enrollmentNumber'))}</div>
+                        <div class="student-name">${esc(g(first, 'firstName'))}</div>
+                        <div class="student-father">${esc(g(first, 'fatherName'))}</div>
+                    </td>
+                    <td rowspan="${n}" class="v-middle border-right-major">
+                        <div class="vertical-text">${esc(ordinal(g(first, 'attempt')))}</div>
+                    </td>`;
+            }
 
-                <!-- Subject -->
-                <td class="data-cell kk" style="border:1px solid #000; padding:3px 4px; text-align:left;">
-                    ${cells(s, x => x.subjectName || '-')}
-                </td>
+            rows += subjectCells(x);
 
-                <!-- Unique Code -->
-                <td class="data-cell kk" style="${scriptIdCellStyle}">${cells(s, x => x.scriptIdI || '-')}</td>
-                <td class="data-cell kk" style="${scriptIdCellStyle}">${cells(s, x => x.scriptIdII || '-')}</td>
+            if (idx === 0) {
+                rows += `
+                    <td rowspan="${n}" class="v-middle border-left-major border-right-major grand-cell">${mark(g(first, 'grandTotal'))}</td>
+                    <td rowspan="${n}" class="v-middle border-right-major result-cell">${esc(result)}</td>`;
+            }
 
-                <!-- Marks Scheme (MAX) -->
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxTheoryI))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxTheoryI_IA))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxTheoryII))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxTheoryII_IA))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxPracticalViva))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMax(x.maxPracticalIA))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.maxMarks))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.minMarks))}</td>
-
-                <!-- Theory I evaluators -->
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'I', x.thearyIEvaluator1))}</td>
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'I', x.thearyIEvaluator2))}</td>
-                <td class="data-cell kk">${cells(s, x => evalDec(x, 'I', x.thearyIDifference12))}</td>
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'I', x.thearyIEvaluator3))}</td>
-                <td class="data-cell kk">${cells(s, x => evalDec(x, 'I', x.thearyIAverageOfTwoHigherMarks))}</td>
-
-                <!-- Theory II evaluators -->
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'II', x.thearyIIEvaluator1))}</td>
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'II', x.thearyIIEvaluator2))}</td>
-                <td class="data-cell kk">${cells(s, x => evalDec(x, 'II', x.thearyIIDifference12))}</td>
-                <td class="data-cell kk">${cells(s, x => evalMark(x, 'II', x.thearyIIEvaluator3))}</td>
-                <td class="data-cell kk">${cells(s, x => evalDec(x, 'II', x.thearyIIAverageOfTwoHigherMarks))}</td>
-
-                <!-- Obtained Theory -->
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.theoryI))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.theoryI_IA))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.theoryII))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.theoryII_IA))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.theoryTotal))}</td>
-
-                <!-- Obtained Practical -->
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.practicalViva))}</td>
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.practicalIA))}</td>
-                <td class="data-cell kk">${cells(s, x => hasPractical(x) ? fmtMark(x.practicalTotal) : '-')}</td>
-
-                <!-- Subject Total -->
-                <td class="data-cell kk">${cells(s, x => fmtMark(x.subjectTotal))}</td>
-
-                <!-- Grace -->
-                <td class="data-cell kk">${cells(s, x => x.remarks === 'G' ? `G-${x.subjectCode || ''}` : '&nbsp;')}</td>
-
-                <!-- Required To Appear (har subject ki line, khaali ho tab bhi - alignment ke liye) -->
-                <td class="data-cell kk">${cells(s, x => x.required_To_Appear || '&nbsp;')}</td>
-
-                <!-- Distinction D / First Class I -->
-                <td class="data-cell kk">${cells(s, x => (x.remarks === 'D' || x.remarks === 'I') ? x.remarks : '&nbsp;')}</td>
-
-                <!-- Grand Total -->
-                <td class="data-cell">
-                    ${fmtMark(first.grandTotal)}
-                    ${first.grandMaxMarks ? `<br><small>/ ${fmtMark(first.grandMaxMarks)}</small>` : ''}
-                </td>
-
-                <!-- Result -->
-                <td class="data-cell">
-                    <b>${first.result || ''}</b>
-                    ${first.graceMarksAwardedIn ? `<br><small>Grace: ${first.graceMarksAwardedIn}</small>` : ''}
-                    ${first.failedIn ? `<br><small>Failed in: ${first.failedIn}</small>` : ''}
-                </td>
-            </tr>`;
+            rows += `</tr>`;
         });
 
-        $("#resultBody2").html(html);
+        return `<tbody class="candidate">${rows}</tbody>`;
+    }
+
+    /* ================================================================
+       SUBJECT ROW  -  C# fields (JSON camelCase) se seedha binding
+         Marks Scheme : maxTheoryI, maxTheoryI_IA, maxTheoryII, maxTheoryII_IA,
+                        maxPracticalViva, maxPracticalIA, maxMarks
+         Obtained     : theoryI, theoryI_IA, theoryII, theoryII_IA, theoryTotal,
+                        practicalViva, practicalIA, practicalTotal, subjectTotal
+         Proc already bhejta hai: component nahi => '' , absent => 'AB', IA nahi mila => 'Ab'
+       ================================================================ */
+
+    /* Max: 0 / khaali => '-' */
+    function maxOf(x, key) {
+        const n = num(g(x, key));
+        return n > 0 ? String(Math.round(n)) : '-';
+    }
+
+    /* Obtained: component ka max 0 hai => '-' ; warna proc ki value (AB / Ab / number) */
+    function obtOf(x, key, maxKey) {
+        if (maxKey && !(num(g(x, maxKey)) > 0)) return '-';
+        return mark(g(x, key));
+    }
+
+    /* Column 4 se 25 tak - ek subject ki line */
+    function subjectCells(x) {
+        const code    = String(g(x, 'subjectCode') || '');
+        const remarks = String(g(x, 'remarks') || '').trim().toUpperCase();
+
+        const theoryMax = num(g(x, 'theoryMaxTotal')) ||
+                          (num(g(x, 'maxTheoryI')) + num(g(x, 'maxTheoryI_IA')) +
+                           num(g(x, 'maxTheoryII')) + num(g(x, 'maxTheoryII_IA')));
+        const pracMax   = num(g(x, 'practicalMaxTotal')) ||
+                          (num(g(x, 'maxPracticalViva')) + num(g(x, 'maxPracticalIA')));
+
+        const cells = [
+            // 4: Subject
+            `<td class="sc subject-name">${esc(subjectLabel(x))}</td>`,
+
+            // 5-6: Unique code
+            `<td class="sc">${dash(g(x, 'scriptIdI'))}</td>`,
+            `<td class="sc">${dash(g(x, 'scriptIdII'))}</td>`,
+
+            // 7-13: Marks scheme
+            `<td class="sc">${maxOf(x, 'maxTheoryI')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxTheoryI_IA')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxTheoryII')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxTheoryII_IA')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxPracticalViva')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxPracticalIA')}</td>`,
+            `<td class="sc">${maxOf(x, 'maxMarks')}</td>`,
+
+            // 14-18: Obtained theory
+            `<td class="sc">${obtOf(x, 'theoryI',     'maxTheoryI')}</td>`,
+            `<td class="sc">${obtOf(x, 'theoryI_IA',  'maxTheoryI_IA')}</td>`,
+            `<td class="sc">${obtOf(x, 'theoryII',    'maxTheoryII')}</td>`,
+            `<td class="sc">${obtOf(x, 'theoryII_IA', 'maxTheoryII_IA')}</td>`,
+            `<td class="sc font-bold">${theoryMax > 0 ? mark(g(x, 'theoryTotal')) : '-'}</td>`,
+
+            // 19-21: Obtained practical
+            `<td class="sc">${obtOf(x, 'practicalViva', 'maxPracticalViva')}</td>`,
+            `<td class="sc">${obtOf(x, 'practicalIA',   'maxPracticalIA')}</td>`,
+            `<td class="sc font-bold">${pracMax > 0 ? mark(g(x, 'practicalTotal')) : '-'}</td>`,
+
+            // 22: Subject total
+            `<td class="sc font-bold">${mark(g(x, 'subjectTotal'))}</td>`,
+
+            // 23: Grace
+            `<td class="sc">${remarks === 'G' ? 'G-' + esc(code) : ''}</td>`,
+
+            // 24: Required to appear
+            `<td class="sc">${esc(g(x, 'required_To_Appear') || '')}</td>`,
+
+            // 25: Distinction / First class
+            `<td class="sc font-bold">${(remarks === 'D' || remarks === 'I') ? remarks : ''}</td>`
+        ];
+
+        return cells.join('');
     }
 
 
@@ -680,53 +949,65 @@
        HELPERS
        ================================================================ */
 
-    /* Ek column ke liye har subject ki value, colored line ke saath */
-    function cells(student, fn) {
-        return student.map(x => wrapCell(x, fn(x))).join('<br>');
+    /* JSON key case-insensitive (DOB -> dob, examname -> examName dono chalega) */
+    function g(item, key) {
+        if (!item) return '';
+        let v = item[key];
+        if (v === undefined) {
+            const lower = key.toLowerCase();
+            const found = Object.keys(item).find(k => k.toLowerCase() === lower);
+            v = found !== undefined ? item[found] : undefined;
+        }
+        return (v === null || v === undefined) ? '' : v;
     }
 
-    /* Number => round; 'AB' / 'Ab' => as-is; khaali/null => '-' */
-    function fmtMark(v) {
-        if (v === null || v === undefined || v === '') return '-';
-        const num = parseFloat(v);
-        if (isNaN(num)) return v;
-        return Math.round(num).toString();
+    function esc(s) {
+        return String(s === null || s === undefined ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
     }
 
-    /* Max marks: 0 ya null => '-' (component configured nahi hai) */
-    function fmtMax(v) {
-        const r = fmtMark(v);
-        return r === '0' ? '-' : r;
+    function num(v) {
+        const n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
     }
 
-    /* Evaluator columns: jis subject me Theory I/II paper hi nahi hai wahan '-' */
-    function hasPaper(x, part) {
-        return part === 'I' ? Number(x.maxTheoryI) > 0 : Number(x.maxTheoryII) > 0;
-    }
-    function evalMark(x, part, v) {
-        if (!hasPaper(x, part)) return '-';
-        return fmtMark(v);
-    }
-    function evalDec(x, part, v) {
-        if (!hasPaper(x, part) || v === null || v === undefined || v === '') return '-';
-        const num = parseFloat(v);
-        return isNaN(num) ? v : num.toFixed(2);
+    /* Number => round, 'AB' => as-is, khaali => '-' */
+    function mark(v) {
+        if (v === null || v === undefined || String(v).trim() === '') return '-';
+        const n = parseFloat(v);
+        if (isNaN(n)) return esc(String(v).toUpperCase());
+        return String(Math.round(n));
     }
 
-    function hasPractical(x) {
-        return Number(x.maxPracticalViva) > 0 || Number(x.maxPracticalIA) > 0;
+    function dash(v) {
+        const s = String(v === null || v === undefined ? '' : v).trim();
+        return s === '' || s === '0' ? '-' : esc(s);
     }
 
-    /* FAIL / ABSENT => red, GRACE => yellow */
-    function subjectBg(item) {
-        if (item.remarks === 'G') return '#fff3b0';
-        if (item.required_To_Appear) return '#ffd6d6';
+    /* "A-1 KAYACHIKITSA" - code pehle se naam mein ho to dobara nahi */
+    function subjectLabel(x) {
+        const name = String(g(x, 'subjectName') || '').trim();
+        const code = String(g(x, 'subjectCode') || '').trim();
+        if (!code || name.toUpperCase().startsWith(code.toUpperCase())) return name || '-';
+        return `${code} ${name}`;
+    }
+
+    /* 1 => 1st, 2 => 2nd ... ; text ho to waisa hi */
+    function ordinal(v) {
+        const n = parseInt(v, 10);
+        if (isNaN(n)) return String(v || '');
+        const s = ['th', 'st', 'nd', 'rd'];
+        const m = n % 100;
+        return n + (s[(m - 20) % 10] || s[m] || s[0]);
+    }
+
+    /* Fail / grace subject ki line highlight (sirf screen) */
+    function subjectRowClass(x) {
+        if (String(g(x, 'remarks') || '').toUpperCase() === 'G') return 'sub-grace';
+        if (g(x, 'required_To_Appear')) return 'sub-fail';
         return '';
-    }
-
-    function wrapCell(item, value) {
-        const bg = subjectBg(item);
-        if (!bg) return value;
-        return `<span style="display:block;background:${bg};padding:2px 4px;margin:-2px -4px;">${value}</span>`;
     }
 </script>
