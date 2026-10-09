@@ -1,8 +1,736 @@
 ﻿
-@{
+@* @{
     ViewData["Title"] = "enrolformprint";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
-}
+} *@
 
-<h1>enrolformprint</h1>
+@{
+    Layout = null;
+}
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Report – NIA</title>
+
+    <style>
+        :root {
+            --accent: #1f3b73;
+            --accent-dark: #162c57;
+            --accent-soft: #eef2f9;
+            --ink: #111;
+            --grid: #c3c9d4;
+            --muted: #5a6270;
+            --error: #b00020;
+            --bg: #eceff3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--ink);
+        }
+
+        .page {
+          /*   max-width: 1400px; */
+            margin: 0 auto;
+            padding: 18px 20px 40px;
+        }
+
+        /* ---------- header ---------- */
+
+        .report-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fff;
+            border: 1px solid var(--grid);
+            border-bottom: 3px solid var(--accent);
+            padding: 12px 18px;
+        }
+
+            .report-head img {
+                width: 60px;
+                height: 60px;
+                object-fit: contain;
+            }
+
+            .report-head h1 {
+                margin: 0;
+                font-size: 20px;
+                color: var(--accent);
+            }
+
+            .report-head p {
+                margin: 2px 0 0;
+                font-size: 13px;
+                color: var(--muted);
+            }
+
+        /* ---------- filters ---------- */
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr) auto;
+            gap: 12px;
+            align-items: end;
+            background: #fff;
+            border: 1px solid var(--grid);
+            border-top: 0;
+            padding: 14px 18px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .field select,
+        .search input {
+            width: 100%;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid var(--grid);
+            border-radius: 4px;
+            font: inherit;
+            font-size: 14px;
+            background: #fff;
+        }
+
+            .field select:disabled {
+                background: #f3f4f6;
+                color: #999;
+            }
+
+        .btn {
+            height: 38px;
+            padding: 0 18px;
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            background: var(--accent);
+            color: #fff;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+            .btn:hover:not(:disabled) {
+                background: var(--accent-dark);
+            }
+
+            .btn:disabled {
+                opacity: .5;
+                cursor: not-allowed;
+            }
+
+            .btn.ghost {
+                background: #fff;
+                color: var(--accent);
+            }
+
+                .btn.ghost:hover:not(:disabled) {
+                    background: var(--accent-soft);
+                }
+
+            .btn:focus-visible,
+            .field select:focus-visible,
+            .search input:focus-visible {
+                outline: 3px solid #f2b705;
+                outline-offset: 1px;
+            }
+
+        /* ---------- toolbar ---------- */
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .search {
+            flex: 1 1 260px;
+            max-width: 360px;
+        }
+
+        .count {
+            font-size: 14px;
+            color: var(--muted);
+            margin-right: auto;
+        }
+
+            .count b {
+                color: var(--ink);
+            }
+
+        /* ---------- table ---------- */
+
+        .print-title {
+            display: none;
+        }
+
+        .table-wrap {
+            margin-top: 10px;
+            background: #fff;
+            border: 1px solid var(--grid);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1150px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid var(--grid);
+            padding: 8px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) td {
+            background: #fafbfd;
+        }
+
+        tbody tr:hover td {
+            background: #f1f5fc;
+        }
+
+        td.num, th.num {
+            text-align: center;
+            width: 48px;
+        }
+
+        td.nowrap {
+            white-space: nowrap;
+        }
+
+        td.name {
+            font-weight: 700;
+        }
+
+        .msg {
+            padding: 28px 16px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+            .msg.error {
+                color: var(--error);
+            }
+
+        /* ---------- mobile ---------- */
+
+        @@media (max-width: 900px) {
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+
+                .filters .btn {
+                    grid-column: 1 / -1;
+                }
+        }
+
+        @@media (max-width: 520px) {
+            .page {
+                padding: 10px;
+            }
+
+            .filters {
+                grid-template-columns: 1fr;
+            }
+
+            .search {
+                max-width: none;
+            }
+        }
+
+        /* ---------- print ---------- */
+
+        @@page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+
+        @@media print {
+            body {
+                background: #fff;
+            }
+
+            .page {
+                padding: 0;
+                max-width: none;
+            }
+
+            .filters, .toolbar {
+                display: none !important;
+            }
+
+            .report-head {
+                border: 0;
+                border-bottom: 2px solid #000;
+                padding: 0 0 6px;
+            }
+
+                .report-head h1 {
+                    color: #000;
+                }
+
+            .print-title {
+                display: block;
+                margin: 8px 0 6px;
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+            .table-wrap {
+                border: 0;
+                overflow: visible;
+            }
+
+            table {
+                min-width: 0;
+                font-size: 9.5px;
+            }
+
+            th, td {
+                padding: 4px 5px;
+                border-color: #777;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+                thead th {
+                    position: static;
+                    color: #000;
+                    background: #e9e9e9;
+                }
+
+            tr {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            thead th, tbody tr:nth-child(even) td {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+
+        <!-- HEADER -->
+        <div class="report-head">
+            <img src="@Url.Content("~/images/nia_logo.png")" alt="NIA logo" onerror="this.style.display='none'">
+            <div>
+                <h1>National Institute of Ayurveda, Jaipur</h1>
+                <p>Student details report</p>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters">
+            <div class="field">
+                <label for="ddlProgram">Program</label>
+                <select id="ddlProgram"><option value="">Loading...</option></select>
+            </div>
+            <div class="field">
+                <label for="ddlCourse">Course / Department</label>
+                <select id="ddlCourse" disabled><option value="">Select program first</option></select>
+            </div>
+            <div class="field">
+                <label for="ddlSemester">Semester / Year</label>
+                <select id="ddlSemester" disabled><option value="">Select course first</option></select>
+            </div>
+            <div class="field">
+                <label for="ddlBatch">Batch</label>
+                <select id="ddlBatch" disabled><option value="">Select semester first</option></select>
+            </div>
+            <button type="button" class="btn" id="btnShow" disabled>Show report</button>
+        </div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <div class="count" id="countText">Select the filters and click Show report.</div>
+            <div class="search">
+                <input type="search" id="txtSearch" placeholder="Search name, roll no., enrollment no." aria-label="Search students" disabled>
+            </div>
+            <button type="button" class="btn ghost" id="btnExcel" disabled>Download Excel</button>
+            <button type="button" class="btn ghost" id="btnPrint" disabled>Print</button>
+        </div>
+
+        <!-- Sirf print mein dikhega -->
+        <div class="print-title" id="printTitle"></div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="num">S.No.</th>
+                        <th>Roll No.</th>
+                        <th>Enrollment No.</th>
+                        <th>Student Name</th>
+                        <th>Father's Name</th>
+                        <th>Mother's Name</th>
+                        <th>Date of Birth</th>
+                        <th>Aadhaar No.</th>
+                        <th>ABC ID</th>
+                        <th>Phone</th>
+                        <th>Nationality</th>
+                        <th>Department</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody">
+                    <tr><td colspan="12" class="msg">No data yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        (function () {
+
+            var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+            // var ApiBaseUrl = (ApiBaseUrlBaseUrl || "").replace(/\/+$/, "") + "/Report/";
+
+            /* Aadhaar par sirf aakhri 4 ank dikhao (true = mask). Poora chahiye to false. */
+            var MASK_AADHAAR = true;
+
+            var allRows = [];      // ApiBaseUrl se aaya poora data
+            var shownRows = [];    // search ke baad wala data
+
+            var $ = function (id) { return document.getElementById(id); };
+
+            /* ============================================================
+               HELPERS
+               ============================================================ */
+            function getValue(obj, name) {
+                if (!obj) return "";
+                var key = Object.keys(obj).find(function (k) { return k.toLowerCase() === name.toLowerCase(); });
+                return (key === undefined || obj[key] === null || obj[key] === undefined) ? "" : String(obj[key]).trim();
+            }
+
+            function esc(v) {
+                return String(v === null || v === undefined ? "" : v).replace(/[&<>"']/g, function (c) {
+                    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+                });
+            }
+
+            function maskAadhaar(v) {
+                var digits = (v || "").replace(/\D/g, "");
+                if (!MASK_AADHAAR || digits.length < 4) return v;
+                return "XXXX-XXXX-" + digits.slice(-4);
+            }
+
+            // "2003-08-15T00:00:00" aaye to bhi dd-MM-yyyy
+            function fmtDate(v) {
+                var m = (v || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+                return m ? m[3] + "-" + m[2] + "-" + m[1] : v;
+            }
+
+            function getJson(url) {
+                return fetch(url, { headers: { "Accept": "application/json" } })
+                    .then(function (res) {
+                        return res.json().catch(function () { return null; }).then(function (body) {
+                            if (!res.ok) {
+                                throw new Error((body && body.message) || ("Server returned HTTP " + res.status + "."));
+                            }
+                            return Array.isArray(body) ? body : [];
+                        });
+                    }, function () {
+                        throw new Error("Could not reach the ApiBaseUrl. Check ApiBaseUrlSettings:BaseUrl and CORS.");
+                    });
+            }
+
+            function fillSelect(sel, items, valueField, textField, placeholder) {
+                var html = '<option value="">' + esc(placeholder) + '</option>';
+                items.forEach(function (it) {
+                    html += '<option value="' + esc(getValue(it, valueField)) + '">' +
+                            esc(getValue(it, textField)) + '</option>';
+                });
+                sel.innerHTML = html;
+                sel.disabled = items.length === 0;
+                if (items.length === 0) sel.innerHTML = '<option value="">No records found</option>';
+            }
+
+            function resetSelect(sel, text) {
+                sel.innerHTML = '<option value="">' + esc(text) + '</option>';
+                sel.disabled = true;
+            }
+
+            function setLoading(sel) {
+                sel.innerHTML = '<option value="">Loading...</option>';
+                sel.disabled = true;
+            }
+
+            function showMsg(text, isError) {
+                $("reportBody").innerHTML =
+                    '<tr><td colspan="12" class="msg' + (isError ? " error" : "") + '">' + esc(text) + '</td></tr>';
+            }
+
+            function clearReport() {
+                allRows = [];
+                shownRows = [];
+                showMsg("No data yet.");
+                $("countText").textContent = "Select the filters and click Show report.";
+                $("txtSearch").value = "";
+                $("txtSearch").disabled = true;
+                $("btnExcel").disabled = true;
+                $("btnPrint").disabled = true;
+            }
+
+            function updateShowButton() {
+                $("btnShow").disabled = !$("ddlBatch").value;
+            }
+
+            function selectedText(id) {
+                var s = $(id);
+                return s.selectedIndex > 0 ? s.options[s.selectedIndex].text : "";
+            }
+
+            /* ============================================================
+               DROPDOWNS (Program -> Course -> Semester -> Batch)
+               ============================================================ */
+            function loadPrograms() {
+                setLoading($("ddlProgram"));
+                getJson(ApiBaseUrl + "Result/GetPrograms")
+                    .then(function (rows) {
+                        fillSelect($("ddlProgram"), rows, "program_Id", "program_name", "Select program");
+                    })
+                    .catch(function (err) {
+                        resetSelect($("ddlProgram"), "Could not load");
+                        showMsg(err.message, true);
+                    });
+            }
+
+            $("ddlProgram").addEventListener("change", function () {
+                resetSelect($("ddlCourse"), "Select program first");
+                resetSelect($("ddlSemester"), "Select course first");
+                resetSelect($("ddlBatch"), "Select semester first");
+                clearReport();
+                updateShowButton();
+                if (!this.value) return;
+
+                setLoading($("ddlCourse"));
+                getJson(ApiBaseUrl + "Result/GetCourses?programId=" + encodeURIComponent(this.value))
+                    .then(function (rows) {
+                        fillSelect($("ddlCourse"), rows, "course_Id", "course_name", "Select course");
+                    })
+                    .catch(function (err) { resetSelect($("ddlCourse"), "Could not load"); showMsg(err.message, true); });
+            });
+
+            $("ddlCourse").addEventListener("change", function () {
+                resetSelect($("ddlSemester"), "Select course first");
+                resetSelect($("ddlBatch"), "Select semester first");
+                clearReport();
+                updateShowButton();
+                if (!this.value) return;
+
+                setLoading($("ddlSemester"));
+                getJson(ApiBaseUrl + "Result/GetSemesters?courseId=" + encodeURIComponent(this.value))
+                    .then(function (rows) {
+                        fillSelect($("ddlSemester"), rows, "semId", "semyearcode", "Select semester");
+                    })
+                    .catch(function (err) { resetSelect($("ddlSemester"), "Could not load"); showMsg(err.message, true); });
+            });
+
+            $("ddlSemester").addEventListener("change", function () {
+                resetSelect($("ddlBatch"), "Select semester first");
+                clearReport();
+                updateShowButton();
+                if (!this.value) return;
+
+                setLoading($("ddlBatch"));
+                getJson(ApiBaseUrl + "Result/GetBatches?courseId=" + encodeURIComponent($("ddlCourse").value) +
+                        "&semesterId=" + encodeURIComponent(this.value))
+                    .then(function (rows) {
+                        fillSelect($("ddlBatch"), rows, "Id", "Batch", "Select batch");
+                        // Ek hi batch ho to apne aap select
+                        if (rows.length === 1) $("ddlBatch").selectedIndex = 1;
+                        updateShowButton();
+                    })
+                    .catch(function (err) { resetSelect($("ddlBatch"), "Could not load"); showMsg(err.message, true); });
+            });
+
+            $("ddlBatch").addEventListener("change", function () {
+                clearReport();
+                updateShowButton();
+            });
+
+            /* ============================================================
+               REPORT
+               ============================================================ */
+            $("btnShow").addEventListener("click", function () {
+                var btn = this;
+                btn.disabled = true;
+                btn.textContent = "Loading...";
+                showMsg("Loading students...");
+
+                var url = ApiBaseUrl + "Result/GetStudents" +
+                    "?courseId=" + encodeURIComponent($("ddlCourse").value) +
+                    "&semesterId=" + encodeURIComponent($("ddlSemester").value) +
+                    "&batch=" + encodeURIComponent($("ddlBatch").value);
+
+                getJson(url)
+                    .then(function (rows) {
+                        allRows = rows;
+                        $("printTitle").textContent =
+                            selectedText("ddlProgram") + "  |  " + selectedText("ddlCourse") + "  |  " +
+                            selectedText("ddlSemester") + "  |  Batch " + selectedText("ddlBatch");
+
+                        var has = rows.length > 0;
+                        $("txtSearch").disabled = !has;
+                        $("btnExcel").disabled = !has;
+                        $("btnPrint").disabled = !has;
+                        applySearch();
+                    })
+                    .catch(function (err) {
+                        clearReport();
+                        showMsg(err.message, true);
+                    })
+                    .then(function () {
+                        btn.textContent = "Show report";
+                        updateShowButton();
+                    });
+            });
+
+            function applySearch() {
+                var q = $("txtSearch").value.trim().toLowerCase();
+
+                shownRows = !q ? allRows : allRows.filter(function (r) {
+                    return ["FirstName", "FatherName", "RollNumber", "EnrollmentNumber"].some(function (f) {
+                        return getValue(r, f).toLowerCase().indexOf(q) !== -1;
+                    });
+                });
+
+                renderTable();
+            }
+
+            $("txtSearch").addEventListener("input", applySearch);
+
+            function renderTable() {
+                if (allRows.length === 0) {
+                    showMsg("No students found for this batch.");
+                    $("countText").innerHTML = "<b>0</b> students";
+                    return;
+                }
+
+                if (shownRows.length === 0) {
+                    showMsg("No student matches your search.");
+                } else {
+                    var html = "";
+                    shownRows.forEach(function (r, i) {
+                        html +=
+                            "<tr>" +
+                                '<td class="num">' + (i + 1) + "</td>" +
+                                '<td class="nowrap">' + esc(getValue(r, "RollNumber")) + "</td>" +
+                                '<td class="nowrap">' + esc(getValue(r, "EnrollmentNumber")) + "</td>" +
+                                '<td class="name">' + esc(getValue(r, "FirstName")) + "</td>" +
+                                "<td>" + esc(getValue(r, "FatherName")) + "</td>" +
+                                "<td>" + esc(getValue(r, "MotherName")) + "</td>" +
+                                '<td class="nowrap">' + esc(fmtDate(getValue(r, "DateOfBirth"))) + "</td>" +
+                                '<td class="nowrap">' + esc(maskAadhaar(getValue(r, "AadhaarId"))) + "</td>" +
+                                '<td class="nowrap">' + esc(getValue(r, "AbcId")) + "</td>" +
+                                '<td class="nowrap">' + esc(getValue(r, "Phone")) + "</td>" +
+                                "<td>" + esc(getValue(r, "Nationality")) + "</td>" +
+                                "<td>" + esc(getValue(r, "department")) + "</td>" +
+                            "</tr>";
+                    });
+                    $("reportBody").innerHTML = html;
+                }
+
+                $("countText").innerHTML = shownRows.length === allRows.length
+                    ? "<b>" + allRows.length + "</b> students"
+                    : "Showing <b>" + shownRows.length + "</b> of " + allRows.length + " students";
+            }
+
+            /* ============================================================
+               EXCEL (CSV) DOWNLOAD - jo table mein dikh raha hai wahi
+               ============================================================ */
+            $("btnExcel").addEventListener("click", function () {
+                var head = ["S.No.", "Roll No.", "Enrollment No.", "Student Name", "Father's Name", "Mother's Name",
+                            "Date of Birth", "Aadhaar No.", "ABC ID", "Phone", "Nationality", "Department"];
+
+                // ="..." se Excel lambe number (Aadhaar/Phone) ko 1.23E+11 nahi banata
+                function cell(v, asText) {
+                    v = String(v || "").replace(/"/g, '""');
+                    return asText && v ? '="' + v + '"' : '"' + v + '"';
+                }
+
+                var lines = [head.map(function (h) { return cell(h); }).join(",")];
+
+                shownRows.forEach(function (r, i) {
+                    lines.push([
+                        cell(i + 1),
+                        cell(getValue(r, "RollNumber"), true),
+                        cell(getValue(r, "EnrollmentNumber"), true),
+                        cell(getValue(r, "FirstName")),
+                        cell(getValue(r, "FatherName")),
+                        cell(getValue(r, "MotherName")),
+                        cell(fmtDate(getValue(r, "DateOfBirth")), true),
+                        cell(maskAadhaar(getValue(r, "AadhaarId")), true),
+                        cell(getValue(r, "AbcId"), true),
+                        cell(getValue(r, "Phone"), true),
+                        cell(getValue(r, "Nationality")),
+                        cell(getValue(r, "department"))
+                    ].join(","));
+                });
+
+                var blob = new Blob(["\uFEFF" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+                var a = document.createElement("a");
+                var name = ("Student_Report_" + selectedText("ddlCourse") + "_" + selectedText("ddlSemester") +
+                            "_" + selectedText("ddlBatch")).replace(/[^\w\-]+/g, "_");
+
+                a.href = URL.createObjectURL(blob);
+                a.download = name + ".csv";
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+            });
+
+            $("btnPrint").addEventListener("click", function () { window.print(); });
+
+            /* ---------- start ---------- */
+            if (!ApiBaseUrl) {
+                resetSelect($("ddlProgram"), "API not configured");
+                showMsg("ApiSettings:BaseUrl is empty in appsettings.json.", true);
+            } else {
+                loadPrograms();
+            }
+        })();
+    </script>
+</body>
+</html>
+
 
