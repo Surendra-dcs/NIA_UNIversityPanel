@@ -1,0 +1,822 @@
+﻿@{
+    ViewData["Title"] = "Marksheet";
+    Layout = null;
+}
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>BAMS IV Professional – Mark Sheet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tinos:wght@400;700&family=Noto+Serif+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>window.jQuery || document.write('<script src="@Url.Content("~/lib/jquery/dist/jquery.min.js")"><\/script>');</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --paper: #ffffff;
+            --ink: #1a1a1a;
+            --line: #333;
+            --muted: #555;
+            --bg: #e9e9e9;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top,0px);
+            padding-bottom: env(safe-area-inset-bottom,0px);
+        }
+
+        @@media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #2a2a2a;
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #2a2a2a;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            font-family: "Tinos","Times New Roman",serif;
+            color: var(--ink);
+        }
+
+        .sheet {
+            background: var(--paper);
+            max-width: 900px;
+            margin: 24px auto;
+            padding: 28px 34px;
+            border: 1px solid #bbb;
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px
+        }
+
+        header {
+            display: grid;
+            grid-template-columns: 90px 1fr 90px;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px
+        }
+
+        .emblem {
+            width: 84px;
+            height: 84px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            text-align: center;
+            color: var(--muted);
+            overflow: hidden
+        }
+
+            .emblem img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain
+            }
+
+        .center {
+            text-align: center;
+            line-height: 1.3
+        }
+
+        .hi {
+            font-family: "Noto Serif Devanagari",serif
+        }
+
+        .h1 {
+            font-size: 26px;
+            font-weight: 700
+        }
+
+        .h2 {
+            font-size: 24px;
+            font-weight: 700
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700
+        }
+
+        .small {
+            font-size: 13px
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin: 14px 0 8px;
+            font-size: 14px;
+            font-weight: 700;
+            gap: 6px
+        }
+
+            .info div {
+                line-height: 1.6
+            }
+
+            .info .val {
+                text-transform: uppercase
+            }
+
+        .tablewrap {
+            overflow-x: auto
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            min-width: 700px
+        }
+
+        th, td {
+            border: 1px solid var(--line);
+            padding: 5px 4px;
+            text-align: center
+        }
+
+        th {
+            font-weight: 700
+        }
+
+        td.sub {
+            text-align: left;
+            font-weight: 700
+        }
+
+        .bold {
+            font-weight: 700
+        }
+
+        .sumcell {
+            text-align: left;
+            vertical-align: top
+        }
+
+            .sumcell span {
+                font-weight: 700;
+                display: block;
+                margin-top: 2px;
+                min-height: 16px
+            }
+
+        .msgcell {
+            padding: 18px;
+            font-weight: 400
+        }
+
+        .result {
+            text-align: right;
+            font-weight: 700;
+            font-size: 16px;
+            margin: 10px 0
+        }
+
+        .notes {
+            font-size: 10.5px;
+            line-height: 1.45
+        }
+
+            .notes p {
+                margin: 2px 0
+            }
+
+        .foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 30px;
+            font-size: 13px;
+            font-weight: 700
+        }
+
+        .editable {
+            display: inline-block;
+            min-width: 110px;
+            border-bottom: 1px solid #333;
+            padding: 0 4px;
+            outline: none
+        }
+
+        .qrbox {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 400;
+            color: var(--muted)
+        }
+
+        #qrcode {
+            display: inline-block;
+            line-height: 0
+        }
+
+        .unofficial {
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 18px;
+            border-top: 1px dashed #aaa;
+            padding-top: 6px
+        }
+
+        .toolbar {
+            max-width: 900px;
+            margin: 16px auto 0;
+            text-align: right;
+            padding: 0 4px
+        }
+
+            .toolbar button {
+                font-family: inherit;
+                font-size: 15px;
+                font-weight: 700;
+                padding: 8px 22px;
+                background: #1f3b73;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer
+            }
+
+                .toolbar button:hover {
+                    background: #162c57
+                }
+
+                .toolbar button:focus-visible {
+                    outline: 3px solid #f2b705;
+                    outline-offset: 2px
+                }
+
+        @@page {
+            size: A4 portrait;
+            margin: 8mm
+        }
+
+        @@media print {
+            :root {
+                padding: 0
+            }
+
+            html, body {
+                background: #fff;
+                margin: 0;
+                padding: 0;
+                height: auto
+            }
+
+            .toolbar {
+                display: none
+            }
+
+            .editable {
+                border-bottom-color: #333
+            }
+
+            .sheet {
+                width: 900px;
+                max-width: 900px;
+                margin: 0 auto;
+                border: 1px solid #bbb;
+                zoom: var(--print-zoom,0.8);
+                break-inside: avoid;
+                page-break-inside: avoid
+            }
+
+            .tablewrap {
+                overflow: visible
+            }
+
+            .unofficial {
+                color: #555
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar"><button type="button" onclick="printSheet()">🖨️ Print</button></div>
+
+    <div class="sheet">
+        <div class="top"><span>Serial No.: ______</span><span>Folio No.: ______</span></div>
+
+        <header>
+            <div class="emblem">
+                <img src="@Url.Content("~/Logo/nia_logo.png")" alt="NIA"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                <span style="display:none">Institute<br>emblem</span>
+            </div>
+            <div class="center">
+                <div class="hi h1">राष्ट्रीय आयुर्वेद संस्थान</div>
+                <div class="hi small">मानद विश्वविद्यालय (डी-नोवो)<br>(आयुष मंत्रालय, भारत सरकार)<br>जोरावर सिंह गेट, आमेर रोड, जयपुर - 302002</div>
+                <div class="h2">National Institute of Ayurveda</div>
+                <div class="small">Deemed to be University (De Novo)<br>(Ministry of AYUSH, Govt. of India)<br>Jorawar Singh Gate, Amer Road, Jaipur-302002</div>
+                <div class="hi title" style="margin-top:6px">आयुर्वेदाचार्य-चतुर्थ व्यावसायिक</div>
+                <div class="hi bold">अंकतालिका</div>
+                <div class="title">BAMS IV Professional</div>
+                <div class="title">MARK SHEET</div>
+                <div class="small" id="examHeldEn"></div>
+            </div>
+            <div class="emblem">Accreditation<br>emblem</div>
+        </header>
+
+        <div class="info">
+            <div>Name: <span class="val" id="studentName">-</span><br>Father's Name: <span class="val" id="fatherName">-</span></div>
+            <div>Roll No.: <span id="rollNumber">-</span><br>Enroll No.: <span id="enrollmentNumber">-</span><br>Attempt: <span id="attempt">-</span></div>
+        </div>
+
+        <div class="tablewrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Subjects / Paper</th>
+                        <th rowspan="2">Max. Marks (<span id="headMaxTotal">-</span>)</th>
+                        <th rowspan="2">Min Marks (<span id="headMinTotal">-</span>)</th>
+                        <th colspan="8">Marks Obtained</th>
+                        <th rowspan="2">Remarks</th>
+                    </tr>
+                    <tr>
+                        <th>Theory I (100)</th>
+                        <th>Internal Assessment (10%)</th>
+                        <th>Theory II (100)</th>
+                        <th>Internal Assessment (10%)</th>
+                        <th>Total</th>
+                        <th>Practical /Viva</th>
+                        <th>Practical Internal Assessment (10%)</th>
+                        <th>Subject Total</th>
+                    </tr>
+                </thead>
+                <tbody id="marksTableBody">
+                    <tr><td colspan="12" class="msgcell">Loading...</td></tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td class="bold" style="text-align:left">GRAND TOTAL</td>
+                        <td class="bold" id="footMaxTotal">-</td>
+                        <td class="bold" id="footMinTotal">-</td>
+                        <td colspan="7"></td>
+                        <td class="bold" id="grandTotal">-</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="bold sumcell">Distinction secured in:<span id="summaryDistinction"></span></td>
+                        <td colspan="3" class="bold sumcell">First Class secured in:<span id="summaryFirstClass"></span></td>
+                        <td colspan="3" class="bold sumcell">Grace Marks Awarded in:<span id="summaryGrace"></span></td>
+                        <td colspan="3" class="bold sumcell">Failed in:<span id="summaryFailed"></span></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="result">RESULT: <span id="resultText">-</span></div>
+
+        <div class="notes">
+            <p><b>Note:</b></p>
+            <p>1. For pass in a subject, a candidate shall require to obtain a minimum of 50% marks in each of Theory and Practical Examination.</p>
+            <p>2. The candidate securing 60% marks or above in a subject shall be declared to have passed in First Class (Denoted by F) in that subject.</p>
+            <p>3. The candidate securing 75% marks or above in a subject shall be declared to have obtained Distinction (Denoted by D) in that subject.</p>
+            <p>4. A candidate failing in the Theory/Practical part of a subject will be considered fail in Theory and Practical both.</p>
+            <p>5. Application for re-totalling of marks as permissible under the rules should reach the Registrar on the prescribed form along with the requisite fee within 15 days from the date of declaration of result.</p>
+            <p>6. In case of any mistake being detected during the preparation of marks-sheet or brought to notice afterwards, the university will be fully empowered to correct the same.</p>
+            <p>7. D-Distinction &nbsp; F-First Class &nbsp; G-Grace &nbsp; F-Fail &nbsp; Ab-Absent</p>
+        </div>
+
+        <div class="foot">
+            <div>Jaipur<br><br>Result date: <span id="resultDate" class="editable" contenteditable="true" title="Click to enter result date"></span></div>
+            <div class="qrbox"><div id="qrcode"></div><div>Scan to verify</div></div>
+            <div>CONTROLLER OF EXAMINATIONS</div>
+        </div>
+
+        <div class="unofficial">Reproduced copy for reference only — not an official document.</div>
+    </div>
+
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+        var ENROLLMENT = @Html.Raw(System.Text.Json.JsonSerializer.Serialize((string?)ViewBag.enrollment ?? ""));
+
+        var DEBUG = true;   // sab theek hone ke baad false kar dena
+
+        function showFatal(text) {
+            var tb = document.getElementById("marksTableBody");
+            if (!tb) return;
+            tb.innerHTML = "";
+            var tr = document.createElement("tr");
+            var td = document.createElement("td");
+            td.colSpan = 12;
+            td.className = "msgcell";
+            td.textContent = text;
+            tr.appendChild(td);
+            tb.appendChild(tr);
+        }
+
+        window.addEventListener("error", function (e) {
+            showFatal("Script error: " + e.message);
+        });
+
+        $(document).ready(function () {
+            loadmarksheet();
+        });
+
+        // ============================================================
+        // COLUMN SYMBOLS (header ke hisaab se)
+        // Symbol us column ke MAX marks se tay hota hai:
+        //   Theory I : (100) normal,  (*50) -> *
+        //   Viva     : (*70) -> *,  (#60) -> #,  (@@75) -> @@
+        //   IA       : (30)  normal,  (*15) -> *
+        // Naya max aaye to sirf yahi table badlo.
+        // ============================================================
+        var COLUMN_SYMBOLS = {
+            theoryI: { 50: "*" },
+            viva:    { 70: "*", 60: "#", 75: "@@" },
+            ia:      { 15: "*" }
+        };
+
+        function getSymbol(column, maxMarks) {
+            var map = COLUMN_SYMBOLS[column];
+            if (!map) return "";
+            var key = Math.round(toNum(maxMarks));
+            return map[key] || "";
+        }
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function esc(v) {
+            return $("<div>").text(v === null || v === undefined ? "" : v).html();
+        }
+
+        // Case-insensitive property read
+        function getValue(obj, propertyName) {
+            if (!obj) return "";
+            var key = Object.keys(obj).find(function (k) {
+                return k.toLowerCase() === propertyName.toLowerCase();
+            });
+            if (key === undefined || obj[key] === null || obj[key] === undefined) return "";
+            return obj[key];
+        }
+
+        function toNum(value) {
+            var n = parseFloat(value);
+            return isNaN(n) ? 0 : n;
+        }
+
+        // number -> round, 'AB' -> 'Ab'
+        function cleanMark(value) {
+            if (value === null || value === undefined) return "-";
+            var text = value.toString().trim();
+            if (text === "") return "-";
+            var num = parseFloat(text);
+            if (isNaN(num)) return text.toUpperCase() === "AB" ? "Ab" : text;
+            return Math.round(num).toString();
+        }
+
+        function isAbsentStatus(value) {
+            var v = (value || "").toString().trim().toUpperCase();
+            return v === "A" || v === "AB" || v === "ABSENT";
+        }
+
+        // Mark ke aage symbol lagao ('-' / 'Ab' par nahi)
+        function withSymbol(mark, symbol) {
+            if (mark === "-" || mark === "Ab" || !symbol) return mark;
+            return symbol + mark;
+        }
+
+        // Theory cell: max 0 -> '-'; column ke max se symbol
+        function theoryCell(obtained, max, column) {
+            if (toNum(max) <= 0) return "-";
+            return withSymbol(cleanMark(obtained), getSymbol(column, max));
+        }
+
+        // Practical-side cell: max 0 -> '-'; absent -> 'Ab'; column ke max se symbol
+        function practicalCell(obtained, max, isAbsent, column) {
+            if (toNum(max) <= 0) return "-";
+            if (isAbsent) return "Ab";
+            return withSymbol(cleanMark(obtained), getSymbol(column, max));
+        }
+
+        function resultHindi(result) {
+            var r = (result || "").toString().trim().toUpperCase();
+            if (r === "PASS") return "उत्तीर्ण";
+            if (r === "PASS BY GRACE") return "कृपांक से उत्तीर्ण";
+            if (r === "FAIL") return "अनुत्तीर्ण";
+            return "";
+        }
+
+        // 1 -> 1st, 2 -> 2nd ...
+        function formatAttempt(v) {
+            var n = parseInt(v, 10);
+            if (isNaN(n) || n <= 0) return "-";
+            var s = ["th", "st", "nd", "rd"], x = n % 100;
+            return n + "<sup>" + (s[(x - 20) % 10] || s[x] || s[0]) + "</sup>";
+        }
+
+        // Exam name me "(August 2026)" / "(June-July 2025)" mile to header line banao
+        function setExamHeld(examName) {
+            var m = (examName || "").match(/\(\s*([A-Za-z]+(?:\s*-\s*[A-Za-z]+)?)\s*,?\s*(\d{4})\s*\)/);
+            if (!m) {
+                $("#examHeldEn").text(examName ? "(" + examName + ")" : "");
+                return;
+            }
+            var months = m[1].split("-").map(function (x) { return x.trim(); }).join("-");
+            $("#examHeldEn").text("(Examination Held in " + months + " " + m[2] + ")");
+        }
+
+        function showMessage(msg) {
+            $("#marksTableBody").html('<tr><td colspan="12" class="msgcell">' + esc(msg) + '</td></tr>');
+        }
+
+        // ============================================================
+        // QR CODE
+        // ============================================================
+        var qrData = { roll: "", name: "", result: "", verify: "" };
+
+        // dd-MM-yyyy
+        function formatDate(d) {
+            var dd = ("0" + d.getDate()).slice(-2);
+            var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+            return dd + "-" + mm + "-" + d.getFullYear();
+        }
+
+        // API mein VerifyCode na ho to roll + enrollment se fixed code
+        function makeVerifyCode(roll, enrollment) {
+            var text = (roll || "") + "|" + (enrollment || "");
+            var hash = 0;
+            for (var i = 0; i < text.length; i++) {
+                hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+            }
+            hash = Math.abs(hash);
+            var year = new Date().getFullYear().toString().slice(-2);
+            var letter = String.fromCharCode(65 + (hash % 26));
+            var num = ("0000" + (hash % 10000)).slice(-4);
+            return year + letter + num;
+        }
+
+        function generateQRCode() {
+            if (!qrData.roll || typeof QRCode === "undefined") return;
+
+            var dateText = $("#resultDate").text().trim();
+            if (dateText === "") dateText = formatDate(new Date());
+
+            var qrText =
+                "National Institute of Ayurveda\n" +
+                "Roll No: " + qrData.roll + "\n" +
+                "Name: " + qrData.name + "\n" +
+                "Result: " + qrData.result + "\n" +
+                "Date: " + dateText + "\n" +
+                "Verify: " + qrData.verify;
+
+            var box = document.getElementById("qrcode");
+            box.innerHTML = "";
+
+            new QRCode(box, {
+                text: qrText,
+                width: 100,
+                height: 100,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+        }
+
+        // Result date badalte hi QR update
+        $(document).on("blur", "#resultDate", function () {
+            generateQRCode();
+        });
+
+        // ============================================================
+        // LOAD MARKSHEET
+        // ============================================================
+        function loadmarksheet() {
+            var enrollment = (ENROLLMENT || "").toString().trim();
+
+            if (enrollment === "") {
+                showMessage("Enrollment number is required.");
+                return;
+            }
+
+            if (!ApiBaseUrl) {
+                showMessage("ApiSettings:BaseUrl is empty in appsettings.json of this project.");
+                return;
+            }
+
+            var base = ApiBaseUrl.replace(/\/+$/, "") + "/";
+            var url = base + "Result/getdataformarksheetBAMSIV?enrollment=" +
+                      encodeURIComponent(enrollment);
+
+            console.log("Marksheet API URL:", url);
+
+            $.ajax({
+                url: url,
+                method: "GET",
+                dataType: "json",
+
+                success: function (data) {
+                    try {
+                        renderMarksheet(data, enrollment);
+                    } catch (ex) {
+                        console.error(ex);
+                        showMessage("Display error: " + ex.message);
+                    }
+                },
+
+                error: function (xhr, status, error) {
+                    console.error("Marksheet API error:", xhr.status, error, xhr.responseText);
+
+                    var msg = "Failed to load marksheet data.";
+                    if (DEBUG) {
+                        var hint = "";
+                        if (xhr.status === 0)        hint = " (network / CORS / http-https mismatch / certificate)";
+                        else if (xhr.status === 404) hint = " (API route not found: controller 'Result' ya [HttpGet] attribute)";
+                        else if (xhr.status === 500) hint = " (API server error: API console dekho)";
+                        msg += " HTTP " + xhr.status + hint + " | URL: " + url;
+                    }
+                    showMessage(msg);
+                }
+            });
+        }
+
+        // ============================================================
+        // RENDER
+        // ============================================================
+        function renderMarksheet(data, enrollment) {
+
+            if (!Array.isArray(data) || data.length === 0) {
+                showMessage("No record found");
+                return;
+            }
+
+            // Ek hi roll number ki marksheet: ?roll=XXXX ya pehla roll number
+            var wantedRoll = (new URLSearchParams(window.location.search).get("roll") || "").trim();
+            var roll = wantedRoll || String(getValue(data[0], "RollNumber"));
+            var rows = data.filter(function (r) { return String(getValue(r, "RollNumber")) === roll; });
+            if (rows.length === 0) rows = data;
+
+            var student = rows[0];
+
+            // ---------- student details ----------
+            $("#studentName").text(getValue(student, "FirstName") || "-");
+            $("#fatherName").text(getValue(student, "FatherName") || "-");
+            $("#rollNumber").text(getValue(student, "RollNumber") || "-");
+            $("#enrollmentNumber").text(getValue(student, "EnrollmentNumber") || enrollment);
+            $("#attempt").html(formatAttempt(getValue(student, "Attempt")));
+
+            setExamHeld(getValue(student, "Examname"));
+
+            // ---------- subject rows ----------
+            var totalMax = 0, totalMin = 0, calculatedGrandTotal = 0;
+            var distinction = [], firstClass = [], grace = [], failed = [];
+            var html = "";
+
+            $.each(rows, function (index, item) {
+
+                var code = String(getValue(item, "SubjectCode")).trim().toUpperCase();
+                var subjectLabel = String(getValue(item, "subjectName")).trim() || code || "-";
+
+                // max marks
+                var mTI    = toNum(getValue(item, "MaxTheoryI"));
+                var mTIia  = toNum(getValue(item, "MaxTheoryI_IA"));
+                var mTII   = toNum(getValue(item, "MaxTheoryII"));
+                var mTIIia = toNum(getValue(item, "MaxTheoryII_IA"));
+                var mPV    = toNum(getValue(item, "MaxPracticalViva"));
+                var mPIA   = toNum(getValue(item, "MaxPracticalIA"));
+
+                var maxMarks = toNum(getValue(item, "MaxMarks"));
+                var minMarks = toNum(getValue(item, "MinMarks"));
+                if (maxMarks <= 0) maxMarks = mTI + mTIia + mTII + mTIIia + mPV + mPIA;
+                if (minMarks <= 0) minMarks = maxMarks / 2;
+
+                totalMax += maxMarks;
+                totalMin += minMarks;
+
+                // obtained marks
+                var absPractical = isAbsentStatus(getValue(item, "PracticalAttendanceStatus"));
+
+                var cTI    = theoryCell(getValue(item, "TheoryI"), mTI, "theoryI");
+                var cTIia  = theoryCell(getValue(item, "TheoryI_IA"), mTIia, "ia");
+                var cTII   = theoryCell(getValue(item, "TheoryII"), mTII, "theoryII");
+                var cTIIia = theoryCell(getValue(item, "TheoryII_IA"), mTIIia, "ia");
+                var cTT    = (mTI + mTIia + mTII + mTIIia) > 0 ? cleanMark(getValue(item, "TheoryTotal")) : "-";
+                var cPV    = practicalCell(getValue(item, "PracticalViva"), mPV, absPractical, "viva");
+                var cPIA   = practicalCell(getValue(item, "PracticalIA"), mPIA, false, "ia");
+                var cST    = cleanMark(getValue(item, "SubjectTotal"));
+
+                calculatedGrandTotal += toNum(getValue(item, "SubjectTotal"));
+
+                // remark (proc ke Remarks column se: AB / G / F / D / I)
+                var r = String(getValue(item, "Remarks")).trim().toUpperCase();
+                var remark = "";
+
+                if (r === "AB") {
+                    remark = "Ab";
+                    if (code && failed.indexOf(code) === -1) failed.push(code);
+                } else if (r === "F") {
+                    remark = "F";
+                    if (code && failed.indexOf(code) === -1) failed.push(code);
+                } else if (r === "G") {
+                    remark = "G";
+                    if (code && grace.indexOf(code) === -1) grace.push(code);
+                } else if (r === "D") {
+                    remark = "D";
+                    if (code && distinction.indexOf(code) === -1) distinction.push(code);
+                } else if (r === "I") {
+                    remark = "I";
+                    if (code && firstClass.indexOf(code) === -1) firstClass.push(code);
+                }
+
+                html += '<tr>' +
+                    '<td class="sub">' + esc(subjectLabel) + '</td>' +
+                    '<td>' + esc(cleanMark(maxMarks)) + '</td>' +
+                    '<td>' + esc(cleanMark(minMarks)) + '</td>' +
+                    '<td>' + esc(cTI) + '</td>' +
+                    '<td>' + esc(cTIia) + '</td>' +
+                    '<td>' + esc(cTII) + '</td>' +
+                    '<td>' + esc(cTIIia) + '</td>' +
+                    '<td>' + esc(cTT) + '</td>' +
+                    '<td>' + esc(cPV) + '</td>' +
+                    '<td>' + esc(cPIA) + '</td>' +
+                    '<td class="bold">' + esc(cST) + '</td>' +
+                    '<td class="bold">' + esc(remark) + '</td>' +
+                '</tr>';
+            });
+
+            $("#marksTableBody").html(html);
+
+            // ---------- totals ----------
+            $("#headMaxTotal, #footMaxTotal").text(cleanMark(totalMax));
+            $("#headMinTotal, #footMinTotal").text(cleanMark(totalMin));
+
+            var apiGrandTotal = getValue(student, "GrandTotal");
+            $("#grandTotal").text(
+                apiGrandTotal.toString().trim() !== ""
+                    ? cleanMark(apiGrandTotal)
+                    : cleanMark(calculatedGrandTotal)
+            );
+
+            // ---------- summary ----------
+            $("#summaryDistinction").text(distinction.join(", "));
+            $("#summaryFirstClass").text(firstClass.join(", "));
+            $("#summaryGrace").text(grace.join(", "));
+            $("#summaryFailed").text(failed.join(", "));
+
+            // ---------- result ----------
+            var finalResult = String(getValue(student, "Result")).trim();
+            var hindiResult = resultHindi(finalResult);
+
+            $("#resultText").html(
+                (hindiResult ? '<span class="hi">' + esc(hindiResult) + '</span> / ' : '') +
+                esc(finalResult || "-")
+            );
+
+            // ---------- QR ----------
+            var rollNo = String(getValue(student, "RollNumber"));
+            var enrollNo = String(getValue(student, "EnrollmentNumber") || enrollment);
+
+            qrData.roll = rollNo;
+            qrData.name = String(getValue(student, "FirstName"));
+            qrData.result = finalResult;
+            qrData.verify = String(getValue(student, "VerifyCode")) || makeVerifyCode(rollNo, enrollNo);
+
+            generateQRCode();
+        }
+    </script>
+
+    <script>
+        // Scale the sheet so it prints exactly as it looks on screen, filling one A4 page.
+        (function(){
+          var PX_PER_MM = 96/25.4;
+          var PAGE_W = (210-16)*PX_PER_MM;   // A4 width minus 8mm margins
+          var PAGE_H = (297-16)*PX_PER_MM-4; // A4 height minus 8mm margins (small safety gap)
+          function fit(){
+            var sheet=document.querySelector('.sheet');
+            var prevW=sheet.style.width, prevMax=sheet.style.maxWidth;
+            sheet.style.width='900px'; sheet.style.maxWidth='900px';
+            var w=sheet.offsetWidth, h=sheet.offsetHeight;
+            sheet.style.width=prevW; sheet.style.maxWidth=prevMax;
+            var z=Math.min(PAGE_W/w, PAGE_H/h);
+            document.documentElement.style.setProperty('--print-zoom', z.toFixed(4));
+          }
+          window.addEventListener('beforeprint', fit);
+          try{
+            var mq=window.matchMedia('print');
+            (mq.addEventListener?mq.addEventListener('change',function(e){if(e.matches)fit();}):mq.addListener(function(e){if(e.matches)fit();}));
+          }catch(e){}
+          window.printSheet=function(){ fit(); window.print(); };
+        })();
+    </script>
+</body>
+</html>
