@@ -374,6 +374,7 @@
         let courseId = $("#courseId").val();
         let subjectId = $("#subjectId").val();
         let semester = $("#semester").val();
+        let BatchId = $("#BatchId").val();
          //var selectedSubject = $("#subjectId option:selected").text().trim();
         //var sessionSubject = '@Context.Session.GetString("subject_name")';
         //if (!sessionSubject) {
@@ -394,7 +395,7 @@
         try {
 
             const response = await fetch(
-                ApiBaseUrl + `PracticalMarks/GetIAStudents?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}`
+                ApiBaseUrl + `PracticalMarks/GetIAStudents?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}&BatchId=${BatchId}`
             );
 
             const students = await response.json();
@@ -548,7 +549,7 @@
         let allInputs = table.$('.practical');
         let isInvalid = false;
          let totalMarks = parseFloat($("#IAmaxmarks").text());
-            alert(totalMarks);
+         
         allInputs.each(function () {           
             if (marks > totalMarks) {
                 isInvalid = true;

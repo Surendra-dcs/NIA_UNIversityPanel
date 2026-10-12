@@ -402,6 +402,7 @@
                 document.getElementById("btnSaveMarks").style.display = "none";
                 return;
             }
+            $("#examId").text(students[0].examname)
             document.getElementById("btnSaveMarks").style.display = "inline-block";
             students.forEach(student => {
                 tbody.innerHTML += `
