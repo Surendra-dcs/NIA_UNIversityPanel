@@ -392,6 +392,7 @@
             }
 
             let first = students[0];
+            $("#examId").text(first.examname)
           $("#Elective_maxmarks").text(`( Max ${first.eltotalMarks || 0} )`);
             let rows = [];
            students.forEach((student, index) => {
