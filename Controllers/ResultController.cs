@@ -8,5 +8,13 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-    }
+        [HttpPost]
+        public IActionResult ProvisionalMarksheetMDMS(string rollNumber, string dob, int exId)
+        {
+            ViewBag.RollNumber = rollNumber;
+            ViewBag.Dob = dob;
+            ViewBag.ExId = exId;
+            return View();
+        }
+     }
 }
