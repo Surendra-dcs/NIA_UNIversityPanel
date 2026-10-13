@@ -402,7 +402,9 @@
                if ($.fn.DataTable.isDataTable('#studentTable')) {
                    $('#studentTable').DataTable().destroy();
                }
-               let tbody = document.getElementById('studentTableBody');
+
+               $("#examId").text(students[0].examname)
+               let tbody = document.getElementById('studentTableBody');               
                tbody.innerHTML = '';
 
                    students.forEach((student, index) => {

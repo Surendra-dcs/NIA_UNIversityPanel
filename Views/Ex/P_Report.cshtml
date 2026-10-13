@@ -402,6 +402,7 @@
                 $('#studentTable').DataTable().clear().destroy();
             }
             let tbody = $("#studentTableBody");
+            $("#examId").text(students[0].examname)
             tbody.empty();
             if (!students || students.length === 0) {
                 tbody.html(`

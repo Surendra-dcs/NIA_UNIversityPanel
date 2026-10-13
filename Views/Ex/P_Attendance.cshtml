@@ -402,6 +402,7 @@
                    $('#studentTable').DataTable().destroy();
                }
                let tbody = document.getElementById('studentTableBody');
+               $("#examId").text(students[0].examname)
                tbody.innerHTML = '';                  
                   
                    students.forEach((student, index) => {
