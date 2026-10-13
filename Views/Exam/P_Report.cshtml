@@ -380,6 +380,7 @@
             if ($.fn.DataTable.isDataTable('#studentTable')) {
                 $('#studentTable').DataTable().clear().destroy();
             }
+             $("#examId").text(students[0].examname)
             let tbody = $("#studentTableBody");
             tbody.empty();
             if (!students || students.length === 0) {
