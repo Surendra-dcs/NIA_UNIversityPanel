@@ -1,0 +1,514 @@
+﻿@inject IConfiguration Configuration
+@{
+    Layout = null;
+    var apiBase = Configuration["ApiSettings:BaseUrl"];
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Provisional Marksheet</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 24px 16px 40px;
+            background: #d8d8d8;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 13.5px;
+            color: #111;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .print-bar {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .btn-print {
+            background: #1f4d3a;
+            color: #fff;
+            padding: 9px 34px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+        }
+
+            .btn-print:hover {
+                background: #143527;
+            }
+
+        .page {
+            width: 850px;
+            max-width: 100%;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        .outer-border {
+            border: 2.5px solid #000;
+            padding: 6px;
+        }
+
+        .inner-border {
+            border: 1px solid #000;
+        }
+
+        .header {
+            border-bottom: 1px solid #000;
+            padding: 14px 20px 12px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-wrap {
+            flex-shrink: 0;
+            width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .logo-wrap img {
+                width: 65px;
+                height: 65px;
+                object-fit: contain;
+            }
+
+        .header-text {
+            flex: 1;
+            text-align: center;
+        }
+
+        .inst-name {
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            line-height: 1.2;
+        }
+
+        .inst-deemed {
+            font-size: 13.5px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .inst-ayush {
+            font-size: 12.5px;
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .inst-address {
+            font-size: 12.5px;
+            margin-top: 3px;
+        }
+
+        .inst-exam {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 6px;
+        }
+
+        .marksheet-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 9px 20px;
+            border-bottom: 1px solid #000;
+            letter-spacing: .4px;
+        }
+
+        .student-info {
+            padding: 12px 20px 10px;
+            border-bottom: 1px solid #000;
+        }
+
+        .info-row {
+            display: flex;
+            margin-bottom: 7px;
+            gap: 12px;
+        }
+
+            .info-row:last-child {
+                margin-bottom: 0;
+            }
+
+        .info-col {
+            flex: 1;
+            display: flex;
+            align-items: baseline;
+        }
+
+        .info-label {
+            width: 112px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .info-colon {
+            width: 18px;
+            flex-shrink: 0;
+        }
+
+        table.marks-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+            table.marks-table th, table.marks-table td {
+                border: 1px solid #000;
+                padding: 7px 8px;
+                text-align: center;
+                font-size: 13px;
+                vertical-align: middle;
+            }
+
+            table.marks-table thead th {
+                background: #f0f0f0;
+                font-weight: bold;
+                font-size: 12.5px;
+            }
+
+            table.marks-table td.code {
+                font-weight: bold;
+            }
+
+            table.marks-table td.name {
+                text-align: left;
+            }
+
+            table.marks-table tfoot td {
+                background: #f9f9f9;
+                font-weight: bold;
+            }
+
+        .remark-f {
+            color: #c00;
+            font-weight: bold;
+        }
+
+        .remark-d {
+            color: #005a00;
+            font-weight: bold;
+        }
+
+        .remark-i {
+            color: #003399;
+            font-weight: bold;
+        }
+
+        .result-line {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-bottom: 1px solid #000;
+            letter-spacing: .5px;
+        }
+
+        .appear-line {
+            padding: 8px 20px;
+            border-bottom: 1px solid #000;
+            font-size: 13px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .remarks-key {
+            padding: 10px 20px;
+            border-bottom: 1px solid #000;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .note-section {
+            padding: 12px 20px 10px;
+            border-bottom: 1px solid #000;
+        }
+
+        .note-head {
+            font-size: 13.5px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-decoration: underline;
+        }
+
+        .note-section ol {
+            padding-left: 20px;
+        }
+
+        .note-section li {
+            font-size: 12.5px;
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+
+        .disclaimer {
+            padding: 12px 20px;
+            border-bottom: 1px solid #000;
+            text-align: center;
+        }
+
+        .dis-head {
+            font-size: 13.5px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin-bottom: 7px;
+        }
+
+        .dis-body {
+            font-size: 11.5px;
+            text-transform: uppercase;
+            line-height: 1.55;
+        }
+
+        .footer-line {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+        }
+
+        #msgBox {
+            max-width: 850px;
+            margin: 40px auto;
+            padding: 18px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #c00;
+            color: #c00;
+            font-weight: bold;
+            display: none;
+            font-family: Arial, sans-serif;
+        }
+
+        @@page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
+        @@media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+
+            .print-bar {
+                display: none;
+            }
+
+            .page {
+                width: 100%;
+            }
+
+            .outer-border {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-bar">
+        <button class="btn-print" id="btnPrint" onclick="window.print()" style="display:none;">Print Marksheet</button>
+    </div>
+
+    <div id="msgBox"></div>
+
+    <div class="page" id="sheet" style="display:none;">
+        <div class="outer-border">
+            <div class="inner-border">
+             
+                <div class="header">
+                    <div class="logo-wrap">
+                        <img src="@Url.Content("~/Logo/nia_logo.png")" alt="NIA Logo" onerror="this.style.display='none'" />
+                    </div>
+                    <div class="header-text">
+                        <div class="inst-name">National Institute of Ayurveda, Jaipur</div>
+                        <div class="inst-deemed">Deemed to be University</div>
+                        <div class="inst-ayush">(Ministry of AYUSH, Govt. of India)</div>
+                        <div class="inst-address">Jorawar Singh Gate, Amer Road, Jaipur &ndash; 302002</div>
+                        <div class="inst-exam" id="tExam"></div>
+                    </div>
+                </div>
+
+                <div class="marksheet-title">Provisional Marksheet</div>
+
+                <div class="student-info">
+                    <div class="info-row">
+                        <div class="info-col"><span class="info-label">Name</span><span class="info-colon">:</span><span id="tName"></span></div>
+                        <div class="info-col"><span class="info-label">Roll No.</span><span class="info-colon">:</span><span id="tRoll"></span></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-col"><span class="info-label">Father's Name</span><span class="info-colon">:</span><span id="tFather"></span></div>
+                        <div class="info-col"><span class="info-label">En. No.</span><span class="info-colon">:</span><span id="tEnroll"></span></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-col"><span class="info-label">Mother's Name</span><span class="info-colon">:</span><span id="tMother"></span></div>
+                        <div class="info-col"><span class="info-label">Attempt</span><span class="info-colon">:</span><span id="tAttempt"></span></div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-col"><span class="info-label">Course</span><span class="info-colon">:</span><span id="tCourse"></span></div>
+                        <div class="info-col"><span class="info-label">Batch</span><span class="info-colon">:</span><span id="tBatch"></span></div>
+                    </div>
+                </div>
+
+                <table class="marks-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:130px;text-align:left;">SUBJECT CODE</th>
+                            <th rowspan="2" style="text-align:left;">SUBJECT NAME</th>
+                            <th colspan="3">MARKS SCHEME</th>
+                            <th colspan="2">OBTAINED MARKS</th>
+                            <th rowspan="2" style="width:75px;">REMARK</th>
+                        </tr>
+                        <tr>
+                            <th style="width:62px;">MAX</th>
+                            <th style="width:62px;">MIN</th>
+                            <th style="width:62px;">TOTAL</th>
+                            <th style="width:68px;">THEORY</th>
+                            <th style="width:62px;">TOTAL</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tBody"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" style="text-align:right;">GRAND TOTAL</td>
+                            <td id="tSumMax"></td>
+                            <td></td>
+                            <td id="tSumTotal"></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="result-line">RESULT : <span id="tResult"></span></div>
+                <div class="appear-line" id="tAppear"></div>
+
+                <div class="remarks-key">
+                    REMARKS :&nbsp; D = DISTINCTION,&nbsp;&nbsp; I = FIRST CLASS,&nbsp;&nbsp; F = FAIL
+                </div>
+
+                <div class="note-section">
+                    <div class="note-head">Note</div>
+                    <ol>
+                        <li>For candidate to pass, he/she shall require to obtain a minimum of 50% marks in Theory Examination.</li>
+                        <li>The candidate securing 65% marks or above in a subject shall be declared to have obtained First Class (Denoted by I) in that Subject.</li>
+                        <li>The candidate securing 75% marks or above shall be declared to have obtained Distinction (Denoted by D).</li>
+                        <li>In case of any mistake being detected during the preparation of marksheet or brought to notice afterwards, the university will be fully empowered to correct the same.</li>
+                    </ol>
+                </div>
+
+                <div class="disclaimer">
+                    <div class="dis-head">Disclaimer</div>
+                    <div class="dis-body">
+                        Utmost care has been taken to prepare these results. However, this is not your official marksheet and there may be a
+                        small chance of error. The original / re-evaluated marksheet will be issued by the university separately.
+                    </div>
+                </div>
+
+                <div class="footer-line">
+                    <span>Print Date : <span id="tPrint"></span></span>
+                    <span>Result Declaration Date : <span id="tDeclare"></span></span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '@apiBase'.replace(/\/$/, '');
+        const api = apiBase + '/Result/';
+        const roll = '@ViewBag.RollNumber';
+        const dob = '@ViewBag.Dob';
+        const exId = '@ViewBag.ExId';
+
+        const esc = v => String(v ?? '').replace(/[&<>"']/g, c =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const setText = (id, v) => { document.getElementById(id).textContent = v ?? ''; };
+        const fmtDate = v => v ? new Date(v).toLocaleDateString('en-GB') : '';
+        const num = v => (v === null || v === undefined || v === '') ? 0 : Number(v);
+
+        function showError(msg) {
+            const box = document.getElementById('msgBox');
+            box.textContent = msg;
+            box.style.display = 'block';
+        }
+
+        fetch(`${api}GetMdMsResultMarksheet?rollNumber=${encodeURIComponent(roll)}&dob=${encodeURIComponent(dob)}&exId=${encodeURIComponent(exId)}`)
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(rows => {
+                if (!rows || rows.length === 0) {
+                    showError('No result found for this student.');
+                    return;
+                }
+
+                const f = rows[0];
+                setText('tExam', f.examName);
+                setText('tName', f.candidateName);
+                setText('tRoll', f.rollNumber);
+                setText('tFather', f.fatherName);
+                setText('tEnroll', f.enrollmentNumber);
+                setText('tMother', f.motherName);
+                setText('tAttempt', f.attempt);
+                setText('tCourse', f.courseName);
+                setText('tBatch', f.batch);
+                setText('tResult', f.result);
+                setText('tPrint', new Date().toLocaleString('en-GB'));
+                setText('tDeclare', fmtDate(f.examDeclareDate));
+
+                let sumMax = 0, sumTotal = 0, html = '';
+                const appear = [];
+
+                rows.forEach(s => {
+                    const max = num(s.maxMarks), min = num(s.minMarks);
+                    const theory = num(s.theoryMarks), total = num(s.total);
+                    sumMax += max;
+                    sumTotal += total;
+
+                    const r = String(s.remark || '').toUpperCase();
+                    const cls = r === 'F' ? 'remark-f' : r === 'D' ? 'remark-d' : r === 'I' ? 'remark-i' : '';
+                    if (s.requiredToAppear) appear.push(s.requiredToAppear);
+
+                    html += `<tr>
+                        <td class="code">${esc(s.subjectCode)}</td>
+                        <td class="name">${esc(s.subjectName)}</td>
+                        <td>${max}</td>
+                        <td>${min}</td>
+                        <td>${max}</td>
+                        <td>${theory}</td>
+                        <td>${total}</td>
+                        <td class="${cls}">${esc(r) || '&nbsp;'}</td>
+                    </tr>`;
+                });
+
+                document.getElementById('tBody').innerHTML = html;
+                setText('tSumMax', sumMax);
+                setText('tSumTotal', sumTotal);
+
+                if (appear.length > 0) {
+                    const a = document.getElementById('tAppear');
+                    a.textContent = 'Required to appear in : ' + appear.join(', ');
+                    a.style.display = 'block';
+                }
+
+                document.getElementById('sheet').style.display = 'block';
+                document.getElementById('btnPrint').style.display = 'inline-block';
+            })
+            .catch(() => showError('Server error. Please try again.'));
+    </script>
+</body>
+</html>

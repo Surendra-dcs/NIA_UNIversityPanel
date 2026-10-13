@@ -204,5 +204,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {           
             return View();
         }
+
+        public IActionResult OldExamDetailsmdms()
+        {
+            return View();
+        }
+
     }
 }

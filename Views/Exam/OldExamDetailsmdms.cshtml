@@ -1,0 +1,734 @@
+﻿@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "MD/MS Result Report";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+    var apiBase = Configuration["ApiSettings:BaseUrl"];
+}
+
+<style>
+    .rr-wrap {
+        --g: #1f4d3a;
+        --g-dark: #143527;
+        --g-mid: #2d6a4f;
+        --g-soft: #eaf1ed;
+        --line: #d5ded9;
+        --ink: #1f2a24;
+        --muted: #667069;
+        --ok: #15803d;
+        --ok-soft: #dcfce7;
+        --bad: #b42318;
+        --bad-soft: #fee4e2;
+        --warn: #b45309;
+      /*   max-width: 1400px; */
+        margin: 0 auto;
+       /*  padding: 16px; */
+        color: var(--ink);
+        font-family: inherit;
+    }
+
+    /* ---------- Banner ---------- */
+    .rr-banner {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(120deg, var(--g-dark) 0%, var(--g) 55%, var(--g-mid) 100%);
+        color: #fff;
+        border-radius: 14px;
+        padding: 26px 30px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: 0 8px 22px rgba(20,53,39,.28);
+    }
+
+        .rr-banner::after {
+            content: "";
+            position: absolute;
+            right: -60px;
+            top: -60px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.07);
+        }
+
+    .rr-banner-icon {
+        width: 58px;
+        height: 58px;
+        flex-shrink: 0;
+        border-radius: 14px;
+        background: rgba(255,255,255,.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .rr-banner h1 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: .3px;
+    }
+
+    .rr-banner p {
+        margin: 4px 0 0;
+        font-size: 14px;
+        opacity: .85;
+    }
+
+    /* ---------- Cards ---------- */
+    .rr-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        box-shadow: 0 3px 14px rgba(0,0,0,.05);
+        margin-top: 18px;
+    }
+
+    /* ---------- Filters ---------- */
+    .rr-filters {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 20px 20px 8px;
+    }
+
+    .rr-field label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 7px;
+    }
+
+    .rr-step {
+        width: 19px;
+        height: 19px;
+        border-radius: 50%;
+        background: var(--g-soft);
+        color: var(--g);
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .rr-field select {
+        width: 100%;
+        height: 44px;
+        padding: 0 12px;
+        font-size: 14px;
+        font-weight: 600;
+        font-family: inherit;
+        color: var(--ink);
+        background: #fff;
+        border: 1.5px solid var(--line);
+        border-radius: 10px;
+        transition: border-color .2s, box-shadow .2s;
+    }
+
+        .rr-field select:focus {
+            outline: none;
+            border-color: var(--g);
+            box-shadow: 0 0 0 4px rgba(31,77,58,.14);
+        }
+
+        .rr-field select:disabled {
+            background: #f3f5f4;
+            color: #a0aaa4;
+            cursor: not-allowed;
+        }
+
+    .rr-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 20px 20px;
+    }
+
+    .rr-btn {
+        height: 44px;
+        padding: 0 24px;
+        font-size: 14px;
+        font-weight: 700;
+        font-family: inherit;
+        border-radius: 10px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform .15s, box-shadow .15s, background .15s;
+    }
+
+        .rr-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgba(0,0,0,.14);
+        }
+
+        .rr-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+    .rr-btn-primary {
+        background: #6d90b5;
+        color: #fff;
+        border: 1.5px solid var(--g);
+    }
+
+        .rr-btn-primary:hover:not(:disabled) {
+            background: var(--g-dark);
+        }
+
+    .rr-btn-print {
+        background: #fff;
+        color: var(--g);
+        border: 1.5px solid var(--g);
+    }
+
+    .rr-btn-reset {
+        background: #fff;
+        color: var(--muted);
+        border: 1.5px solid var(--line);
+    }
+
+    .rr-spinner {
+        width: 15px;
+        height: 15px;
+        border: 2px solid rgba(255,255,255,.5);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: rr-spin .7s linear infinite;
+        display: none;
+    }
+
+    .rr-loading .rr-spinner {
+        display: inline-block;
+    }
+
+    @@keyframes rr-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ---------- Summary ---------- */
+    .rr-summary {
+        display: none;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .rr-stat {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 4px solid var(--g);
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.04);
+    }
+
+        .rr-stat span {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+
+        .rr-stat strong {
+            display: block;
+            margin-top: 2px;
+            font-size: 30px;
+            font-weight: 800;
+            color: var(--g);
+        }
+
+        .rr-stat.ok {
+            border-top-color: var(--ok);
+        }
+
+            .rr-stat.ok strong {
+                color: var(--ok);
+            }
+
+        .rr-stat.bad {
+            border-top-color: var(--bad);
+        }
+
+            .rr-stat.bad strong {
+                color: var(--bad);
+            }
+
+        .rr-stat.pct {
+            border-top-color: var(--warn);
+        }
+
+            .rr-stat.pct strong {
+                color: var(--warn);
+            }
+
+    /* ---------- Table card ---------- */
+    .rr-table-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 16px 20px 6px;
+    }
+
+        .rr-table-head h3 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--g);
+        }
+
+    .rr-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .rr-chip {
+        background: var(--g-soft);
+        color: var(--g);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 999px;
+    }
+
+    .rr-table-body {
+        padding: 8px 20px 16px;
+    }
+
+    .rr-scroll {
+        overflow: auto;
+        max-height: 70vh;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+    }
+
+    #tblResult {
+        width: 100% !important;
+        margin: 0 !important;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 14px;
+    }
+
+        #tblResult thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #6d90b5;
+            color: #fff;
+            font-size: 12.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            padding: 12px;
+            text-align: center;
+            white-space: nowrap;
+            border: none;
+        }
+
+        #tblResult tbody td {
+            padding: 11px 12px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        #tblResult tbody tr:nth-child(even) {
+            background: #f9fbfa;
+        }
+
+        #tblResult tbody tr:hover {
+            background: var(--g-soft);
+        }
+
+    .rr-center {
+        text-align: center;
+    }
+
+    .rr-name {
+        font-weight: 700;
+        min-width: 180px;
+    }
+
+    .rr-total {
+        font-weight: 800;
+        font-size: 15px;
+    }
+
+    .rr-badge {
+        display: inline-block;
+        min-width: 66px;
+        padding: 4px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: .4px;
+        text-align: center;
+    }
+
+    .rr-pass {
+        background: var(--ok-soft);
+        color: var(--ok);
+    }
+
+    .rr-fail {
+        background: var(--bad-soft);
+        color: var(--bad);
+    }
+
+    .rr-empty {
+        text-align: center;
+        padding: 48px 12px !important;
+        color: var(--muted);
+    }
+
+        .rr-empty .ico {
+            display: block;
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        padding: 5px 10px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: var(--g) !important;
+        color: #fff !important;
+        border: 1px solid var(--g) !important;
+        border-radius: 8px;
+    }
+
+    /* ---------- Responsive ---------- */
+    @@media (max-width: 992px) {
+        .rr-filters, .rr-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .rr-filters, .rr-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .rr-banner h1 {
+            font-size: 20px;
+        }
+
+        .rr-btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    /* Agar koi seedha Ctrl+P kare */
+    @@media print {
+        .rr-noprint {
+            display: none !important;
+        }
+    }
+</style>
+
+<div class="rr-wrap">
+@* 
+    <div class="rr-banner">
+        <div class="rr-banner-icon">&#127891;</div>
+        <div>
+            <h1>National Institute of Ayurveda</h1>
+            <p>MD/MS Result Sheet &mdash; select exam, course, semester and batch to view the result.</p>
+        </div>
+    </div> *@
+
+    <div class="rr-card rr-noprint">
+        <div class="rr-filters">
+            <div class="rr-field">
+                <label for="ddlExam"><span class="rr-step">1</span> Exam</label>
+                <select id="ddlExam"><option value="">Select Exam</option></select>
+            </div>
+            <div class="rr-field">
+                <label for="ddlCourse"><span class="rr-step">2</span> Course</label>
+                <select id="ddlCourse" disabled><option value="">Select Course</option></select>
+            </div>
+            <div class="rr-field">
+                <label for="ddlSemester"><span class="rr-step">3</span> Semester</label>
+                <select id="ddlSemester" disabled><option value="">Select Semester</option></select>
+            </div>
+            <div class="rr-field">
+                <label for="ddlBatch"><span class="rr-step">4</span> Batch</label>
+                <select id="ddlBatch" disabled><option value="">Select Batch</option></select>
+            </div>
+        </div>
+        <div class="rr-actions">
+            <button type="button" id="btnSearch" class="rr-btn rr-btn-primary" disabled>
+                <span class="rr-spinner"></span><span id="btnSearchText">Search report</span>
+            </button>
+            <button type="button" id="btnPrint" class="rr-btn rr-btn-print" disabled>Print</button>
+            <button type="button" id="btnReset" class="rr-btn rr-btn-reset">Reset</button>
+        </div>
+    </div>
+
+    <div class="rr-summary rr-noprint" id="rrSummary">
+        <div class="rr-stat"><span>Total students</span><strong id="stTotal">0</strong></div>
+        <div class="rr-stat ok"><span>Pass</span><strong id="stPass">0</strong></div>
+        <div class="rr-stat bad"><span>Fail</span><strong id="stFail">0</strong></div>
+        <div class="rr-stat pct"><span>Pass percentage</span><strong id="stPercent">0%</strong></div>
+    </div>
+
+    <div class="rr-card">
+        <div class="rr-table-head">
+            <h3>Result List</h3>
+            <div class="rr-chips" id="rrChips"></div>
+        </div>
+        <div class="rr-table-body">
+            <div class="rr-scroll">
+                <table id="tblResult">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Roll No.</th>
+                            <th>Enrollment No.</th>
+                            <th>Candidate Name</th>
+                            <th>Father Name</th>
+                            <th>Mother Name</th>
+                            <th>DOB</th>
+                            <th>Grand Total</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="9" class="rr-empty">
+                                <span class="ico">&#128196;</span>
+                                No data yet. Choose Exam, Course, Semester and Batch, then select Search report.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/printMdMsResult.js"></script>
+<script>
+    const apiBase = '@apiBase'.replace(/\/$/, '');
+    const api = apiBase + '/Result/';
+    const logoUrl = '@Url.Content("~/assets/images/nia_logo.png")';   // logo ka path alag ho to yahan badlein
+
+    const ddl = {
+        exam: document.getElementById('ddlExam'),
+        course: document.getElementById('ddlCourse'),
+        sem: document.getElementById('ddlSemester'),
+        batch: document.getElementById('ddlBatch')
+    };
+    const btnSearch = document.getElementById('btnSearch');
+    const btnPrint = document.getElementById('btnPrint');
+    const DEFAULT_MSG = 'No data yet. Choose Exam, Course, Semester and Batch, then select Search report.';
+
+    let currentData = [];
+    let currentMeta = {};
+
+    const esc = v => String(v ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const fmtDate = v => v ? new Date(v).toLocaleDateString('en-GB') : '';
+
+    const emptyRow = msg =>
+        `<tr><td colspan="9" class="rr-empty"><span class="ico">&#128196;</span>${msg}</td></tr>`;
+
+    function getJson(url) {
+        return fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    }
+
+    function fillDropdown(el, placeholder, data, valueKey, textKey) {
+        el.innerHTML = `<option value="">${placeholder}</option>`;
+        data.forEach(x => {
+            const opt = document.createElement('option');
+            opt.value = x[valueKey];
+            opt.text = x[textKey];
+            el.appendChild(opt);
+        });
+        el.disabled = data.length === 0;
+    }
+
+    function resetFrom(...els) {
+        const labels = { ddlCourse: 'Course', ddlSemester: 'Semester', ddlBatch: 'Batch' };
+        els.forEach(el => fillDropdown(el, `Select ${labels[el.id]}`, [], '', ''));
+        updateSearchState();
+    }
+
+    function updateSearchState() {
+        btnSearch.disabled = !(ddl.exam.value && ddl.course.value && ddl.sem.value && ddl.batch.value);
+    }
+
+    function clearTable(message) {
+        if ($.fn.DataTable.isDataTable('#tblResult')) {
+            $('#tblResult').DataTable().destroy();
+        }
+        $('#tblResult tbody').html(emptyRow(message));
+        document.getElementById('rrSummary').style.display = 'none';
+        document.getElementById('rrChips').innerHTML = '';
+        currentData = [];
+        btnPrint.disabled = true;
+    }
+
+    // ---------- Filters ----------
+    getJson(api + 'GetMdMsResultExams')
+        .then(d => fillDropdown(ddl.exam, 'Select Exam', d, 'exId', 'examYear'))
+        .then(() => { ddl.exam.disabled = false; })
+        .catch(() => alert('Exam list load nahi hui.'));
+
+    ddl.exam.addEventListener('change', function () {
+        resetFrom(ddl.course, ddl.sem, ddl.batch);
+        clearTable(DEFAULT_MSG);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultCourses?exId=${this.value}`)
+            .then(d => fillDropdown(ddl.course, 'Select Course', d, 'courseId', 'courseName'));
+    });
+
+    ddl.course.addEventListener('change', function () {
+        resetFrom(ddl.sem, ddl.batch);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultSemesters?exId=${ddl.exam.value}&courseId=${this.value}`)
+            .then(d => fillDropdown(ddl.sem, 'Select Semester', d, 'semId', 'semesterName'));
+    });
+
+    ddl.sem.addEventListener('change', function () {
+        resetFrom(ddl.batch);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultBatches?exId=${ddl.exam.value}&courseId=${ddl.course.value}&semId=${this.value}`)
+            .then(d => fillDropdown(ddl.batch, 'Select Batch', d, 'batch', 'batch'));
+    });
+
+    ddl.batch.addEventListener('change', updateSearchState);
+
+    document.getElementById('btnReset').addEventListener('click', function () {
+        ddl.exam.value = '';
+        resetFrom(ddl.course, ddl.sem, ddl.batch);
+        clearTable(DEFAULT_MSG);
+    });
+
+    // ---------- Search ----------
+    btnSearch.addEventListener('click', function () {
+        const url = `${api}GetMdMsResultStudents?exId=${ddl.exam.value}&courseId=${ddl.course.value}` +
+                    `&semId=${ddl.sem.value}&batch=${encodeURIComponent(ddl.batch.value)}`;
+
+        btnSearch.classList.add('rr-loading');
+        btnSearch.disabled = true;
+        document.getElementById('btnSearchText').innerText = 'Loading...';
+
+        getJson(url).then(data => {
+            if ($.fn.DataTable.isDataTable('#tblResult')) {
+                $('#tblResult').DataTable().destroy();
+            }
+
+            if (!data || data.length === 0) {
+                clearTable('No record found for the selected filters.');
+                return;
+            }
+
+            let rows = '', pass = 0;
+            data.forEach((s, i) => {
+                const isPass = s.result === 'PASS';
+                if (isPass) pass++;
+                rows += `<tr>
+                    <td class="rr-center">${i + 1}</td>
+                   <td class="rr-center"><a href="#" class="rr-roll"
+    data-roll="${esc(s.rollNumber)}"
+    data-dob="${s.dateOfBirth ? String(s.dateOfBirth).substring(0, 10) : ''}"
+    data-exid="${esc(s.exId)}">${esc(s.rollNumber)}</a></td>
+                    <td class="rr-center">${esc(s.enrollmentNumber)}</td>
+                    <td class="rr-name">${esc(s.candidateName)}</td>
+                    <td>${esc(s.fatherName)}</td>
+                    <td>${esc(s.motherName)}</td>
+                    <td class="rr-center">${fmtDate(s.dateOfBirth)}</td>
+                    <td class="rr-center rr-total">${esc(s.grandTotal)}</td>
+                    <td class="rr-center"><span class="rr-badge ${isPass ? 'rr-pass' : 'rr-fail'}">${esc(s.result)}</span></td>
+                </tr>`;
+            });
+            $('#tblResult tbody').html(rows);
+
+            $('#tblResult').DataTable({
+                pageLength: 25,
+                ordering: true,
+                searching: true,
+                columnDefs: [{ orderable: false, targets: 0 }]
+            });
+
+            const total = data.length, fail = total - pass;
+            const pct = ((pass / total) * 100).toFixed(1);
+            document.getElementById('stTotal').innerText = total;
+            document.getElementById('stPass').innerText = pass;
+            document.getElementById('stFail').innerText = fail;
+            document.getElementById('stPercent').innerText = pct + '%';
+            document.getElementById('rrSummary').style.display = 'grid';
+
+            const t = el => el.options[el.selectedIndex].text;
+            currentData = data;
+            currentMeta = {
+                exam: t(ddl.exam), course: t(ddl.course), sem: t(ddl.sem), batch: t(ddl.batch),
+                total, pass, fail, pct
+            };
+
+            document.getElementById('rrChips').innerHTML =
+                [currentMeta.exam, currentMeta.course, currentMeta.sem, 'Batch ' + currentMeta.batch]
+                    .map(x => `<span class="rr-chip">${esc(x)}</span>`).join('');
+
+            btnPrint.disabled = false;
+        })
+        .catch(() => alert('Result is not load.'))
+        .finally(() => {
+            btnSearch.classList.remove('rr-loading');
+            document.getElementById('btnSearchText').innerText = 'Search report';
+            updateSearchState();
+        });
+    });
+
+    // ---------- Print ----------
+    btnPrint.addEventListener('click', function () {
+        if (!currentData.length) return;
+        const logo = new URL(logoUrl, window.location.origin).href;
+        printResultSheet(currentData, currentMeta, logo);
+    });
+
+     $(document).on('click', 'a.rr-roll', function (e) {
+        e.preventDefault();
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '@Url.Action("ProvisionalMarksheetMDMS","Result")';
+        form.target = '_blank';
+
+        const add = (name, value) => {
+            const i = document.createElement('input');
+            i.type = 'hidden';
+            i.name = name;
+            i.value = value;
+            form.appendChild(i);
+        };
+        add('rollNumber', this.dataset.roll);
+        add('dob', this.dataset.dob);
+        add('exId', this.dataset.exid);
+
+        document.body.appendChild(form);
+        form.submit();
+        form.remove();
+    });
+</script>
