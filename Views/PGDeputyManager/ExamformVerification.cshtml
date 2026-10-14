@@ -521,6 +521,7 @@
 
        function verifyForm(id) {
         let checkbox = $(`.rowCheckbox[value="${id}"]`);
+        var examinnerMobile = '@Context.Session.GetString("Mobile")';
         if (!checkbox.prop('checked')) {
             alert("Please select checkbox first");
             return;
@@ -531,7 +532,7 @@
             url: ApiBaseUrl + 'StudentEnrollment/StudentformVerify',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: id }),
+            data: JSON.stringify({ id: id,Mobile:examinnerMobile }),
             success: function () {
                 alert("Student verified successfully");
                 table.ajax.reload();
