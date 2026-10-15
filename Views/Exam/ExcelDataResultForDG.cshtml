@@ -1,330 +1,140 @@
-﻿@{
-    ViewData["Title"] = "Result For CSV&Excel";
+﻿@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Result For CSV & Excel";
     Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+    var apiBase = Configuration["ApiSettings:BaseUrl"];
 }
-<script src="~/js/printdepartmentwisereports.js"></script>
+
 <style>
-    .search-panel {
+    .dl-panel {
         background: #fff;
         border: 1px solid #dcdcdc;
         border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
+        padding: 18px;
+        margin: 16px 0 20px;
         box-shadow: 0 2px 8px rgba(0,0,0,.08);
     }
 
-    .search-title {
+    .dl-title {
         font-size: 20px;
         font-weight: 600;
         color: #0d3b66;
-        margin-bottom: 15px;
+        margin-bottom: 16px;
     }
 
-    .search-row {
+    .dl-row {
         display: flex;
         flex-wrap: wrap;
         gap: 15px;
-        align-items: end;
+        align-items: flex-end;
     }
 
-    .search-group {
-        min-width: 220px;
+    .dl-group {
+        min-width: 200px;
         flex: 1;
     }
 
-        .search-group label {
-            display: block;
+        .dl-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-weight: 600;
             margin-bottom: 6px;
         }
 
-        .search-group select {
+        .dl-group select {
             width: 100%;
-            height: 38px;
+            height: 40px;
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 0 10px;
+            background: #fff;
         }
 
-    .btn-group {
-        flex: 0;
-    }
-
-        .btn-group button {
-            height: 38px;
-            padding: 0 25px;
-            border: none;
-            background: #0d6efd;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-            .btn-group button:hover {
-                background: #0b5ed7;
+            .dl-group select:disabled {
+                background: #f1f3f5;
+                color: #9aa0a6;
+                cursor: not-allowed;
             }
 
-    .download-btn:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
+            .dl-group select:focus {
+                outline: none;
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+            }
 
-    .search-title {
-        display: flex;
-        justify-content: space-between;
+    .dl-step {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #e7f0ff;
+        color: #0d6efd;
+        font-size: 11px;
+        font-weight: 800;
+        display: inline-flex;
         align-items: center;
+        justify-content: center;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 10px;
+    .dl-btn-wrap {
+        flex: 0 0 auto;
+        min-width: 150px;
     }
 
-    .print-page {
-        position: relative;
-        page-break-after: always;
-        min-height: 190mm;
-    }
-
-        .print-page:last-child {
-            page-break-after: auto;
-        }
-
-</style>
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-        background: #f4f6f9;
-        padding: 20px;
-        color: #222;
-    }
-
-    .page {
+    .dl-btn {
         width: 100%;
-        max-width: 1400px;
-        margin: auto;
-        background: #fff;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        height: 40px;
+        border: none;
+        background: #0d6efd;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
     }
 
-    /* ================= HEADER ================= */
-
-    .top {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        border-bottom: 3px solid #0d6efd;
-        padding-bottom: 15px;
-        margin-bottom: 20px;
-    }
-
-    .logo img {
-        width: 90px;
-        height: 90px;
-        object-fit: contain;
-    }
-
-    .heading {
-        flex: 1;
-        text-align: center;
-    }
-
-        .heading h2 {
-            font-size: 28px;
-            color: #0d3b66;
-            font-weight: 700;
-            margin-bottom: 4px;
+        .dl-btn:hover:not(:disabled) {
+            background: #0b5ed7;
         }
 
-        .heading p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 2px;
+        .dl-btn:disabled {
+            cursor: not-allowed;
+            opacity: .6;
         }
 
-        .heading h4 {
-            margin-top: 10px;
-            font-size: 18px;
-            color: #c1121f;
-            font-weight: 700;
-        }
-
-        .heading h3 {
-            margin-top: 8px;
-            font-size: 20px;
-            background: #0d6efd;
-            color: white;
-            display: inline-block;
-            padding: 8px 18px;
-            border-radius: 5px;
-            letter-spacing: 1px;
-        }
-
-    /* ================= TABLE ================= */
-
-    .table-responsive {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    .ledger {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 1100px;
-    }
-
-        .ledger thead th {
-            background: #0d3b66;
-            color: #fff;
-            padding: 12px 10px;
-            font-size: 14px;
-            border: 1px solid #dcdcdc;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        .ledger tbody td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .ledger tbody tr:nth-child(even) {
-            background: #f8fbff;
-        }
-
-        .ledger tbody tr:hover {
-            background: #eef5ff;
-            transition: 0.3s;
-        }
-
-    /* Result Badge */
-
-    .pass {
-        color: #198754;
-        font-weight: bold;
-    }
-
-    .fail {
-        color: #dc3545;
-        font-weight: bold;
-    }
-
-    /* ================= MOBILE ================= */
-
-    @@media(max-width:768px) {
-        body
-
-    {
-        padding: 10px;
-    }
-
-    .page {
-        padding: 15px;
-    }
-
-    .top {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .logo img {
-        width: 70px;
-        height: 70px;
-    }
-
-    .heading h2 {
-        font-size: 20px;
-    }
-
-    .heading h3 {
-        font-size: 16px;
-        padding: 6px 12px;
-    }
-
-    .heading h4 {
-        font-size: 15px;
-    }
-
-    .ledger thead th,
-    .ledger tbody td {
-        padding: 8px;
-        font-size: 12px;
-    }
-
-    }
-
-    /* ================= PRINT ================= */
-
-    @@media print {
-
-        body {
-            background: white;
-            padding: 0;
-        }
-
-        .page {
-            box-shadow: none;
-            border-radius: 0;
-            padding: 0;
-        }
-
-        .ledger thead th {
-            background: #d9d9d9 !important;
-            color: black !important;
-        }
+    .dl-note {
+        margin-top: 12px;
+        font-size: 13px;
+        color: #666;
     }
 </style>
 
-<div class="search-panel">
+<div class="dl-panel">
 
-    <div class="search-title">
-        🔍 Result Sheet Download (CSV & Excel)        
-    </div>
+    <div class="dl-title">&#128269; Result Sheet Download (CSV &amp; Excel)</div>
 
-    <div class="search-row">
-        <div class="search-group">
-            <label>Session</label>
-            <select id="sessionId">
-                <option value="">Select Session</option>
-            </select>
+    <div class="dl-row">
+        <div class="dl-group">
+            <label for="ddlExam"><span class="dl-step">1</span> Exam</label>
+            <select id="ddlExam"><option value="">Select Exam</option></select>
         </div>
 
-        <div class="search-group">
-            <label>Program</label>
-            <select id="programId">
-                <option value="">Select Program</option>
-            </select>
+        <div class="dl-group">
+            <label for="ddlCourse"><span class="dl-step">2</span> Course</label>
+            <select id="ddlCourse" disabled><option value="">Select Course</option></select>
         </div>
 
-        <div class="search-group">
-            <label>Course</label>
-            <select id="courseId">
-                <option value="">Select Course</option>
-            </select>
+        <div class="dl-group">
+            <label for="ddlSemester"><span class="dl-step">3</span> Semester</label>
+            <select id="ddlSemester" disabled><option value="">Select Semester</option></select>
         </div>
 
-        <div class="search-group">
-            <label>Semester</label>
-            <select id="semester">
-                <option value="">Select Semester</option>
-            </select>
+        <div class="dl-group">
+            <label for="ddlBatch"><span class="dl-step">4</span> Batch</label>
+            <select id="ddlBatch" disabled><option value="">Select Batch</option></select>
         </div>
 
-        <div class="search-group">
-            <label>Download Type</label>
+        <div class="dl-group">
+            <label for="downloadType"><span class="dl-step">5</span> Download Type</label>
             <select id="downloadType">
                 <option value="">Select Type</option>
                 <option value="excel">Excel</option>
@@ -332,100 +142,123 @@
             </select>
         </div>
 
-        
-
-        <div class="search-group btn-group">
-            <button type="button" onclick="downloadResult()">
-                Download
-            </button>           
+        <div class="dl-btn-wrap">
+            <button type="button" id="btnDownload" class="dl-btn">Download</button>
         </div>
-    
-       
     </div>
+
+    <div class="dl-note">Please select an Exam first. The Course, Semester, and Batch options will then open automatically, one after another.</div>
 </div>
 
-    <script>
-        $(document).ready(function () {
-        loadPrograms();
-        loadSession();       
+<script>
+    const apiBase = '@apiBase'.replace(/\/$/, '');
+    const api = apiBase + '/Result/';
+
+    const ddl = {
+        exam: document.getElementById('ddlExam'),
+        course: document.getElementById('ddlCourse'),
+        sem: document.getElementById('ddlSemester'),
+        batch: document.getElementById('ddlBatch')
+    };
+    const downloadType = document.getElementById('downloadType');
+    const btnDownload = document.getElementById('btnDownload');
+    const BTN_TEXT = 'Download';
+
+    function getJson(url) {
+        return fetch(url).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    }
+
+    function fillDropdown(el, placeholder, data, valueKey, textKey) {
+        el.innerHTML = `<option value="">${placeholder}</option>`;
+        data.forEach(x => {
+            const opt = document.createElement('option');
+            opt.value = x[valueKey];
+            opt.text = x[textKey];
+            el.appendChild(opt);
         });
-         function loadSession() {
-           $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
-               let session = '<option value="">Select Session</option>';
-               res.forEach(x => {
-                   session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
-               });
-               $('#sessionId').html(session);
-           });
-         }
-         function loadPrograms() {
-           $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
-               let opt = '<option value="">Select Program</option>';
-               res.forEach(x => {
-                   opt += `<option value="${x.programId}">${x.programName}</option>`;
-               });
-               $('#programId').html(opt);
-           });
-         }
-         document.getElementById("programId").addEventListener("change", function () {
-        let programId = this.value;
-        $("#courseId").val('');
-        $("#semester").val('');
-        $("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/courses/${programId}`)
-            .then(res => res.json())
-            .then(data => {
-                let courseDropdown = document.getElementById("courseId");
-                courseDropdown.innerHTML = '<option value="">Select Course</option>';                   
-                data.forEach(item => {
-                     courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
-                });
+        el.disabled = data.length === 0;
+    }
+
+    function resetFrom(...els) {
+        const labels = { ddlCourse: 'Course', ddlSemester: 'Semester', ddlBatch: 'Batch' };
+        els.forEach(el => fillDropdown(el, `Select ${labels[el.id]}`, [], '', ''));
+    }
+
+    const selText = el => el.options[el.selectedIndex].text;
+
+    // ---------- Filters ----------
+    getJson(api + 'GetMdMsResultExams')
+        .then(d => fillDropdown(ddl.exam, 'Select Exam', d, 'exId', 'examYear'))
+        .then(() => { ddl.exam.disabled = false; })
+        .catch(() => alert('Exam list load nahi hui.'));
+
+    ddl.exam.addEventListener('change', function () {
+        resetFrom(ddl.course, ddl.sem, ddl.batch);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultCourses?exId=${this.value}`)
+            .then(d => fillDropdown(ddl.course, 'Select Course', d, 'courseId', 'courseName'))
+            .catch(() => alert('Course list load nahi hui.'));
+    });
+
+    ddl.course.addEventListener('change', function () {
+        resetFrom(ddl.sem, ddl.batch);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultSemesters?exId=${ddl.exam.value}&courseId=${this.value}`)
+            .then(d => fillDropdown(ddl.sem, 'Select Semester', d, 'semId', 'semesterName'))
+            .catch(() => alert('Semester list load nahi hui.'));
+    });
+
+    ddl.sem.addEventListener('change', function () {
+        resetFrom(ddl.batch);
+        if (!this.value) return;
+        getJson(`${api}GetMdMsResultBatches?exId=${ddl.exam.value}&courseId=${ddl.course.value}&semId=${this.value}`)
+            .then(d => fillDropdown(ddl.batch, 'Select Batch', d, 'batch', 'batch'))
+            .catch(() => alert('Batch list load nahi hui.'));
+    });
+
+    // ---------- Download ----------
+    btnDownload.addEventListener('click', function () {
+
+        if (!ddl.exam.value) { alert('Please select Exam.'); return; }
+        if (!ddl.course.value) { alert('Please select Course.'); return; }
+        if (!ddl.sem.value) { alert('Please select Semester.'); return; }
+        if (!ddl.batch.value) { alert('Please select Batch.'); return; }
+        if (!downloadType.value) { alert('Please select Download Type (Excel / CSV).'); return; }
+
+        const ext = downloadType.value === 'csv' ? 'csv' : 'xlsx';
+        const fileName = `Result_${selText(ddl.course)}_${selText(ddl.sem)}_${selText(ddl.batch)}.${ext}`
+            .replace(/[^\w.\-]+/g, '_');
+
+        const url = `${api}DownloadResult?exId=${ddl.exam.value}&courseId=${ddl.course.value}` +
+                    `&semester=${ddl.sem.value}&batch=${encodeURIComponent(ddl.batch.value)}` +
+                    `&downloadType=${downloadType.value}`;
+
+        btnDownload.disabled = true;
+        btnDownload.textContent = 'Downloading...';
+
+        fetch(url)
+            .then(r => {
+                if (r.status === 404) throw new Error('NOT_FOUND');
+                if (!r.ok) throw new Error(r.status);
+                return r.blob();
+            })
+            .then(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+            })
+            .catch(err => {
+                alert(err.message === 'NOT_FOUND'
+                    ? 'No records found for the selected filters.'
+                    : 'Download failed. Please try again.');
+            })
+            .finally(() => {
+                btnDownload.disabled = false;
+                btnDownload.textContent = BTN_TEXT;
             });
-     });
-       document.getElementById("courseId").addEventListener("change", function () {
-        let courseId = this.value;
-        $("#semester").val('');
-        $("#subjectId").val('');
-        fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
-            .then(res => res.json())
-            .then(data => {
-                let courseDropdown = document.getElementById("semester");
-                courseDropdown.innerHTML = '<option value="">Select Semester</option>';
-                data.forEach(item => {
-                     courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
-                });
-            });
-     });
-
-       function downloadResult() {
-           if($("#courseId").val()=="")
-           {
-            alert("Please select Course.");
-            return;
-           }
-           if($("#semester").val()=="")
-           {
-            alert("Please select Semester.");
-            return;
-           }
-           if($("#sessionId").val()=="")
-           {
-            alert("Please select Session.");
-            return;
-           }
-           if($("#downloadType").val()=="")
-           {
-            alert("Please select Session.");
-            return;
-           }          
-
-        const courseId = parseInt($("#courseId").val())
-        const semester = parseInt($("#semester").val())
-        const sessionId = parseInt($("#sessionId").val())
-        const downloadType = $("#downloadType").val();       
-        window.location =
-            ApiBaseUrl +`Result/DownloadResult?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&downloadType=${downloadType}`;
-    }      
-
+    });
 </script>
-

@@ -230,25 +230,39 @@
                 <div class="nav-item has-dropdown" id="Result">
                     <div class="nav-link nav-toggle" onclick="toggleDropdown('Result', event)">
                         <i class="fas fa-qrcode"></i>
-                        <span>Result Management </span>
+                        <span>Result/TR Management </span>
                         <i class="fas fa-chevron-right arrow-icon"></i>
                     </div>
                     <ul class="dropdown-menu">
-                        <li><a href="/Result/ProvisionalMarksheet"><i class="fas fa-circle dot"></i>Provisional Marksheet</a></li>                       
+                   @*      <li><a href="/Result/ProvisionalMarksheet"><i class="fas fa-circle dot"></i>Provisional Marksheet</a></li>    *@                    
                         <li><a href="/Exam/resulttr"><i class="fas fa-circle dot"></i>Result TR PG</a></li>
                         <li><a href="/Exam/resulttrug"><i class="fas fa-circle dot"></i>Result TR UG IInd BAMS</a></li>
                         <li><a href="/Exam/resulttrugIII"><i class="fas fa-circle dot"></i>Result TR UG IIIrd BAMS</a></li>
                         <li><a href="/Exam/resulttrugIV"><i class="fas fa-circle dot"></i>Result TR UG IVth BAMS</a></li>
                         <li><a href="/Exam/resultpkt"><i class="fas fa-circle dot"></i>Result TR PKT</a></li>
+                      
+                    </ul>
+                </div>
+
+
+                <div class="nav-item has-dropdown" id="Resultmrt">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('Resultmrt', event)">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Result & Marksheet Management </span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
                         <li><a href="/Exam/dataforresult"><i class="fas fa-circle dot"></i>Marksheet Data For UG II BAMS</a></li>
                         <li><a href="/Exam/dataforresultIIIBAMS"><i class="fas fa-circle dot"></i>Marksheet Data For UG III BAMS</a></li>
                         <li><a href="/Exam/dataforresultBAMSIV"><i class="fas fa-circle dot"></i>Marksheet Data For UG IV BAMS</a></li>
-                        <li><a href="/Exam/dataforresultpkt"><i class="fas fa-circle dot"></i>Marksheet Data For PKT</a></li>                        
-                        <li><a href="/Exam/resultReports"><i class="fas fa-circle dot"></i>Department Wise Result Repotrs</a></li>
+                        <li><a href="/Exam/dataforresultpkt"><i class="fas fa-circle dot"></i>Marksheet Data For PKT</a></li>
+                 @*        <li><a href="/Exam/resultReports"><i class="fas fa-circle dot"></i>Department Wise Result Repotrs</a></li> *@
                         <li><a href="/Exam/ExcelDataResultForDG"><i class="fas fa-circle dot"></i>Download CSV & Excel Result for DG</a></li>
+
 
                     </ul>
                 </div>
+
 
                 <div class="nav-item has-dropdown" id="ResultMGMT">
                     <div class="nav-link nav-toggle" onclick="toggleDropdown('ResultMGMT', event)">
@@ -261,7 +275,7 @@
 
                     </ul>
                 </div>
-                <div class="nav-item has-dropdown" id="Evaluation">
+             @*    <div class="nav-item has-dropdown" id="Evaluation">
                     <div class="nav-link nav-toggle" onclick="toggleDropdown('Evaluation', event)">
                     <i class="fas fa-qrcode"></i>
                     <span>Statistics /आंकड़े </span>
@@ -273,7 +287,7 @@
                     <li><a href="/Statistics/statisticsofresult"><i class="fas fa-circle dot"></i>Statistics Of Result(pass and fail)</a></li>
                     <li><a href="/Statistics/resultreport"><i class="fas fa-circle dot"></i>Result Report</a></li>
                     </ul>
-                </div>
+                </div> *@
             }
      
         
