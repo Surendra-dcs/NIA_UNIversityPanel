@@ -145,7 +145,7 @@
         margin-top: 6px;
         font-size: 11.5px;
         border: 1px solid #000;
-        line-height: 2;
+        line-height: 1.5;
     }
 
         table.ledger th, table.ledger td {
@@ -157,6 +157,7 @@
 
         table.ledger thead th {
             padding: 3.5px 2px;
+            line-height: 2;
         }
 
         table.ledger thead {
@@ -178,6 +179,7 @@
         padding-bottom: 9px !important;
     }
 
+    /* har candidate ke last subject row ke neeche line */
     table.ledger tbody tr.group-end td,
     table.ledger tbody tr.candidate-row td[rowspan] {
         border-bottom: 1px solid #000;
@@ -188,7 +190,7 @@
     }
 
     .col-roll {
-        width: 13.5%;
+        width: 12.5%;
     }
 
     .col-attempt {
@@ -196,7 +198,7 @@
     }
 
     .col-subject {
-        width: 12%;
+        width: 20%;
         text-align: left;
     }
 
@@ -221,12 +223,12 @@
     }
 
     .col-vert {
-        width: 3.8%;
+        width: 4.2%;
         padding: 2px 1px !important;
     }
 
     .col-distinction {
-        width: 2.8%;
+        width: 3%;
         padding: 2px 1px !important;
     }
 
@@ -244,17 +246,20 @@
         padding: 5px 3px !important;
     }
 
+    /* Subject name: left align, wrap ho to bhi sirf isi cell ki height badhegi,
+           baaki columns usi row me align rahenge */
     .subject-row-inner {
-        text-align: left;
+        text-align: left !important;
         padding-left: 5px !important;
+        word-break: break-word;
     }
 
     .vert-header-appear {
         writing-mode: vertical-rl;
         text-orientation: mixed;
         display: inline-block;
-        font-size: 8px;
-        line-height: 1.15;
+        font-size: 8.5px;
+        line-height: 1.5;
         font-weight: bold;
         text-align: left;
     }
@@ -263,8 +268,8 @@
         writing-mode: vertical-rl;
         text-orientation: mixed;
         display: inline-block;
-        font-size: 8px;
-        line-height: 1.15;
+        font-size: 8.5px;
+        line-height: 1.5;
         font-weight: bold;
         white-space: nowrap;
     }
@@ -580,8 +585,17 @@
       });
 
 
-
-
+    /* ============================================================
+       loadResultformdmsII
+       FIX: pehle ek student ke saare subjects ek hi <td> me <br> se
+       jude hote the. Subject name 2-3 line me wrap hota tha to
+       baaki columns (Unique Code, marks) us subject ki line se
+       khisak jate the.
+       Ab har subject ki apni alag <tr> hai. Student ke common cells
+       (S.No, Roll/Name, Attempt, Grand Total, Result) rowspan se
+       poore student par failte hain. Isse har subject ka naam aur
+       uske marks hamesha ek hi row me, seedhe align rahte hain.
+       ============================================================ */
     async function loadResultformdmsII() {
 
            const courseId = $("#courseId").val();
@@ -605,135 +619,76 @@
 
            $("#ExamnameId").text(data[0].examname || '');
 
-           let grouped = {};
+           // Map use kiya hai taaki students ka order (SQL ka order) bina badle rahe
+           const grouped = new Map();
            data.forEach(item => {
-
-               let key = item.rollNumber;
-
-               if (!grouped[key]) {
-                   grouped[key] = [];
+               if (!grouped.has(item.rollNumber)) {
+                   grouped.set(item.rollNumber, []);
                }
-
-               grouped[key].push(item);
+               grouped.get(item.rollNumber).push(item);
            });
 
            let html = '';
            let sno = 1;
 
-           Object.keys(grouped).forEach(key => {
+           grouped.forEach(student => {
 
-               let student = grouped[key];
-               let first = student[0];
-               let rowClass = student.length === 1 ? 'candidate-row row-single-candidate' : 'candidate-row';
+               const first = student[0];
+               const n = student.length;
+               const currentSno = sno++;
 
-               html += `
-               <tr class="${rowClass}" style="border:solid 1px #000;">
+               student.forEach((x, i) => {
 
-                   <!-- S.No -->
-                   <td class="data-cell" style="border:solid 1px #000;">
-                       ${sno++}
-                   </td>
+                   const isFirst = (i === 0);
+                   const isLast = (i === n - 1);
 
-                   <!-- Roll No / Enrollment No / Candidate Name / Father's Name -->
+                   const classes = [];
+                   if (isFirst) classes.push('candidate-row');
+                   if (n === 1) classes.push('row-single-candidate');
+                   if (isLast) classes.push('group-end');
 
-                    <td class="roll-cell" style="border: solid 1px #000;">
-                        <div style="border-bottom: 1px solid #d3d3d3;">
-                            ${first.rollNumber}
-                        </div>
-                        <div style="border-bottom: 1px solid #d3d3d3;">
-                            ${first.enrollmentNumber}
-                        </div>
-                        <div style="border-bottom: 1px solid #d3d3d3;">
-                            ${first.candidateName}
-                        </div>
-                        <div>
-                            ${first.fatherName}
-                        </div>
-                    </td>
+                   const bg = subjectBg(x);
+                   const bgStyle = bg ? ` style="background:${bg};"` : '';
 
+                   html += `<tr class="${classes.join(' ')}">`;
 
+                   if (isFirst) {
+                       html += `
+                       <td class="data-cell" rowspan="${n}" style="border:solid 1px #000;">${currentSno}</td>
 
-                   <!-- Attempt -->
-                   <td class="data-cell" style="border:solid 1px #000;">
-                       ${first.attempt || ''}
-                   </td>
+                       <td class="roll-cell" rowspan="${n}" style="border:solid 1px #000;">
+                           <div style="border-bottom:1px solid #d3d3d3;">${first.rollNumber}</div>
+                           <div style="border-bottom:1px solid #d3d3d3;">${first.enrollmentNumber}</div>
+                           <div style="border-bottom:1px solid #d3d3d3;">${first.candidateName}</div>
+                           <div>${first.fatherName}</div>
+                       </td>
 
-                   <!-- Name of Subjects in which appearing -->
-                   <td class="subject-row-inner kk">
-                       ${student.map(x => wrapCell(x, x.subjectAppearing || '-')).join('<br>')}
-                   </td>
+                       <td class="data-cell" rowspan="${n}" style="border:solid 1px #000;">${first.attempt || ''}</td>`;
+                   }
 
-                   <!-- Unique Code -->
-                   <td class="data-cell kk">
-                       ${student.map(x => wrapCell(x, x.uniqueCode || '-')).join('<br>')}
-                   </td>
+                   html += `
+                       <td class="subject-row-inner kk"${bgStyle}>${x.subjectAppearing || '-'}</td>
+                       <td class="data-cell kk"${bgStyle}>${x.uniqueCode || '-'}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.theoryMax)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.theoryMin)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.practicalMax)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.practicalMin)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.marksSchemeTotal)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.theoryObtained)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.practicalObtained)}</td>
+                       <td class="data-cell kk"${bgStyle}>${fmtMark(x.obtainedTotal)}</td>
+                       <td class="data-cell kk"${bgStyle}>${x.graceMarks || '&nbsp;'}</td>
+                       <td class="data-cell"${bgStyle}>${x.required_To_Appear || '&nbsp;'}</td>
+                       <td class="border-r"${bgStyle}>${x.distinction || '&nbsp;'}</td>`;
 
-                   <!-- Theory MAX -->
-                   <td class="data-cell kk">
-                       ${student.map(x => wrapCell(x, fmtMark(x.theoryMax))).join('<br>')}
-                   </td>
+                   if (isFirst) {
+                       html += `
+                       <td class="data-cell border-r" rowspan="${n}" style="border:solid 1px #000;">${fmtMark(first.grandTotal)}</td>
+                       <td class="data-cell" rowspan="${n}" style="border:solid 1px #000;">${first.result || ''}</td>`;
+                   }
 
-                   <!-- Theory MIN -->
-                   <td class="data-cell kk">
-                       ${student.map(x => wrapCell(x, fmtMark(x.theoryMin))).join('<br>')}
-                   </td>
-
-                   <!-- Practical MAX -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, fmtMark(x.practicalMax))).join('<br>')}
-                   </td>
-
-                   <!-- Practical MIN -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, fmtMark(x.practicalMin))).join('<br>')}
-                   </td>
-
-                   <!-- Marks Scheme Total -->
-                   <td class="data-cell kk">
-                       ${student.map(x => wrapCell(x, fmtMark(x.marksSchemeTotal))).join('<br>')}
-                   </td>
-
-                   <!-- Obtained Theory -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, fmtMark(x.theoryObtained))).join('<br>')}
-                   </td>
-
-                   <!-- Obtained Practical -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, fmtMark(x.practicalObtained))).join('<br>')}
-                   </td>
-
-                   <!-- Obtained Total -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, fmtMark(x.obtainedTotal))).join('<br>')}
-                   </td>
-
-                   <!-- Grace -->
-                   <td class="data-cell kk" >
-                       ${student.map(x => wrapCell(x, x.graceMarks || '&nbsp;')).join('<br>')}
-                   </td>
-
-                   <!-- Required To Appear -->
-                   <td class="data-cell" >
-                       ${student.map(x => wrapCell(x, x.required_To_Appear || '&nbsp;')).join('<br>')}
-                   </td>
-
-                   <!-- Distinction -->
-                   <td class="border-r" >
-                       ${student.map(x => wrapCell(x, x.distinction || '&nbsp;')).join('<br>')}
-                   </td>
-
-                   <!-- Grand Total (candidate-level, same for every subject row of this student) -->
-                   <td class="data-cell border-r" style="border:solid 1px #000;">
-                       ${fmtMark(first.grandTotal)}
-                   </td>
-
-                   <!-- Result (candidate-level) -->
-                   <td class="data-cell" style="border:solid 1px #000;">
-                       ${first.result || ''}
-                   </td>
-
-               </tr>`;
+                   html += `</tr>`;
+               });
            });
 
            $("#resultBody2").html(html);
@@ -743,40 +698,27 @@
           fmtMark — display helper
           - Number aaye to nearest whole number tak ROUND karke dikhata
             hai.
-          - 'AB' ya koi bhi non-numeric text ko bina tode/error diye
-            JAISA HAI WAISA hi dikha deta hai.
+          - 'AB', '-' ya koi bhi non-numeric text ko JAISA HAI WAISA
+            hi dikha deta hai.
           - null/undefined/khaali value ke liye '-' dikhata hai.
           ============================================================ */
        function fmtMark(v) {
            if (v === null || v === undefined || v === '') return '-';
            const num = parseFloat(v);
-           if (isNaN(num)) return v;   // e.g. 'AB' - as-is, round mat karo
+           if (isNaN(num)) return v;
            return Math.round(num).toString();
        }
 
        /* ============================================================
-          subjectBg — us subject ke liye background color decide karta
-          hai:
-          - required_To_Appear bhara hua => subject FAIL => red
-          - graceMarks bhara hua          => subject GRACE => yellow
+          subjectBg — us subject row ka background color:
+          - required_To_Appear bhara hua => FAIL  => red
+          - graceMarks bhara hua          => GRACE => yellow
           - warna                         => koi highlight nahi
           ============================================================ */
        function subjectBg(item) {
            if (item.required_To_Appear) return '#ffd6d6';   // FAIL - red
            if (item.graceMarks) return '#fff3b0';            // GRACE - yellow
            return '';
-       }
-
-       /* ============================================================
-          wrapCell — Subject Name se lekar aage ki har per-subject
-          column ke value ko ek block-level <span> mein wrap karta hai,
-          jisse us subject ki poori "line" (is column ke andar) colored
-          dikhti hai.
-          ============================================================ */
-       function wrapCell(item, value) {
-           let bg = subjectBg(item);
-           if (!bg) return value;
-           return `<span style="display:block;background:${bg};padding:2px 4px;margin:-2px -4px;">${value}</span>`;
        }
 
 </script>
