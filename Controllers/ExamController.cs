@@ -209,6 +209,9 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-
+        public IActionResult resultMDMSII()
+        {
+            return View();
+        }
     }
 }

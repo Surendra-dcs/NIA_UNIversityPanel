@@ -1226,6 +1226,10 @@
             // बाकी normal
             // ============================================================
 
+               // ============================================================
+        // HELPERS
+        // ============================================================
+
         function formatIA(value, subjectName) {
 
             let mark = cleanMark(value);
@@ -1239,1276 +1243,427 @@
                 mark.startsWith("#") ||
                 mark.startsWith("*")
             ) {
-
                 return mark;
-
             }
 
-
-            let subjectCode =
-                getSubjectCode(subjectName);
-
+            let subjectCode = getSubjectCode(subjectName);
 
             if (subjectCode === "A-5") {
-
                 return "*" + mark;
-
             }
 
             return mark;
-
         }
 
-            // ============================================================
-            // RESULT FAIL CHECK
-            // ============================================================
 
-            function isFail(result) {
-
-                if (
-                    result === null ||
-                    result === undefined ||
-                    result === ""
-                ) {
-
-                    return false;
-
-                }
-
-                let value =
-                    result.toString()
-                        .trim()
-                        .toUpperCase();
+        function isTruthyFlag(value) {
+            if (value === null || value === undefined) return false;
+            if (value === true) return true;
+            let v = value.toString().trim().toUpperCase();
+            return v === "1" || v === "TRUE" || v === "Y" || v === "YES";
+        }
 
 
-                return (
-                    value === "FAIL" ||
-                    value === "F"
-                );
+        // Subject-wise remark: AB > F > D > I > G
+        function subjectRemark(item) {
+            if (isTruthyFlag(getValue(item, "IsSubjectAbsent"))) return "AB";
+            if (getValue(item, "Required_To_Appear")) return "F";
 
+            let d = String(getValue(item, "Distinction") || "").trim().toUpperCase();
+            if (d === "D") return "D";
+            if (d === "I") return "I";
+
+            if (getValue(item, "GraceMarks")) return "G";
+            return "";
+        }
+
+
+        function isFail(result) {
+
+            if (result === null || result === undefined || result === "") {
+                return false;
             }
 
+            let value = result.toString().trim().toUpperCase();
 
-            // ============================================================
-            // LOAD MARKSHEET
-            // ============================================================
+            return (value === "FAIL" || value === "F");
+        }
 
-            function loadmarksheet() {
 
-                let enrollment =
-                    '@ViewBag.enrollment';
+        function mkNum(value) {
+            let n = parseFloat(value);
+            return isNaN(n) ? 0 : n;
+        }
 
 
-                $.ajax({
+        // ============================================================
+        // LOAD MARKSHEET
+        // ============================================================
 
-                    url:
-                        ApiBaseUrl +
-                        `Result/getdataformarksheet?enrollment=${encodeURIComponent(enrollment)}`,
+        function loadmarksheet() {
 
-                    method: "GET",
+            let enrollment = '@ViewBag.enrollment';
 
+            $.ajax({
 
-                    // ====================================================
-                    // SUCCESS
-                    // ====================================================
+                url: ApiBaseUrl +
+                    `Result/getdataformarksheet?enrollment=${encodeURIComponent(enrollment)}`,
 
-                    success: function (data) {
+                method: "GET",
 
-                        console.log(
-                            "Marksheet API Data:",
-                            data
-                        );
 
+                // ====================================================
+                // SUCCESS
+                // ====================================================
 
-                        // =================================================
-                        // CHECK DATA
-                        // =================================================
+                success: function (data) {
 
-                        if (
-                            !data ||
-                            !Array.isArray(data) ||
-                            data.length === 0
-                        ) {
+                    console.log("Marksheet API Data:", data);
 
-                            $("#marksTableBody").html(`
+                    // ---------- No data ----------
+                    if (!data || !Array.isArray(data) || data.length === 0) {
 
-                                <tr>
+                        $("#marksTableBody").html(`
+                            <tr>
+                                <td colspan="12" style="text-align:center;">
+                                    No record found
+                                </td>
+                            </tr>
+                        `);
 
-                                    <td
-                                        colspan="12"
-                                        style="text-align:center;"
-                                    >
-                                        No record found
-                                    </td>
-
-                                </tr>
-
-                            `);
-
-                            return;
-
-                        }
-
-
-                        // =================================================
-                        // FIRST RECORD
-                        // =================================================
-
-                        let student =
-                            data[0];
-
-
-                        // =================================================
-                        // STUDENT DETAILS
-                        // =================================================
-
-
-
-
-
-                        $("#studentName").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                          "FirstName"
-                                ),
-                                ""
-                            )
-
-                        );
-
-                                         $("#studentNameHindi").text(
-
-                                    displayValue(
-                                        getValue(
-                                            student,
-                                                          "StudentHindiName"
-                                        ),
-                                        ""
-                                    )
-
-                                );
-
-                        $("#fatherName").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                           "FatherName"
-                                ),
-                                ""
-                            )
-
-                        );
-
-
-
-                                        $("#fatherNameHindi").text(
-
-                                    displayValue(
-                                        getValue(
-                                            student,
-                                                           "FatherNameHindi"
-                                        ),
-                                        ""
-                                    )
-
-                                );
-
-                             $("#MotherName").text(
-
-                                    displayValue(
-                                        getValue(
-                                            student,
-                                            "MotherName"
-                                        ),
-                                        ""
-                                    )
-
-                                );
-
-                                                  $("#motherNameHindi").text(
-
-                                            displayValue(
-                                                getValue(
-                                                    student,
-                                                            "MotherNameHindi"
-                                                ),
-                                                ""
-                                            )
-
-                                        );
-
-                        $("#rollNumber").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                    "RollNumber"
-                                ),
-                                ""
-                            )
-
-                        );
-
-
-                        $("#enrollmentNumber").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                    "EnrollmentNumber"
-                                ),
-                                enrollment
-                            )
-
-                        );
-
-
-                        $("#attempt").text(
-
-                            displayValue(
-                                getValue(
-                                    student,
-                                    "Attempt"
-                                ),
-                                ""
-                            )
-
-                        );
-
-
-                        // =================================================
-                        // EXAM NAME
-                        // =================================================
-
-                        let examName =
-                            getValue(
-                                student,
-                                "Examname"
-                            );
-
-
-                        if (examName !== "") {
-
-                            $(".exam-h").text(
-                                "Examination Held in " +
-                                examName
-                            );
-
-                        }
-
-
-                        // =================================================
-                        // TABLE BODY
-                        // =================================================
-
-                        let tbody =
-                            $("#marksTableBody");
-
-
-                        tbody.empty();
-
-
-                        // =================================================
-                        // GRAND TOTAL CALCULATION
-                        // =================================================
-
-                        let calculatedGrandTotal = 0;
-
-
-                        // =================================================
-                        // SUMMARY ARRAYS
-                        // =================================================
-
-                        let distinctionSubjects = [];
-
-                        let firstClassSubjects = [];
-
-                        let graceMarks = [];
-
-                        let failedSubjects = [];
-
-
-                        // =================================================
-                        // SUBJECT LOOP
-                        // =================================================
-
-                        $.each(
-                            data,
-                            function (index, item) {
-
-
-                                // =========================================
-                                // SUBJECT NAME
-                                // =========================================
-
-                                let subjectName =
-                                    getValue(
-                                        item,
-                                        "subjectName"
-                                    );
-
-
-                                let subjectHindiName =
-                                    getValue(
-                                        item,
-                                        "subjectHindiName"
-                                    );
-
-
-                                // =========================================
-                                // SUBJECT CODE
-                                // =========================================
-
-                                let subjectCode =
-                                    getSubjectCode(
-                                        subjectName
-                                    );
-
-
-                                       // =========================================
-                // MARKS DISTRIBUTION
-                // (Max marks ka sum chahiye - obtained ka nahi)
-                // =========================================
-
-                let theoryI_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "TheoryI"
-                        )
-                    );
-
-                let theoryII_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "TheoryII"
-                        )
-                    );
-
-                let theoryTotal =
-                    (
-                        (isNaN(theoryI_max) ? 0 : theoryI_max) +
-                        (isNaN(theoryII_max) ? 0 : theoryII_max)
-                    );
-
-
-                let practical_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "Practical"
-                        )
-                    );
-
-                let viva_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "VivaMarks"
-                        )
-                    );
-
-                let elective_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "ElectiveMarks"
-                        )
-                    );
-
-                let ia_max =
-                    parseFloat(
-                        getValue(
-                            item,
-                            "IAMarks"
-                        )
-                    );
-
-                let practicalTotal =
-                    (
-                        (isNaN(practical_max) ? 0 : practical_max) +
-                        (isNaN(viva_max) ? 0 : viva_max) +
-                        (isNaN(elective_max) ? 0 : elective_max) +
-                        (isNaN(ia_max) ? 0 : ia_max)
-                    );
-
-
-                let distribution = "";
-
-                if (
-                    theoryTotal > 0 ||
-                    practicalTotal > 0
-                ) {
-
-                    // theoryTotal/practicalTotal formatMarks() se
-                    // guzarte hain - taaki clean rounded number dikhe,
-                    // raw floating-point sum nahi.
-                    distribution = `
-
-                        सै. ${formatMarks(
-                            theoryTotal
-                        )}
-
-                        Th ${formatMarks(
-                            theoryTotal
-                        )}
-
-                        <br>
-
-                        व्याव. ${formatMarks(
-                            practicalTotal
-                        )}
-
-                        Pr ${formatMarks(
-                            practicalTotal
-                        )}
-
-                    `;
-
-                }
-
-
-                                // =========================================
-                                // MAX MARKS
-                                // =========================================
-
-                                let maxMarks =
-                                    getValue(
-                                        item,
-                                        "GrandTotalMarks"
-                                    );
-
-
-                                // =========================================
-                                // MIN MARKS
-                                // =========================================
-
-                                let minMarks =
-                                    getValue(
-                                        item,
-                                        "MinTotalMarks"
-                                    );
-
-
-                                // =========================================
-                                // MIN MARKS NOT FROM API
-                                // MAX / 2
-                                // =========================================
-
-                                if (
-                                    minMarks === "" &&
-                                    maxMarks !== ""
-                                ) {
-
-                                    let max =
-                                        parseFloat(
-                                            maxMarks
-                                        );
-
-
-                                    if (!isNaN(max)) {
-
-                                        minMarks =
-                                            max / 2;
-
-                                    }
-
-                                }
-
-
-                                // =========================================
-                                // THEORY I
-                                // =========================================
-
-                                let theoryI =
-                                    getValue(
-                                        item,
-                                        "FinalTheoryIMarks"
-                                    );
-
-
-                                if (theoryI === "") {
-
-                                    theoryI =
-                                        getValue(
-                                            item,
-                                            "TheoryI"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // THEORY II
-                                // =========================================
-
-                                let theoryII =
-                                    getValue(
-                                        item,
-                                        "FinalTheoryIIMarks"
-                                    );
-
-
-                                if (theoryII === "") {
-
-                                    theoryII =
-                                        getValue(
-                                            item,
-                                            "TheoryII"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // NOTE: Theory I/II ke liye ab koi extra
-                                // override ki zaroorat nahi. Marksheet SQL
-                                // procedure ab Tr procedure jaisa hi seedha
-                                // 'AB' text bhejti hai jab student absent
-                                // hota hai (pehle '-' bhejti thi) - isliye
-                                // neeche formatMarks() khud hi 'AB' ko
-                                // as-is, bina tode, dikha deta hai.
-                                // =========================================
-
-
-                                // =========================================
-                                // PRACTICAL
-                                // =========================================
-
-                                let practical =
-                                    getValue(
-                                        item,
-                                        "ObtenPracticalMarks"
-                                    );
-
-
-                                if (practical === "") {
-
-                                    practical =
-                                        getValue(
-                                            item,
-                                            "Practical"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // VIVA
-                                // =========================================
-
-                                let viva =
-                                    getValue(
-                                        item,
-                                        "ObtenVivaMarks"
-                                    );
-
-
-                                if (viva === "") {
-
-                                    viva =
-                                        getValue(
-                                            item,
-                                            "VivaMarks"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // ELECTIVE
-                                // =========================================
-
-                                let elective =
-                                    getValue(
-                                        item,
-                                        "ObtenElativeMarks"
-                                    );
-
-
-                                if (elective === "") {
-
-                                    elective =
-                                        getValue(
-                                            item,
-                                            "ElectiveMarks"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // IA
-                                // =========================================
-
-                                let ia =
-                                    getValue(
-                                        item,
-                                        "ObtenIAMarks"
-                                    );
-
-
-                                if (ia === "") {
-
-                                    ia =
-                                        getValue(
-                                            item,
-                                            "IAMarks"
-                                        );
-
-                                }
-
-
-                                // =========================================
-                                // SUBJECT TOTAL
-                                // =========================================
-
-                                let subjectTotal =
-                                    getValue(
-                                        item,
-                                        "subjectTotal"
-                                    );
-
-
-                                let totalNumber =
-                                    parseFloat(
-                                        subjectTotal
-                                    );
-
-
-                                if (!isNaN(totalNumber)) {
-
-                                    calculatedGrandTotal +=
-                                        totalNumber;
-
-                                }
-
-
-                                // =========================================
-                                // DISTINCTION
-                                // =========================================
-
-                                let distinction =
-                                    getValue(
-                                        item,
-                                        "Distinction"
-                                    );
-
-
-                                // =========================================
-                                // RESULT
-                                // =========================================
-
-                                let result =
-                                    getValue(
-                                        item,
-                                        "Result"
-                                    );
-
-
-                                // =========================================
-                                // REMARK
-                                // =========================================
-
-                                let remark =
-                                    distinction;
-
-
-                                if (isFail(result)) {
-
-                                    remark = "F";
-
-                                }
-
-
-                                // =========================================
-                                // DISTINCTION VALUE
-                                // =========================================
-
-                                let distinctionValue =
-                                    distinction
-                                        .toString()
-                                        .trim()
-                                        .toUpperCase();
-
-
-                                // =========================================
-                                // DISTINCTION
-                                // =========================================
-
-                                if (
-                                    distinctionValue === "D"
-                                ) {
-
-                                    distinctionSubjects.push(
-                                        subjectCode
-                                    );
-
-                                }
-
-
-                                // =========================================
-                                // FIRST CLASS
-                                // =========================================
-
-                                if (
-                                    distinctionValue === "I"
-                                ) {
-
-                                    firstClassSubjects.push(
-                                        subjectCode
-                                    );
-
-                                }
-
-
-                                // =========================================
-                                // GRACE MARKS
-                                // =========================================
-
-                                let grace = getValue(item, "GraceMarks");
-
-                                let hasGrace = false;
-                                let graceDisplay = "";
-
-                                // GraceMarks ko safely string me convert karo
-                                let graceText = "";
-
-                                if (grace !== null && grace !== undefined) {
-
-                                    graceText = grace
-                                        .toString()
-                                        .replace(/<br\s*\/?>/gi, " ")
-                                        .replace(/<[^>]*>/g, " ")
-                                        .replace(/&nbsp;/gi, " ")
-                                        .replace(/\s+/g, " ")
-                                        .trim();
-
-                                    console.log("RAW GraceMarks:", grace);
-                                    console.log("CLEAN GraceMarks:", graceText);
-
-                                    // G-A-1, G-A-2, G-A-3 etc.
-                                    let graceMatch = graceText.match(/G\s*-\s*A\s*-\s*\d+/i);
-
-                                    if (graceMatch) {
-
-                                        hasGrace = true;
-
-                                        graceDisplay = graceMatch[0]
-                                            .replace(/\s+/g, "")
-                                            .toUpperCase();
-
-                                        console.log(
-                                            "GRACE FOUND:",
-                                            subjectCode,
-                                            graceDisplay
-                                        );
-
-                                        graceMarks.push(
-                                            subjectCode + " (" + graceDisplay + ")"
-                                        );
-                                    }
-                                }
-
-
-                                // =========================================
-                                // FAILED
-                                // =========================================
-
-                                if (isFail(result)) {
-
-                                    failedSubjects.push(
-                                        subjectCode
-                                    );
-
-                                }
-
-
-
-                                // =================================================
-                                // APPEND ROW
-                                // =================================================
-
-                                tbody.append(`
-
-                                        <tr class="${hasGrace ? "grace-row" : ""}"
-        ${hasGrace ? 'style="background-color: yellow !important;"' : ''}>
-
-
-                                        <!-- =============================== -->
-                                        <!-- SUBJECT -->
-                                        <!-- =============================== -->
-
-                                        <td class="subject-name">
-
-                                            ${displayValue(
-                                                subjectHindiName,
-                                                ""
-                                            )}
-
-                                            ${
-                                                subjectHindiName !== ""
-                                                    ? "<br>"
-                                                    : ""
-                                            }
-
-                                            ${displayValue(
-                                                subjectName,
-                                                ""
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- MARKS DISTRIBUTION -->
-                                        <!-- =============================== -->
-
-                                        <td class="distribution">
-
-                                            ${distribution}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- MAX -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatMarks(
-                                                maxMarks
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- MIN -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatMarks(
-                                                minMarks
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- THEORY I -->
-                                        <!-- =============================== -->
-
-                                                <td>
-            ${formatMarksZeroDash(
-                theoryI
-            )}
-        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- THEORY II -->
-                                        <!-- =============================== -->
-
-                                             <td>
-            ${formatMarksZeroDash(
-                theoryII
-            )}
-        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- PRACTICAL -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatMarks(
-                                                practical
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- VIVA -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatViva(
-                                                viva,
-                                                subjectName
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- ELECTIVE -->
-                                        <!-- =============================== -->
-
-                                              <td>
-                    ${formatElective(
-                        elective,
-                        subjectName
-                    )}
-                </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- IA -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatIA(
-                                                ia,
-                                                subjectName
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- SUBJECT TOTAL -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${formatMarks(
-                                                subjectTotal
-                                            )}
-
-                                        </td>
-
-
-                                        <!-- =============================== -->
-                                        <!-- REMARK -->
-                                        <!-- =============================== -->
-
-                                        <td>
-
-                                            ${displayValue(
-                                                remark,
-                                                ""
-                                            )}
-
-                                        </td>
-
-
-                                    </tr>
-
-                                `);
-
-                            }
-                        );
-
-
-                        // ====================================================
-                        // GRAND TOTAL
-                        // ====================================================
-
-                        let apiGrandTotal =
-                            getValue(
-                                student,
-                                "GrandTotal"
-                            );
-
-
-                        if (apiGrandTotal !== "") {
-
-                            $("#grandTotal").text(
-                                formatMarks(
-                                    apiGrandTotal
-                                )
-                            );
-
-                        }
-                        else {
-
-                            $("#grandTotal").text(
-                                formatMarks(
-                                    calculatedGrandTotal
-                                )
-                            );
-
-                        }
-
-
-                        // ====================================================
-                        // SUMMARY
-                        // ====================================================
-
-                        let summaryRow =
-                            $(".summary tr");
-
-
-                        if (summaryRow.length > 0) {
-
-                            let cells =
-                                summaryRow.find("td");
-
-
-                            // =================================================
-                            // DISTINCTION
-                            // =================================================
-
-                            if (cells.length > 0) {
-
-                                $(cells[0]).html(`
-
-                                    <span class="hi-text">
-                                        डिस्टिक्शन प्राप्तिः
-                                    </span>
-
-                                    <br>
-
-                                    Distinction secured:
-
-                                    ${
-                                        distinctionSubjects.length > 0
-                                            ? distinctionSubjects.join(", ")
-                                            : ""
-                                    }
-
-                                `);
-
-                            }
-
-
-                            // =================================================
-                            // FIRST CLASS
-                            // =================================================
-
-                            if (cells.length > 1) {
-
-                                $(cells[1]).html(`
-
-                                    <span class="hi-text">
-                                        प्रथम श्रेणी प्राप्तिः
-                                    </span>
-
-                                    <br>
-
-                                    First Class secured:
-
-                                    ${
-                                        firstClassSubjects.length > 0
-                                            ? firstClassSubjects.join(", ")
-                                            : ""
-                                    }
-
-                                `);
-
-                            }
-
-
-                            // =================================================
-                            // GRACE
-                            // =================================================
-
-                            if (cells.length > 2) {
-
-                                $(cells[2]).html(`
-
-                                    <span class="hi-text">
-                                        कृपांक प्राप्तिः
-                                    </span>
-
-                                    <br>
-
-                                    Grace Marks Awarded:
-
-                                    ${
-                                        graceMarks.length > 0
-                                            ? graceMarks.join(", ")
-                                            : ""
-                                    }
-
-                                `);
-
-                            }
-
-
-                            // =================================================
-                            // FAILED
-                            // =================================================
-
-                            if (cells.length > 3) {
-
-                                $(cells[3]).html(`
-
-                                    <span class="hi-text">
-                                        अनुत्तीर्णः
-                                    </span>
-
-                                    <br>
-
-                                    Failed:
-
-                                    ${
-                                        failedSubjects.length > 0
-                                            ? failedSubjects.join(", ")
-                                            : ""
-                                    }
-
-                                `);
-
-                            }
-
-                        }
-
-
-                        // ====================================================
-                        // FINAL RESULT
-                        // ====================================================
-
-                        let finalResult =
-                            getValue(
-                                student,
-                                "Result"
-                            );
-
-
-                        if ($(".result-box").length > 0) {
-
-                            $(".result-box").html(`
-
-                                <span class="hi-text">
-                                    परिणाम
-                                </span>
-
-                                / RESULT:
-
-                                <span class="hi-text">
-
-                                    ${displayValue(
-                                        finalResult,
-                                        ""
-                                    )}
-
-                                </span>
-
-                                /
-
-                                ${displayValue(
-                                    finalResult,
-                                    ""
-                                )}
-
-                            `);
-
-                        }
-
-
-                        // ====================================================
-                        // SERIAL NO
-                        // ====================================================
-
-                        let serialNo =
-                            getValue(
-                                student,
-                                "SerialNo"
-                            );
-
-
-                        if (
-                            serialNo !== "" &&
-                            $("#Serialno").length > 0
-                        ) {
-
-                            $("#Serialno").text(
-                                serialNo
-                            );
-
-                        }
-
-
-                        // ====================================================
-                        // FOLIO
-                        // ====================================================
-
-                        let folioNo =
-                            getValue(
-                                student,
-                                "Folio"
-                            );
-
-
-                        if (
-                            folioNo !== "" &&
-                            $("#Folio").length > 0
-                        ) {
-
-                            $("#Folio").text(
-                                folioNo
-                            );
-
-                        }
-
-
-                        // ====================================================
-                        // BOTTOM SERIAL
-                        // ====================================================
-
-                        let serialBottom =
-                            getValue(
-                                student,
-                                "SerialBottom"
-                            );
-
-
-                        if (
-                            serialBottom !== "" &&
-                            $("#serialbottom").length > 0
-                        ) {
-
-                            $("#serialbottom").text(
-                                serialBottom
-                            );
-
-                        }
-
-                    },
-
-
-                    // ====================================================
-                    // AJAX ERROR
-                    // ====================================================
-
-                    error: function (
-                        xhr,
-                        status,
-                        error
-                    ) {
-
-                        console.error(
-                            "Marksheet API Error:",
-                            error
-                        );
-
-
-                        console.error(
-                            "API Response:",
-                            xhr.responseText
-                        );
-
-
-                        alert(
-                            "Failed to load marksheet data."
-                        );
-
+                        return;
                     }
-                });
-              }
 
+
+                    // ---------- Student details ----------
+                    let student = data[0];
+
+                    $("#studentName").text(displayValue(getValue(student, "FirstName"), ""));
+                    $("#studentNameHindi").text(displayValue(getValue(student, "StudentHindiName"), ""));
+                    $("#fatherName").text(displayValue(getValue(student, "FatherName"), ""));
+                    $("#fatherNameHindi").text(displayValue(getValue(student, "FatherNameHindi"), ""));
+                    $("#MotherName").text(displayValue(getValue(student, "MotherName"), ""));
+                    $("#motherNameHindi").text(displayValue(getValue(student, "MotherNameHindi"), ""));
+                    $("#rollNumber").text(displayValue(getValue(student, "RollNumber"), ""));
+                    $("#enrollmentNumber").text(displayValue(getValue(student, "EnrollmentNumber"), enrollment));
+                    $("#attempt").text(displayValue(getValue(student, "Attempt"), ""));
+
+
+                    // ---------- Exam name ----------
+                    let examName = getValue(student, "Examname");
+
+                    if (examName !== "") {
+                        $(".exam-h").text("Examination Held in " + examName);
+                    }
+
+
+                    // ---------- Table body ----------
+                    let tbody = $("#marksTableBody");
+                    tbody.empty();
+
+                    let calculatedGrandTotal = 0;
+
+                    let distinctionSubjects = [];
+                    let firstClassSubjects = [];
+                    let graceMarks = [];
+                    let failedSubjects = [];
+
+
+                    // ====================================================
+                    // SUBJECT LOOP
+                    // ====================================================
+
+                    $.each(data, function (index, item) {
+
+                        // ---------- Subject name / code ----------
+                        let subjectName = getValue(item, "subjectName");
+                        let subjectHindiName = getValue(item, "subjectHindiName");
+                        let subjectCode = getSubjectCode(subjectName);
+
+
+                        // ---------- Marks distribution (max marks ka sum) ----------
+                        let theoryTotal =
+                            mkNum(getValue(item, "TheoryI")) +
+                            mkNum(getValue(item, "TheoryII"));
+
+                        let practicalTotal =
+                            mkNum(getValue(item, "Practical")) +
+                            mkNum(getValue(item, "VivaMarks")) +
+                            mkNum(getValue(item, "ElectiveMarks")) +
+                            mkNum(getValue(item, "IAMarks"));
+
+                        let distribution = "";
+
+                        if (theoryTotal > 0 || practicalTotal > 0) {
+
+                            distribution = `
+                                सै. ${formatMarks(theoryTotal)}
+                                Th ${formatMarks(theoryTotal)}
+                                <br>
+                                व्याव. ${formatMarks(practicalTotal)}
+                                Pr ${formatMarks(practicalTotal)}
+                            `;
+                        }
+
+
+                        // ---------- Max / Min ----------
+                        let maxMarks = getValue(item, "GrandTotalMarks");
+                        let minMarks = getValue(item, "MinTotalMarks");
+
+                        if (minMarks === "" && maxMarks !== "") {
+
+                            let max = parseFloat(maxMarks);
+
+                            if (!isNaN(max)) {
+                                minMarks = max / 2;
+                            }
+                        }
+
+
+                        // ---------- Theory I / II ----------
+                        let theoryI = getValue(item, "FinalTheoryIMarks");
+                        if (theoryI === "") theoryI = getValue(item, "TheoryI");
+
+                        let theoryII = getValue(item, "FinalTheoryIIMarks");
+                        if (theoryII === "") theoryII = getValue(item, "TheoryII");
+
+
+                        // ---------- Practical / Viva / Elective / IA ----------
+                        let practical = getValue(item, "ObtenPracticalMarks");
+                        if (practical === "") practical = getValue(item, "Practical");
+
+                        let viva = getValue(item, "ObtenVivaMarks");
+                        if (viva === "") viva = getValue(item, "VivaMarks");
+
+                        let elective = getValue(item, "ObtenElativeMarks");
+                        if (elective === "") elective = getValue(item, "ElectiveMarks");
+
+                        let ia = getValue(item, "ObtenIAMarks");
+                        if (ia === "") ia = getValue(item, "IAMarks");
+
+
+                        // ---------- Subject total ----------
+                        let subjectTotal = getValue(item, "subjectTotal");
+                        let totalNumber = parseFloat(subjectTotal);
+
+                        if (!isNaN(totalNumber)) {
+                            calculatedGrandTotal += totalNumber;
+                        }
+
+
+                        // ---------- Remark (SUBJECT-WISE) ----------
+                        let remark = subjectRemark(item);
+
+
+                        // ---------- Distinction / First class summary ----------
+                        let distinctionValue =
+                            String(getValue(item, "Distinction") || "")
+                                .trim()
+                                .toUpperCase();
+
+                        if (distinctionValue === "D") {
+                            distinctionSubjects.push(subjectCode);
+                        }
+
+                        if (distinctionValue === "I") {
+                            firstClassSubjects.push(subjectCode);
+                        }
+
+
+                        // ---------- Grace (G-A-1 ya G A-1, dono chalenge) ----------
+                        let grace = getValue(item, "GraceMarks");
+
+                        let hasGrace = false;
+
+                        if (grace !== null && grace !== undefined && grace !== "") {
+
+                            let graceText = grace
+                                .toString()
+                                .replace(/<br\s*\/?>/gi, " ")
+                                .replace(/<[^>]*>/g, " ")
+                                .replace(/&nbsp;/gi, " ")
+                                .replace(/\s+/g, " ")
+                                .trim();
+
+                            let graceMatch = graceText.match(/G\s*-?\s*([A-Z]+\s*-\s*\d+)/i);
+
+                            if (graceMatch) {
+
+                                hasGrace = true;
+
+                                let graceDisplay =
+                                    "G-" + graceMatch[1].replace(/\s+/g, "").toUpperCase();
+
+                                graceMarks.push(subjectCode + " (" + graceDisplay + ")");
+                            }
+                        }
+
+
+                        // ---------- Failed summary (SUBJECT-WISE) ----------
+                        if (getValue(item, "Required_To_Appear")) {
+                            failedSubjects.push(subjectCode);
+                        }
+
+
+                        // ---------- Append row ----------
+                        tbody.append(`
+
+                            <tr class="${hasGrace ? "grace-row" : ""}"
+                                ${hasGrace ? 'style="background-color: yellow !important;"' : ''}>
+
+                                <td class="subject-name">
+                                    ${displayValue(subjectHindiName, "")}
+                                    ${subjectHindiName !== "" ? "<br>" : ""}
+                                    ${displayValue(subjectName, "")}
+                                </td>
+
+                                <td class="distribution">${distribution}</td>
+
+                                <td>${formatMarks(maxMarks)}</td>
+
+                                <td>${formatMarks(minMarks)}</td>
+
+                                <td>${formatMarksZeroDash(theoryI)}</td>
+
+                                <td>${formatMarksZeroDash(theoryII)}</td>
+
+                                <td>${formatMarks(practical)}</td>
+
+                                <td>${formatViva(viva, subjectName)}</td>
+
+                                <td>${formatElective(elective, subjectName)}</td>
+
+                                <td>${formatIA(ia, subjectName)}</td>
+
+                                <td>${formatMarks(subjectTotal)}</td>
+
+                                <td>${displayValue(remark, "")}</td>
+
+                            </tr>
+
+                        `);
+
+                    });
+
+
+                    // ====================================================
+                    // GRAND TOTAL
+                    // ====================================================
+
+                    let apiGrandTotal = getValue(student, "GrandTotal");
+
+                    if (apiGrandTotal !== "") {
+                        $("#grandTotal").text(formatMarks(apiGrandTotal));
+                    }
+                    else {
+                        $("#grandTotal").text(formatMarks(calculatedGrandTotal));
+                    }
+
+
+                    // ====================================================
+                    // SUMMARY
+                    // ====================================================
+
+                    let summaryRow = $(".summary tr");
+
+                    if (summaryRow.length > 0) {
+
+                        let cells = summaryRow.find("td");
+
+                        if (cells.length > 0) {
+                            $(cells[0]).html(`
+                                <span class="hi-text">डिस्टिक्शन प्राप्तिः</span>
+                                <br>
+                                Distinction secured:
+                                ${distinctionSubjects.length > 0 ? distinctionSubjects.join(", ") : ""}
+                            `);
+                        }
+
+                        if (cells.length > 1) {
+                            $(cells[1]).html(`
+                                <span class="hi-text">प्रथम श्रेणी प्राप्तिः</span>
+                                <br>
+                                First Class secured:
+                                ${firstClassSubjects.length > 0 ? firstClassSubjects.join(", ") : ""}
+                            `);
+                        }
+
+                        if (cells.length > 2) {
+                            $(cells[2]).html(`
+                                <span class="hi-text">कृपांक प्राप्तिः</span>
+                                <br>
+                                Grace Marks Awarded:
+                                ${graceMarks.length > 0 ? graceMarks.join(", ") : ""}
+                            `);
+                        }
+
+                        if (cells.length > 3) {
+                            $(cells[3]).html(`
+                                <span class="hi-text">अनुत्तीर्णः</span>
+                                <br>
+                                Failed:
+                                ${failedSubjects.length > 0 ? failedSubjects.join(", ") : ""}
+                            `);
+                        }
+                    }
+
+
+                    // ====================================================
+                    // FINAL RESULT
+                    // ====================================================
+
+                    let finalResult = getValue(student, "Result");
+
+                    if ($(".result-box").length > 0) {
+
+                        $(".result-box").html(`
+                            <span class="hi-text">परिणाम</span>
+                            / RESULT:
+                            <span class="hi-text">${displayValue(finalResult, "")}</span>
+                            /
+                            ${displayValue(finalResult, "")}
+                        `);
+                    }
+
+
+                    // ====================================================
+                    // SERIAL NO / FOLIO / BOTTOM SERIAL
+                    // ====================================================
+
+                    let serialNo = getValue(student, "SerialNo");
+
+                    if (serialNo !== "" && $("#Serialno").length > 0) {
+                        $("#Serialno").text(serialNo);
+                    }
+
+                    let folioNo = getValue(student, "Folio");
+
+                    if (folioNo !== "" && $("#Folio").length > 0) {
+                        $("#Folio").text(folioNo);
+                    }
+
+                    let serialBottom = getValue(student, "SerialBottom");
+
+                    if (serialBottom !== "" && $("#serialbottom").length > 0) {
+                        $("#serialbottom").text(serialBottom);
+                    }
+
+                },
+
+
+                // ====================================================
+                // AJAX ERROR
+                // ====================================================
+
+                error: function (xhr, status, error) {
+
+                    console.error("Marksheet API Error:", error);
+                    console.error("API Response:", xhr.responseText);
+
+                    alert("Failed to load marksheet data.");
+                }
+            });
+        }
 
 
             // ============================================================
