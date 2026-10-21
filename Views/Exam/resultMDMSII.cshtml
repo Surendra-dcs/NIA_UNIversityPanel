@@ -461,6 +461,7 @@
 
         <div class="exam-title-row">
             <div class="exam-title" id="ExamnameId">M.D./MS Part-II (Final) BATCH-2022 MAIN EXAM (September 2026)</div>
+            <div class="exam-title"><b>Subject : </b> <span id="subject_Id"></span></div>
             <div class="register-title">TABULATION REGISTER/LEDGER</div>
             <div class="issue-date">Date of Issue :</div>
         </div>
@@ -510,7 +511,8 @@
             <p>3. A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</p>
         </div>
         <div class="signatories">
-            <div class="sig-box">Tabulator DCOE</div>
+            <div class="sig-box">Tabulator</div>
+            <div class="sig-box">DCOE</div>
             <div class="sig-box">Controller of Examinations</div>
             <div class="sig-box">Registrar</div>
             <div class="sig-box">Vice Chancellor.</div>
@@ -618,6 +620,7 @@
            }
 
            $("#ExamnameId").text(data[0].examname || '');
+           $("#subject_Id").text(data[0].subjectNameCourseWise || '');
 
            // Map use kiya hai taaki students ka order (SQL ka order) bina badle rahe
            const grouped = new Map();
