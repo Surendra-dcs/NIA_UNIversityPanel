@@ -13,5 +13,6 @@
         public string semyearcode { get; set; } = "";
         public string subject_name { get; set; } = "";
         public string Examname { get; set; } = "";
+        public string collegename { get; set; } = "";
     }
 }

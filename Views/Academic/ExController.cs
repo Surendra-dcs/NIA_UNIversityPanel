@@ -35,6 +35,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+        public IActionResult P_marksPNK()
+        {
+            return View();
+        }        
         public IActionResult special_practical()
         {
             return View();
@@ -51,6 +55,12 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult P_AttendancePNK()
+        {
+            return View();
+        }
+        
         public IActionResult V_Attendance()
         {
             return View();

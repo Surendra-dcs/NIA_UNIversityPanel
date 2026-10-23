@@ -57,30 +57,67 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-item" id="nav-dashboard">
-                <a href="/Ex/Dashboard" class="nav-link">
-                    <i class="fas fa-border-all"></i>
-                    <span>Dashboard</span>
-                </a>
-            </div>
 
-            <div class="nav-item has-dropdown" id="program">
-                <div class="nav-link nav-toggle" onclick="toggleDropdown('program', event)">
-                    <i class="fas fa-file-lines"></i>
-                    <span>Practical Management</span>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
+        @{
+            var collegename = Context.Session.GetString("collegename");
+
+        }
+
+        @if (collegename=="Panchkula")
+        {
+            <nav class="sidebar-nav">
+                <div class="nav-item" id="nav-dashboard">
+                    <a href="/Ex/Dashboard" class="nav-link">
+                        <i class="fas fa-border-all"></i>
+                        <span>Dashboard</span>
+                    </a>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a href="/Ex/P_marks"><i class="fas fa-circle dot"></i>Fill Practical Marks</a></li>
-                   @*  <li><a href="/Ex/special_practical"><i class="fas fa-circle dot"></i>Fill Special Practical  Mark</a></li> *@
-                    <li><a href="/Ex/P_Attendance"><i class="fas fa-circle dot"></i>Print Practical Attendance</a></li>
-                    
-                    <li><a href="/Ex/P_Report"><i class="fas fa-circle dot"></i>Award List</a></li>
-                    <li><a href="/Ex/SubjctWiseBill" target="_blank"><i class="fas fa-circle dot"></i>Bill Details</a></li>
-                </ul>
-            </div>
-        </nav>
+
+                <div class="nav-item has-dropdown" id="program">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('program', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Practical Management</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Ex/P_marksPNK"><i class="fas fa-circle dot"></i>Fill Practical Marks</a></li>
+                        @*  <li><a href="/Ex/special_practical"><i class="fas fa-circle dot"></i>Fill Special Practical  Mark</a></li> *@
+                        <li><a href="/Ex/P_AttendancePNK"><i class="fas fa-circle dot"></i>Print Practical Attendance</a></li>
+                        <li><a href="/Ex/P_ReportPNK"><i class="fas fa-circle dot"></i>Award List</a></li>
+                        <li><a href="/Ex/SubjctWiseBill" target="_blank"><i class="fas fa-circle dot"></i>Bill Details</a></li>
+                    </ul>
+                </div>
+            </nav>
+        }
+        else        
+        {
+            <nav class="sidebar-nav">
+                <div class="nav-item" id="nav-dashboard">
+                    <a href="/Ex/Dashboard" class="nav-link">
+                        <i class="fas fa-border-all"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+
+                <div class="nav-item has-dropdown" id="program">
+                    <div class="nav-link nav-toggle" onclick="toggleDropdown('program', event)">
+                        <i class="fas fa-file-lines"></i>
+                        <span>Practical Management</span>
+                        <i class="fas fa-chevron-right arrow-icon"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Ex/P_marks"><i class="fas fa-circle dot"></i>Fill Practical Marks</a></li>
+                        @*  <li><a href="/Ex/special_practical"><i class="fas fa-circle dot"></i>Fill Special Practical  Mark</a></li> *@
+                        <li><a href="/Ex/P_Attendance"><i class="fas fa-circle dot"></i>Print Practical Attendance</a></li>
+
+                        <li><a href="/Ex/P_Report"><i class="fas fa-circle dot"></i>Award List</a></li>
+                        <li><a href="/Ex/SubjctWiseBill" target="_blank"><i class="fas fa-circle dot"></i>Bill Details</a></li>
+                    </ul>
+                </div>
+            </nav>
+        }
+
+       
 
         <div class="sidebar-footer">
             <a href="/Ex_Account/Login" class="logout-btn">
