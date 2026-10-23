@@ -1,0 +1,438 @@
+﻿
+@{
+    ViewData["Title"] = "P_Attendance";
+    Layout = "~/Views/Shared/_ExaminerLayout.cshtml";
+}
+<script src="~/PrintAttendanceshhet.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 95%;
+        margin: 30px auto;
+    }
+
+    .card {
+        background: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        padding: 15px 20px;
+    }
+
+    .bg-primary {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .bg-success {
+        background: #1a3a5c;
+        color: white;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .col-md-3 {
+        width: 25%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: bold;
+    }
+
+    .form-select,
+    .form-control {
+        width: 100%;
+        height: 40px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 5px 10px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #0d6efd;
+        }
+
+    .mt-4 {
+        margin-top: 20px;
+    }
+
+    .mt-3 {
+        margin-top: 15px;
+    }
+
+    .text-end {
+        text-align: right;
+    }
+
+    .btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .btn-primary {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .btn-success {
+        background: #198754;
+        color: white;
+    }
+
+    .btn:hover {
+        opacity: 0.9;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+        
+        .table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: center;
+        }
+
+    .table-dark {
+        background: #212529;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f1f1f1;
+    }
+
+    .align-middle td,
+    .align-middle th {
+        vertical-align: middle;
+    }
+
+    .mb-0 {
+        margin-bottom: 0;
+    }
+
+    
+
+    @@media(max - width: 992px) {
+        .col-md-3 {
+            width: 50%;
+        }
+    }
+
+    @@media(max - width: 576px) {
+        .col-md-3 {
+            width: 100%;
+        }
+
+        .text-end {
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @@media print {
+
+        body * {
+            visibility: hidden;
+        }
+
+        #studentTable,
+        #studentTable * {
+            visibility: visible;
+        }
+
+        #studentTable {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+            #studentTable input {
+                border: none;
+            }
+
+        .dataTables_paginate,
+        .dataTables_filter,
+        .dataTables_length,
+        .dataTables_info {
+            display: none !important;
+        }
+    }
+</style>
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Practical / Viva Attendance Sheet</h4>
+            <button type="button"
+                    class="btn btn-light btn-sm"
+                    onclick="printTable()" style="float:right;margin-top:-2.2%;background:red;font-weight:800;">
+                🖨 Print
+            </button>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="form-label">Session</label>
+                    <select class="form-select" id="sessionId">
+                        <option value="">Select Session</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Program </label>
+                    <select class="form-select" id="programId">
+                        <option value="">Select Program</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Course </label>
+                    <select class="form-select" id="courseId">
+                        <option value="">Select Course</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Semester </label>
+                    <select class="form-select" id="semester">
+                        <option value="">Select Semester</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Batch </label>
+                    <select class="form-select" id="BatchId">
+                        <option value="">Select Batch</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject </label>
+                    <select class="form-select" id="subjectId">
+                        <option value="">Select Subject</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label"> </label>
+                    <button class="btn btn-primary" onclick="loadStudents()" style="margin-top:7%;">
+                        Search here...
+                    </button>
+                </div>
+            </div>
+            <div>
+                <h4>Exam Name : <strong><span id="examId" style="color:red"></span></strong></h4>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="card shadow-lg border-0 mt-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Practical / Viva Attendance Sheet</h5>
+        </div>      
+
+
+        <div class="card-body table-responsive">
+            <table class="table table-bordered table-hover align-middle" id="studentTable">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="text-align: center;">Sr.No.</th>
+                        <th>Student Name</th>
+                        <th style="text-align:center;">Enrollment No.</th>
+                        <th style="text-align:center;">Roll Number</th>
+                        <th style="text-align:center;">Candidate Signature</th>
+                        <th style="text-align:center;">Remark</th>                        
+                    </tr>
+                </thead>
+                <tbody id="studentTableBody"></tbody>
+            </table>
+          
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+    loadPrograms();
+    loadSession();
+    });
+     function loadSession() {
+              $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
+                  let session = '<option value="">Select Session</option>';
+                  res.forEach(x => {
+                      session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
+                  });
+                  $('#sessionId').html(session);
+              });
+            }
+    function loadPrograms() {
+              $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
+                  let opt = '<option value="">Select Program</option>';
+                  res.forEach(x => {
+                      opt += `<option value="${x.programId}">${x.programName}</option>`;
+                  });
+                  $('#programId').html(opt);
+              });
+            }
+    document.getElementById("programId").addEventListener("change", function () {
+           let programId = this.value;
+           $("#courseId").val('');
+           $("#semester").val('');
+           $("#BatchId").val('');
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/courses/${programId}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("courseId");
+                   courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
+                   });
+               });
+        });
+    document.getElementById("courseId").addEventListener("change", function () {
+           let courseId = this.value;
+           $("#semester").val('');
+           $("#BatchId").val('');
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("semester");
+                   courseDropdown.innerHTML = '<option value="">Select Semester</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
+                   });
+               });
+        });
+    $("#semester").on("change", function () {
+           let semId = this.value;
+           let courseId = $("#courseId").val();
+           $("#BatchId").html('<option value="">Select Batch</option>');
+           if (!semId) return;
+           $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
+               let opt = '<option value="">Select Batch</option>';
+               data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
+               $("#BatchId").html(opt);
+           });
+       });
+    document.getElementById("BatchId").addEventListener("change", function () {
+           let semester = $("#semester").val();
+           var courseid = $("#courseId").val();
+           var batch = this.value;
+           $("#subjectId").val('');
+           fetch(ApiBaseUrl + `Subject/getsubject/${semester}/${courseid}/${batch}`)
+               .then(res => res.json())
+               .then(data => {
+                   let courseDropdown = document.getElementById("subjectId");
+                   courseDropdown.innerHTML = '<option value="">Select Subject</option>';
+                   data.forEach(item => {
+                        courseDropdown.innerHTML += `<option value="${item.subjectId}">${item.subjectName}</option>`;
+                   });
+               });
+        });
+
+    async function loadStudents() {
+           let sessionId = document.getElementById('sessionId').value;
+           let courseId = document.getElementById('courseId').value;
+           let subjectId = document.getElementById('subjectId').value;
+           let semester = document.getElementById('semester').value;
+           let BatchId = $("#BatchId").val();
+           var selectedSubject = $("#subjectId option:selected").text().trim();
+           var sessionSubject = '@Context.Session.GetString("subject_name")';
+           // if (!sessionSubject) {
+           //     alert("Your session has expired. Please logout and login again.");
+           //     window.location.href = '/Ex_Account/Logout';
+           //     return;
+           // }
+
+           // if (selectedSubject != sessionSubject) {
+           //     alert(`You are registered for "${sessionSubject}". Please select the same Subject.`);
+           //     $("#subjectId").val('');
+           //     if ($.fn.DataTable.isDataTable('#studentTable')) {
+           //     $('#studentTable').DataTable().clear().draw();
+           //     }
+           //     $("#studentTableBody").empty();
+           //     return;
+           // }
+
+           try {
+
+               const response = await fetch(
+                   ApiBaseUrl + `PracticalMarks/GetStudentsforAttendancepnk?sessionId=${sessionId}&courseId=${courseId}&subjectId=${subjectId}&semester=${semester}&btcId=${BatchId}`
+               );
+
+               const students = await response.json();
+               if ($.fn.DataTable.isDataTable('#studentTable')) {
+                   $('#studentTable').DataTable().destroy();
+               }
+               let tbody = document.getElementById('studentTableBody');
+               $("#examId").text(students[0].examname)
+               tbody.innerHTML = '';                  
+                  
+                   students.forEach((student, index) => {
+                   tbody.innerHTML += `
+                               <tr>
+                                   <td>${index + 1}</td>                                  
+                                   <td>${student.studentName}</td>
+                                   <td>${student.enrollmentNo}</td>
+                                   <td>${student.rollNumber}</td>
+                                   <td></td>
+                                   <td></td>                                 
+                                   
+                               </tr>`;
+                  });
+
+               $('#studentTable').DataTable({
+                 pageLength: 10,
+                 responsive: true,
+                 searching: true,
+                 ordering: true,
+                 lengthMenu: [[10,25,50,100],[10,25,50,100]]
+               });          
+
+               }
+           catch (error) {
+
+               console.error(error);
+               alert("Error loading students.");
+           }
+       }
+
+</script>
+
