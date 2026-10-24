@@ -60,7 +60,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
-        
+        public IActionResult P_ReportPNK()
+        {
+            return View();
+        }
+
         public IActionResult V_Attendance()
         {
             return View();
