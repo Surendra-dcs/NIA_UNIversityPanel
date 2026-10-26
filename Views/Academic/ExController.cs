@@ -91,9 +91,21 @@ namespace NIAUNIVERSITYPANEL.Controllers
             ViewBag.SubjectId =subjectId;
             return View();
         }
+
+        public IActionResult ExbpnkDetails(int subjectId)
+        {
+            ViewBag.SubjectId =subjectId;
+            return View();
+        }
         public IActionResult SubjctWiseBill()
         {           
             return View();
         }
+        public IActionResult Subjctwpnkbill()
+        {
+            return View();
+        }
+
+        
     }
 }
