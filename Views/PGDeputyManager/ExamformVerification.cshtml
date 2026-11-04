@@ -490,21 +490,20 @@
                 },
 
                 {
-                    data: null,
-                    orderable: false,
-                    render: function (data) {
-
-                        return `
-                            <button class="btn btn-sm"
-                                    style="${data.isVerify
-                                        ? 'background:gray;color:white;opacity:.6;cursor:not-allowed;'
-                                        : 'background:#2d7dd2;color:white;'}"
-                                    onclick="verifyForm(${data.id})"
-                                    ${data.isVerify ? 'disabled' : ''}>
-                                ${data.isVerify ? 'Verified' : 'Verify'}
-                            </button>`;
-                    }
+                  data: null,
+                  orderable: false,
+                  render: function (data) {
+                   return `
+                      <button class="btn btn-sm"
+                              style="${data.isVerify
+                                  ? 'background:gray;color:white;opacity:.6;cursor:not-allowed;'
+                                  : 'background:#2d7dd2;color:white;'}"
+                              onclick="verifyForm(${data.id}, '${data.rollNumber ?? ''}')"
+                              ${data.isVerify ? 'disabled' : ''}>
+                          ${data.isVerify ? 'Verified' : 'Verify'}
+                      </button>`;
                 }
+              }
 
             ],
 
@@ -519,27 +518,32 @@
 
     }
 
-       function verifyForm(id) {
+     function verifyForm(id, rollNumber) {
         let checkbox = $(`.rowCheckbox[value="${id}"]`);
         var examinnerMobile = '@Context.Session.GetString("Mobile")';
+
         if (!checkbox.prop('checked')) {
             alert("Please select checkbox first");
             return;
         }
         if (!confirm("Are you sure you want to verify this student?"))
             return;
+
         $.ajax({
             url: ApiBaseUrl + 'StudentEnrollment/StudentformVerify',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ id: id,Mobile:examinnerMobile }),
+            data: JSON.stringify({
+                id: id,
+                RollNumber: rollNumber,
+                Mobile: examinnerMobile
+            }),
             success: function () {
                 alert("Student verified successfully");
                 table.ajax.reload();
             },
             error: function () {
                 alert("Verification failed");
-
             }
         });
     }
