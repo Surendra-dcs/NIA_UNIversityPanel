@@ -1,0 +1,682 @@
+﻿@{
+    ViewData["Title"] = "Student Payment Dashboard";
+    Layout = "~/Views/Shared/_AccounttentLayout.cshtml";
+}
+
+@inject IConfiguration Configuration
+
+<script>
+    var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+    .dashboard-page {
+        padding: 22px;
+        background: #f4f7fb;
+        min-height: 100vh;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+
+    .dashboard-title {
+        font-size: 25px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
+    }
+
+    .dashboard-subtitle {
+        color: #64748b;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .filter-card, .chart-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        border: 1px solid #e8edf5;
+        box-shadow: 0 3px 12px rgba(0,0,0,.04);
+        margin-bottom: 20px;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .filter-field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 7px;
+    }
+
+    .filter-field input {
+        width: 100%;
+        height: 41px;
+        border: 1px solid #dbe2ec;
+        border-radius: 8px;
+        padding: 0 11px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+        .filter-field input:focus {
+            border-color: #2563eb;
+        }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+    }
+
+    .dash-btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        color: white;
+    }
+
+    .search-btn {
+        background: #2563eb;
+    }
+
+    .reset-btn {
+        background: #64748b;
+    }
+
+    .export-btn {
+        background: #15803d;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+
+    .stat-card {
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+        padding: 20px;
+        border-radius: 13px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.05);
+        border: 1px solid #e8edf5;
+        border-left: 5px solid #2563eb;
+    }
+
+        .stat-card.success {
+            border-left-color: #16a34a;
+        }
+
+        .stat-card.failed {
+            border-left-color: #dc2626;
+        }
+
+        .stat-card.amount {
+            border-left-color: #7c3aed;
+        }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 27px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-top: 9px;
+        overflow-wrap: anywhere;
+    }
+
+    .stat-icon {
+        font-size: 27px;
+        position: absolute;
+        right: 18px;
+        top: 18px;
+        opacity: .8;
+    }
+
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .chart-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #334155;
+        margin: 0 0 18px;
+    }
+
+    .chart-container {
+        height: 320px;
+        position: relative;
+        width: 100%;
+    }
+
+        .chart-container.small {
+            max-width: 450px;
+            margin: auto;
+        }
+
+    .dashboard-alert {
+        display: none;
+        background: #fee2e2;
+        border: 1px solid #fecaca;
+        color: #b91c1c;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-loading {
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    @@media(max-width: 1100px) {
+        .filter-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media(max-width: 700px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media(max-width: 500px) {
+        .dashboard-page {
+            padding: 12px;
+        }
+
+        .filter-grid, .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dash-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="dashboard-page">
+
+    <div class="dashboard-header">
+        <div>
+            <h2 class="dashboard-title">Student Payment Dashboard</h2>
+            <p class="dashboard-subtitle">
+                Online Examination Fee Transaction Overview
+            </p>
+        </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-card">
+        <h3 class="chart-title">Search / Filter Payments</h3>
+
+        <div class="filter-grid">
+            <div class="filter-field">
+                <label>Enrollment Number</label>
+                <input type="text" id="fEnrollmentNo" placeholder="Enter enrollment number">
+            </div>
+
+            <div class="filter-field">
+                <label>Student Name</label>
+                <input type="text" id="fStudentName" placeholder="Enter student name">
+            </div>
+
+            <div class="filter-field">
+                <label>Father Name</label>
+                <input type="text" id="fFatherName" placeholder="Enter father name">
+            </div>
+
+            <div class="filter-field">
+                <label>From Date</label>
+                <input type="date" id="fFromDate">
+            </div>
+
+            <div class="filter-field">
+                <label>To Date</label>
+                <input type="date" id="fToDate">
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button class="dash-btn search-btn" id="btnSearch" onclick="loadPaymentDashboard()">
+                Search
+            </button>
+
+            <button class="dash-btn reset-btn" onclick="resetDashboardFilters()">
+                Reset
+            </button>
+
+            <button class="dash-btn export-btn" onclick="exportPaymentCsv()">
+                Export CSV
+            </button>
+        </div>
+    </div>
+
+    <div id="dashboardAlert" class="dashboard-alert"></div>
+    <div id="loadingText" class="dashboard-loading"></div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-label">Total Transactions</div>
+            <div class="stat-value" id="totalTransactions">0</div>
+           
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-label">Successful Transactions</div>
+            <div class="stat-value" id="successfulTransactions">0</div>
+        
+        </div>
+
+        <div class="stat-card failed">
+            <div class="stat-label">Failed / Other Transactions</div>
+            <div class="stat-value" id="failedTransactions">0</div>
+            
+        </div>
+
+        <div class="stat-card amount">
+            <div class="stat-label">Amount</div>
+            <div class="stat-value" id="successfulAmount">₹0.00</div>
+            
+        </div>
+
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+
+        <div class="chart-card">
+            <h3 class="chart-title">Payment Status Overview</h3>
+            <div class="chart-container small">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title">Transaction Comparison</h3>
+            <div class="chart-container">
+                <canvas id="transactionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title">Date-wise Transactions</h3>
+            <div class="chart-container">
+                <canvas id="dateTransactionChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3 class="chart-title">Date-wise Successful Payment Amount</h3>
+            <div class="chart-container">
+                <canvas id="dateAmountChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let paymentRows = [];
+
+    let statusChart = null;
+    let transactionChart = null;
+    let dateTransactionChart = null;
+    let dateAmountChart = null;
+
+    function money(value) {
+        return (Number(value) || 0).toLocaleString('en-IN', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function getStatus(row) {
+        return String(row.transactionStatus || row.orderStatus || '').trim().toUpperCase();
+    }
+
+    function isSuccess(row) {
+        return getStatus(row).includes('SUCCESS');
+    }
+
+    function isFailed(row) {
+        let status = getStatus(row);
+        return status.includes('FAIL') ||
+               status.includes('CANCEL') ||
+               status.includes('REJECT');
+    }
+
+    function getDate(value) {
+        if (!value) return 'Unknown';
+
+        let d = new Date(value);
+        if (isNaN(d.getTime())) return 'Unknown';
+
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+
+        return day + '-' + month + '-' + d.getFullYear();
+    }
+
+    function showDashboardError(message) {
+        $('#dashboardAlert').text(message).show();
+    }
+
+    function clearDashboardError() {
+        $('#dashboardAlert').hide().text('');
+    }
+
+    function loadPaymentDashboard() {
+        clearDashboardError();
+
+        let from = $('#fFromDate').val();
+        let to = $('#fToDate').val();
+
+        if (from && to && from > to) {
+            showDashboardError('From Date cannot be greater than To Date.');
+            return;
+        }
+
+        let params = {
+            enrollmentNo: $.trim($('#fEnrollmentNo').val()),
+            studentName: $.trim($('#fStudentName').val()),
+            fatherName: $.trim($('#fFatherName').val()),
+            fromDate: from,
+            toDate: to
+        };
+
+        Object.keys(params).forEach(function (key) {
+            if (!params[key]) delete params[key];
+        });
+
+        $('#btnSearch').prop('disabled', true).text('Loading...');
+        $('#loadingText').text('Loading payment dashboard...');
+
+        $.ajax({
+            url: ApiBaseUrl + 'Result/GetStudentPayAmount',
+            type: 'GET',
+            data: params,
+
+            success: function (response) {
+                paymentRows = Array.isArray(response) ? response : [];
+                bindPaymentDashboard(paymentRows);
+            },
+
+            error: function (xhr) {
+                let message = 'Unable to load payment dashboard data.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                showDashboardError(message);
+                console.log(xhr.responseText);
+            },
+
+            complete: function () {
+                $('#btnSearch').prop('disabled', false).text('Search');
+                $('#loadingText').text('');
+            }
+        });
+    }
+
+    function bindPaymentDashboard(rows) {
+        let success = rows.filter(isSuccess);
+        let failed = rows.filter(isFailed);
+        let other = rows.length - success.length - failed.length;
+
+        let successAmount = success.reduce(function (total, row) {
+            return total + (Number(row.totalAmount) || 0);
+        }, 0);
+
+        $('#totalTransactions').text(rows.length);
+        $('#successfulTransactions').text(success.length);
+        $('#failedTransactions').text(failed.length + other);
+        $('#successfulAmount').text('₹' + money(successAmount));
+
+        bindStatusChart(success.length, failed.length, other);
+        bindTransactionChart(success.length, failed.length, other);
+        bindDateTransactionChart(rows);
+        bindDateAmountChart(success);
+    }
+
+    function bindStatusChart(success, failed, other) {
+        if (statusChart) statusChart.destroy();
+
+        statusChart = new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Successful', 'Failed', 'Pending / Other'],
+                datasets: [{
+                    data: [success, failed, other],
+                    backgroundColor: ['#16a34a', '#dc2626', '#f59e0b'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    }
+
+    function bindTransactionChart(success, failed, other) {
+        if (transactionChart) transactionChart.destroy();
+
+        transactionChart = new Chart(document.getElementById('transactionChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Successful', 'Failed', 'Pending / Other'],
+                datasets: [{
+                    label: 'Number of Transactions',
+                    data: [success, failed, other],
+                    backgroundColor: ['#16a34a', '#dc2626', '#f59e0b'],
+                    borderRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    function bindDateTransactionChart(rows) {
+        let grouped = {};
+
+        rows.forEach(function (row) {
+            let date = getDate(row.createdOn);
+            grouped[date] = (grouped[date] || 0) + 1;
+        });
+
+        let labels = Object.keys(grouped).sort(function (a, b) {
+            let pa = a.split('-').reverse().join('');
+            let pb = b.split('-').reverse().join('');
+            return pa.localeCompare(pb);
+        });
+
+        if (dateTransactionChart) dateTransactionChart.destroy();
+
+        dateTransactionChart = new Chart(document.getElementById('dateTransactionChart'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Transactions',
+                    data: labels.map(date => grouped[date]),
+                    backgroundColor: '#2563eb',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
+            }
+        });
+    }
+
+    function bindDateAmountChart(rows) {
+        let grouped = {};
+
+        rows.forEach(function (row) {
+            let date = getDate(row.createdOn);
+            grouped[date] = (grouped[date] || 0) + (Number(row.totalAmount) || 0);
+        });
+
+        let labels = Object.keys(grouped).sort(function (a, b) {
+            let pa = a.split('-').reverse().join('');
+            let pb = b.split('-').reverse().join('');
+            return pa.localeCompare(pb);
+        });
+
+        if (dateAmountChart) dateAmountChart.destroy();
+
+        dateAmountChart = new Chart(document.getElementById('dateAmountChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Successful Amount (₹)',
+                    data: labels.map(date => grouped[date]),
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124,58,237,.12)',
+                    fill: true,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => '₹' + value.toLocaleString('en-IN')
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function resetDashboardFilters() {
+        $('#fEnrollmentNo, #fStudentName, #fFatherName, #fFromDate, #fToDate').val('');
+        loadPaymentDashboard();
+    }
+
+    function exportPaymentCsv() {
+        if (!paymentRows.length) {
+            showDashboardError('There is no data available to export.');
+            return;
+        }
+
+        let columns = [
+            ['enrollmentNo', 'Enrollment No'],
+            ['studentName', 'Student Name'],
+            ['fatherName', 'Father Name'],
+            ['orderRefNumber', 'Order Ref No'],
+            ['sbiOrderRefNumber', 'SBI Ref No'],
+            ['atrn', 'ATRN'],
+            ['orderAmount', 'Order Amount'],
+            ['totalAmount', 'Total Amount'],
+            ['orderStatus', 'Order Status'],
+            ['transactionStatus', 'Transaction Status'],
+            ['payMode', 'Pay Mode'],
+            ['bankName', 'Bank'],
+            ['bankRefNumber', 'Bank Ref No'],
+            ['transactionTime', 'Transaction Time'],
+            ['createdOn', 'Created On'],
+            ['dataSource', 'Source']
+        ];
+
+        function quote(value) {
+            return '"' + String(value == null ? '' : value).replace(/"/g, '""') + '"';
+        }
+
+        let lines = [columns.map(c => quote(c[1])).join(',')];
+
+        paymentRows.forEach(function (row) {
+            lines.push(columns.map(c => quote(row[c[0]])).join(','));
+        });
+
+        let blob = new Blob(['\uFEFF' + lines.join('\r\n')], {
+            type: 'text/csv;charset=utf-8;'
+        });
+
+        let url = URL.createObjectURL(blob);
+        let link = document.createElement('a');
+
+        link.href = url;
+        link.download = 'Student_Payment_Dashboard.csv';
+        link.click();
+
+        URL.revokeObjectURL(url);
+    }
+
+    $(document).ready(function () {
+        $('.filter-field input').on('keydown', function (event) {
+            if (event.key === 'Enter') {
+                loadPaymentDashboard();
+            }
+        });
+
+        loadPaymentDashboard();
+    });
+</script>

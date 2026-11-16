@@ -50,6 +50,10 @@ namespace NIAUNIVERSITYPANEL.Controllers
                     return RedirectToAction(
                         "Dashboard",
                         "University");
+                case 10:
+                    return RedirectToAction(
+                        "Dashboard",
+                        "Accountent");
 
                 default:
                     ViewBag.Error = "Invalid Role!";

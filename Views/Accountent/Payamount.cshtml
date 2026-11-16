@@ -1,0 +1,862 @@
+﻿@{
+    ViewData["Title"] = "Student Payment Details";
+    Layout = null;
+}
+
+@inject IConfiguration Configuration
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Payment Details</title>
+
+    <script>
+        var ApiBaseUrl = '@Configuration["ApiSettings:BaseUrl"]';
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f1f5f9;
+            font-family: 'Roboto', sans-serif;
+            color: #334155;
+        }
+
+        .pay-page {
+            width: 100%;
+            max-width: 100%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        .pay-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .pay-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .pay-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8edf5;
+            box-shadow: 0 3px 14px rgba(0,0,0,.05);
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .pay-card-head {
+            padding: 15px 22px;
+            background: linear-gradient(120deg,#1e3a8a,#2563eb);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .pay-card-body {
+            padding: 22px;
+        }
+
+        .pay-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(5,minmax(0,1fr));
+            gap: 15px;
+        }
+
+        .pay-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            min-width: 0;
+        }
+
+            .pay-field label {
+                font-size: 13px;
+                font-weight: 600;
+                color: #475569;
+            }
+
+            .pay-field input {
+                width: 100%;
+                height: 43px;
+                border: 1px solid #dbe2ec;
+                border-radius: 9px;
+                padding: 0 12px;
+                background: #f8fafc;
+                font-size: 14px;
+                outline: none;
+            }
+
+                .pay-field input:focus {
+                    border-color: #2563eb;
+                    background: #fff;
+                    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+                }
+
+        .pay-filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .pay-btn {
+            height: 42px;
+            padding: 0 22px;
+            border: 0;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .pay-btn-primary {
+            color: white;
+            background: linear-gradient(120deg,#1e40af,#2563eb);
+        }
+
+        .pay-btn-secondary {
+            color: #475569;
+            background: #eef2f7;
+            border: 1px solid #dbe2ec;
+        }
+
+        .pay-btn-green {
+            color: white;
+            background: linear-gradient(120deg,#15803d,#22c55e);
+        }
+
+        .pay-btn:hover {
+            transform: translateY(-1px);
+            opacity: .94;
+        }
+
+        .pay-btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+        }
+
+        .pay-summary {
+            display: grid;
+            grid-template-columns: repeat(4,minmax(0,1fr));
+            gap: 15px;
+        }
+
+        .pay-stat {
+            background: #fff;
+            padding: 18px;
+            border-radius: 13px;
+            border: 1px solid #e8edf5;
+            box-shadow: 0 2px 10px rgba(0,0,0,.04);
+        }
+
+            .pay-stat .lbl {
+                color: #64748b;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .pay-stat .val {
+                margin-top: 7px;
+                font-size: 23px;
+                font-weight: 700;
+                color: #1e40af;
+                overflow-wrap: anywhere;
+            }
+
+            .pay-stat.ok .val {
+                color: #15803d;
+            }
+
+            .pay-stat.bad .val {
+                color: #dc2626;
+            }
+
+        /* Table */
+
+        .pay-table-wrap {
+            width: 100%;
+            max-width: 100%;
+            padding: 18px;
+            overflow: hidden;
+        }
+
+        #payTable {
+            width: 100% !important;
+            min-width: 1800px;
+            white-space: nowrap;
+        }
+
+            #payTable th,
+            #payTable td {
+                white-space: nowrap !important;
+                padding: 12px 14px;
+                font-size: 13px;
+            }
+
+            #payTable thead th {
+                background: #f1f5f9;
+                color: #334155;
+                font-weight: 700;
+                border-bottom: 2px solid #dbe4f0 !important;
+            }
+
+            #payTable tbody td {
+                color: #475569;
+                border-bottom: 1px solid #edf1f5;
+            }
+
+            #payTable tbody tr:hover {
+                background: #f5f9ff !important;
+            }
+
+        .pay-amt {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .pay-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+            .pay-badge.ok {
+                background: #dcfce7;
+                color: #15803d;
+            }
+
+            .pay-badge.bad {
+                background: #fee2e2;
+                color: #dc2626;
+            }
+
+            .pay-badge.wait {
+                background: #fef3c7;
+                color: #b45309;
+            }
+
+        .pay-src {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-radius: 5px;
+            padding: 4px 9px;
+            font-size: 11px;
+        }
+
+        /* DataTables horizontal scrollbar */
+
+        .dataTables_wrapper {
+            width: 100%;
+        }
+
+        .dataTables_scroll {
+            width: 100% !important;
+        }
+
+        .dataTables_scrollHead {
+            overflow: hidden !important;
+        }
+
+        .dataTables_scrollBody {
+            overflow-x: auto !important;
+            overflow-y: auto !important;
+            scrollbar-width: auto;
+            scrollbar-color: #64748b #e2e8f0;
+        }
+
+            .dataTables_scrollBody::-webkit-scrollbar {
+                height: 14px;
+                width: 10px;
+            }
+
+            .dataTables_scrollBody::-webkit-scrollbar-track {
+                background: #e2e8f0;
+                border-radius: 10px;
+            }
+
+            .dataTables_scrollBody::-webkit-scrollbar-thumb {
+                background: #64748b;
+                border-radius: 10px;
+            }
+
+                .dataTables_scrollBody::-webkit-scrollbar-thumb:hover {
+                    background: #334155;
+                }
+
+        .dataTables_wrapper .dataTables_filter input,
+        .dataTables_wrapper .dataTables_length select {
+            border: 1px solid #dbe2ec;
+            border-radius: 7px;
+            padding: 6px 9px;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            color: #64748b;
+            font-size: 13px;
+            padding-top: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            padding-top: 12px;
+        }
+
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+                background: #2563eb !important;
+                color: white !important;
+                border: 1px solid #2563eb !important;
+                border-radius: 7px;
+            }
+
+        .pay-alert {
+            display: none;
+            padding: 13px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+
+            .pay-alert.error {
+                display: block;
+                background: #fee2e2;
+                color: #b91c1c;
+                border: 1px solid #fecaca;
+            }
+
+        @@media(max-width:1100px) {
+            .pay-filter-grid {
+                grid-template-columns: repeat(3,minmax(0,1fr));
+            }
+        }
+
+        @@media(max-width:800px) {
+            .pay-summary {
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+
+            .pay-filter-grid {
+                grid-template-columns: repeat(2,minmax(0,1fr));
+            }
+        }
+
+        @@media(max-width:500px) {
+            .pay-page {
+                padding: 12px;
+            }
+
+            .pay-filter-grid,
+            .pay-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .pay-card-body {
+                padding: 15px;
+            }
+
+            .pay-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="pay-page">
+
+        <div>
+            <h1 class="pay-title">Student Payment Details</h1>
+            <p class="pay-subtitle">Exam form fee transactions (online payments)</p>
+        </div>
+
+        <!-- FILTER -->
+
+        <div class="pay-card">
+            <div class="pay-card-head">Search / Filter</div>
+
+            <div class="pay-card-body">
+                <div class="pay-filter-grid">
+
+                    <div class="pay-field">
+                        <label>Enrollment No.</label>
+                        <input type="text" id="fEnrollmentNo" placeholder="Enrollment number" />
+                    </div>
+
+                    <div class="pay-field">
+                        <label>Student Name</label>
+                        <input type="text" id="fStudentName" placeholder="Student name" />
+                    </div>
+
+                    <div class="pay-field">
+                        <label>Father Name</label>
+                        <input type="text" id="fFatherName" placeholder="Father name" />
+                    </div>
+
+                    <div class="pay-field">
+                        <label>From Date</label>
+                        <input type="date" id="fFromDate" />
+                    </div>
+
+                    <div class="pay-field">
+                        <label>To Date</label>
+                        <input type="date" id="fToDate" />
+                    </div>
+
+                </div>
+
+                <div class="pay-filter-actions">
+                    <button type="button" class="pay-btn pay-btn-primary" id="btnSearch"
+                            onclick="loadStudentPayDetails()">
+                        Search
+                    </button>
+
+                    <button type="button" class="pay-btn pay-btn-secondary"
+                            onclick="resetFilters()">
+                        Reset
+                    </button>
+
+                    <button type="button" class="pay-btn pay-btn-green"
+                            onclick="exportCsv()">
+                        Export CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="payAlert" class="pay-alert"></div>
+
+        <!-- SUMMARY -->
+
+        <div class="pay-summary">
+
+            <div class="pay-stat">
+                <div class="lbl">Total Transactions</div>
+                <div class="val" id="sumCount">0</div>
+            </div>
+
+            <div class="pay-stat ok">
+                <div class="lbl">Successful</div>
+                <div class="val" id="sumSuccess">0</div>
+            </div>
+
+            <div class="pay-stat bad">
+                <div class="lbl">Failed / Other</div>
+                <div class="val" id="sumOther">0</div>
+            </div>
+
+            <div class="pay-stat ok">
+                <div class="lbl">Successful Amount (₹)</div>
+                <div class="val" id="sumAmount">0.00</div>
+            </div>
+
+        </div>
+
+        <!-- PAYMENT TABLE -->
+
+        <div class="pay-card">
+
+            <div class="pay-card-head">Payment Transactions</div>
+
+            <div class="pay-table-wrap">
+
+                <table id="payTable" class="display" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Enrollment No.</th>
+                            <th>Student Name</th>
+                            <th>Father Name</th>
+                            <th>Order Ref No.</th>
+                            <th>SBI Ref No.</th>
+                            <th>ATRN</th>
+                            <th>Order Amt (₹)</th>
+                            <th>Total Amt (₹)</th>
+                            <th>Status</th>
+                            <th>Pay Mode</th>
+                            <th>Bank</th>
+                            <th>Bank Ref No.</th>
+                            <th>Txn Time</th>
+                            <th>Created On</th>
+                            <th>Source</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+    <script>
+
+        var payTable = null;
+        var payRows = [];
+
+        function esc(v) {
+            return String(v == null ? '' : v)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function money(v) {
+            var n = Number(v);
+            if (isNaN(n)) return '0.00';
+
+            return n.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function fmtDate(v) {
+            if (!v) return '—';
+
+            var d = new Date(v);
+            if (isNaN(d.getTime())) return esc(v);
+
+            var p = function (x) {
+                return String(x).padStart(2, '0');
+            };
+
+            return p(d.getDate()) + '-' + p(d.getMonth() + 1) + '-' +
+                d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+        }
+
+        function statusOf(r) {
+            return String(r.transactionStatus || r.orderStatus || '').trim();
+        }
+
+        function statusClass(s) {
+            var u = s.toUpperCase();
+
+            if (u.indexOf('SUCCESS') > -1) return 'ok';
+
+            if (u.indexOf('FAIL') > -1 ||
+                u.indexOf('CANCEL') > -1 ||
+                u.indexOf('REJECT') > -1) return 'bad';
+
+            return 'wait';
+        }
+
+        function showError(msg) {
+            $('#payAlert').attr('class', 'pay-alert error').text(msg);
+        }
+
+        function clearError() {
+            $('#payAlert').attr('class', 'pay-alert').text('');
+        }
+
+        /* INITIALIZE DATATABLE */
+
+        function initTable() {
+
+            payTable = $('#payTable').DataTable({
+
+                data: [],
+
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function (d, t, r, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    { data: 'enrollmentNo', defaultContent: '' },
+                    { data: 'studentName', defaultContent: '' },
+                    { data: 'fatherName', defaultContent: '' },
+                    { data: 'orderRefNumber', defaultContent: '' },
+                    { data: 'sbiOrderRefNumber', defaultContent: '' },
+                    { data: 'atrn', defaultContent: '' },
+                    {
+                        data: 'orderAmount',
+                        defaultContent: 0,
+                        className: 'pay-amt',
+                        render: function (d, t) {
+                            return t === 'display' ? money(d) : d;
+                        }
+                    },
+                    {
+                        data: 'totalAmount',
+                        defaultContent: 0,
+                        className: 'pay-amt',
+                        render: function (d, t) {
+                            return t === 'display' ? money(d) : d;
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function (d, t, r) {
+                            var s = statusOf(r);
+
+                            if (t !== 'display') return s;
+
+                            return s
+                                ? '<span class="pay-badge ' + statusClass(s) + '">' + esc(s) + '</span>'
+                                : '—';
+                        }
+                    },
+                    { data: 'payMode', defaultContent: '' },
+                    { data: 'bankName', defaultContent: '' },
+                    { data: 'bankRefNumber', defaultContent: '' },
+                    {
+                        data: 'transactionTime',
+                        defaultContent: '',
+                        render: function (d, t) {
+                            return t === 'display' ? fmtDate(d) : d;
+                        }
+                    },
+                    {
+                        data: 'createdOn',
+                        defaultContent: '',
+                        render: function (d, t) {
+                            return t === 'display' ? fmtDate(d) : d;
+                        }
+                    },
+                    {
+                        data: 'dataSource',
+                        defaultContent: '',
+                        render: function (d, t) {
+                            return t === 'display'
+                                ? '<span class="pay-src">' + esc(d) + '</span>'
+                                : d;
+                        }
+                    }
+                ],
+
+                scrollX: true,
+                scrollY: '500px',
+                scrollCollapse: true,
+
+                autoWidth: false,
+                responsive: false,
+
+                pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                order: [],
+
+                language: {
+                    search: 'Search in table:',
+                    emptyTable: 'No payment records found',
+                    zeroRecords: 'No matching records found'
+                }
+            });
+        }
+
+        /* SUMMARY */
+
+        function updateSummary(rows) {
+
+            var success = 0;
+            var amount = 0;
+
+            rows.forEach(function (r) {
+                if (statusClass(statusOf(r)) === 'ok') {
+                    success++;
+                    amount += Number(r.totalAmount) || 0;
+                }
+            });
+
+            $('#sumCount').text(rows.length);
+            $('#sumSuccess').text(success);
+            $('#sumOther').text(rows.length - success);
+            $('#sumAmount').text(money(amount));
+        }
+
+        /* LOAD DATA */
+
+        function loadStudentPayDetails() {
+
+            clearError();
+
+            var from = $('#fFromDate').val();
+            var to = $('#fToDate').val();
+
+            if (from && to && from > to) {
+                showError('From Date, To Date se bada nahi ho sakta.');
+                return;
+            }
+
+            var params = {
+                enrollmentNo: $.trim($('#fEnrollmentNo').val()),
+                studentName: $.trim($('#fStudentName').val()),
+                fatherName: $.trim($('#fFatherName').val()),
+                fromDate: from,
+                toDate: to
+            };
+
+            Object.keys(params).forEach(function (k) {
+                if (!params[k]) delete params[k];
+            });
+
+            $('#btnSearch').prop('disabled', true).text('Loading...');
+
+            $.ajax({
+
+                url: ApiBaseUrl + 'Result/GetStudentPayAmount',
+                type: 'GET',
+                data: params,
+
+                success: function (res) {
+
+                    payRows = Array.isArray(res) ? res : [];
+
+                    if (payTable) {
+                        payTable.clear();
+                        payTable.rows.add(payRows);
+                        payTable.draw();
+
+                        setTimeout(function () {
+                            payTable.columns.adjust().draw(false);
+                        }, 100);
+                    }
+
+                    updateSummary(payRows);
+                },
+
+                error: function (xhr) {
+
+                    var msg = 'Payment details load nahi ho paye.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+
+                    showError(msg);
+                    console.log(xhr.responseText);
+                },
+
+                complete: function () {
+                    $('#btnSearch').prop('disabled', false).text('Search');
+                }
+            });
+        }
+
+        /* RESET */
+
+        function resetFilters() {
+
+            $('#fEnrollmentNo, #fStudentName, #fFatherName, #fFromDate, #fToDate').val('');
+
+            loadStudentPayDetails();
+        }
+
+        /* CSV EXPORT */
+
+        function exportCsv() {
+
+            if (!payRows.length) {
+                showError('Export ke liye koi data nahi hai.');
+                return;
+            }
+
+            clearError();
+
+            var cols = [
+                ['enrollmentNo', 'Enrollment No'],
+                ['studentName', 'Student Name'],
+                ['fatherName', 'Father Name'],
+                ['orderRefNumber', 'Order Ref No'],
+                ['sbiOrderRefNumber', 'SBI Ref No'],
+                ['atrn', 'ATRN'],
+                ['orderAmount', 'Order Amount'],
+                ['totalAmount', 'Total Amount'],
+                ['orderStatus', 'Order Status'],
+                ['transactionStatus', 'Transaction Status'],
+                ['payMode', 'Pay Mode'],
+                ['bankName', 'Bank'],
+                ['bankRefNumber', 'Bank Ref No'],
+                ['bankTxnNumber', 'Bank Txn No'],
+                ['currencyCode', 'Currency'],
+                ['transactionTime', 'Transaction Time'],
+                ['cin', 'CIN'],
+                ['createdOn', 'Created On'],
+                ['dataSource', 'Source']
+            ];
+
+            var q = function (v) {
+                return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+            };
+
+            var lines = [
+                cols.map(function (c) {
+                    return q(c[1]);
+                }).join(',')
+            ];
+
+            payRows.forEach(function (r) {
+                lines.push(cols.map(function (c) {
+                    return q(r[c[0]]);
+                }).join(','));
+            });
+
+            var blob = new Blob(
+                ['\uFEFF' + lines.join('\r\n')],
+                { type: 'text/csv;charset=utf-8;' }
+            );
+
+            var a = document.createElement('a');
+            var url = URL.createObjectURL(blob);
+
+            a.href = url;
+            a.download = 'student_payment_details.csv';
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            URL.revokeObjectURL(url);
+        }
+
+        /* DOCUMENT READY */
+
+        $(document).ready(function () {
+
+            $('.pay-field input').on('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    loadStudentPayDetails();
+                }
+            });
+
+            initTable();
+            loadStudentPayDetails();
+
+        });
+
+    </script>
+
+</body>
+</html>
