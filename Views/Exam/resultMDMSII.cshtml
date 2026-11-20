@@ -401,19 +401,13 @@
 <div class="search-row">
 
     <div class="search-group">
-        <label>Session</label>
-        <select id="sessionId">
-            <option value="">Select Session</option>
+        <label>Exam Name</label>
+        <select id="ExamId">
+            <option value="">Select Exam</option>
         </select>
     </div>
 
-    <div class="search-group">
-        <label>Program</label>
-        <select id="programId">
-            <option value="">Select Program</option>
-            <option value="3">Post Graduate (PG)</option>
-        </select>
-    </div>
+
 
     <div class="search-group">
         <label>Course</label>
@@ -525,89 +519,133 @@
 
 <script>
       $(document).ready(function () {
-       loadSession();
+       loadExamname();
        });
-        function loadSession() {
-          $.get(ApiBaseUrl + 'Course/GetSession', function (res) {
-              let session = '<option value="">Select Session</option>';
-              res.forEach(x => {
-                  session += `<option value="${x.sessionId}">${x.sessionName}</option>`;
-              });
-              $('#sessionId').html(session);
-          });
-        }
-        function loadPrograms() {
-          $.get(ApiBaseUrl + 'Course/GetPrograms', function (res) {
-              let opt = '<option value="">Select Program</option>';
-              res.forEach(x => {
-                  opt += `<option value="${x.programId}">${x.programName}</option>`;
-              });
-              $('#programId').html(opt);
-          });
-        }
-        document.getElementById("programId").addEventListener("change", function () {
-       let programId = this.value;
-       $("#courseId").val('');
-       $("#semester").val('');
-       $("#subjectId").val('');
-       fetch(ApiBaseUrl + `Subject/courses/${programId}`)
-           .then(res => res.json())
-           .then(data => {
-               let courseDropdown = document.getElementById("courseId");
-               courseDropdown.innerHTML = '<option value="">Select Course</option>';
-               data.forEach(item => {
-                    courseDropdown.innerHTML += `<option value="${item.course_Id}">${item.course_Name}</option>`;
-               });
-           });
+          // ---------------- LOAD EXAM ----------------
+
+    function loadExamname() {
+
+        $.get(ApiBaseUrl + 'Result/GetExamNameMDMSII', function (res) {
+
+            let options = '<option value="">Select Exam</option>';
+
+            res.forEach(x => {
+                options += `<option value="${x.exid}">
+                                ${x.examinationName}
+                            </option>`;
+            });
+
+            $('#ExamId').html(options);
+        });
+    }
+
+
+    // ---------------- EXAM CHANGE : LOAD COURSE ----------------
+
+    $('#ExamId').on('change', function () {
+
+        let examId = $(this).val();
+
+        // Reset all dropdowns
+        $('#courseId').html('<option value="">Select Course</option>');
+        $('#semester').html('<option value="">Select Semester</option>');
+        $('#BatchId').html('<option value="">Select Batch</option>');
+
+        if (!examId) return;
+
+        $.get(
+            ApiBaseUrl + `Result/GetCourseMDMSII/${examId}`,
+            function (data) {
+
+                let options = '<option value="">Select Course</option>';
+
+                data.forEach(item => {
+                    options += `<option value="${item.courseId}">
+                                    ${item.courseName}
+                                </option>`;
+                });
+
+                $('#courseId').html(options);
+            }
+        );
     });
-      document.getElementById("courseId").addEventListener("change", function () {
-       let courseId = this.value;
-       $("#semester").val('');
-       $("#BatchId").val('');
-       fetch(ApiBaseUrl + `Subject/semester/${courseId}`)
-           .then(res => res.json())
-           .then(data => {
-               let courseDropdown = document.getElementById("semester");
-               courseDropdown.innerHTML = '<option value="">Select Semester</option>';
-               data.forEach(item => {
-                    courseDropdown.innerHTML += `<option value="${item.semesterId}">${item.semesterName}</option>`;
-               });
-           });
-     });
-     $("#semester").on("change", function () {
-          let semId = this.value;
-          let courseId = $("#courseId").val();
-          $("#BatchId").html('<option value="">Select Batch</option>');
-          if (!semId) return;
-          $.get(ApiBaseUrl + `Subject/getBatch/${semId}/${courseId}`, function (data) {
-              let opt = '<option value="">Select Batch</option>';
-              data.forEach(item => opt += `<option value="${item.batchname}">${item.batchname}</option>`);
-              $("#BatchId").html(opt);
-          });
-      });
 
 
-    /* ============================================================
-       loadResultformdmsII
-       FIX: pehle ek student ke saare subjects ek hi <td> me <br> se
-       jude hote the. Subject name 2-3 line me wrap hota tha to
-       baaki columns (Unique Code, marks) us subject ki line se
-       khisak jate the.
-       Ab har subject ki apni alag <tr> hai. Student ke common cells
-       (S.No, Roll/Name, Attempt, Grand Total, Result) rowspan se
-       poore student par failte hain. Isse har subject ka naam aur
-       uske marks hamesha ek hi row me, seedhe align rahte hain.
-       ============================================================ */
+    // ---------------- COURSE CHANGE : LOAD SEMESTER ----------------
+
+    $('#courseId').on('change', function () {
+
+        let courseId = $(this).val();
+        let examId = $('#ExamId').val();
+
+        // Reset semester and batch
+        $('#semester').html('<option value="">Select Semester</option>');
+        $('#BatchId').html('<option value="">Select Batch</option>');
+
+        if (!courseId || !examId) return;
+
+        $.get(
+            ApiBaseUrl + `Result/GetSemesterByCourseMDMSII/${examId}/${courseId}`,
+            function (data) {
+
+                let options = '<option value="">Select Semester</option>';
+
+                data.forEach(item => {
+                    options += `<option value="${item.semesterId}">
+                                    ${item.semesterName}
+                                </option>`;
+                });
+
+                $('#semester').html(options);
+            }
+        );
+    });
+
+
+    // ---------------- SEMESTER CHANGE : LOAD BATCH ----------------
+
+    $('#semester').on('change', function () {
+
+        let semesterId = $(this).val();
+        let courseId = $('#courseId').val();
+        let examId = $('#ExamId').val();
+
+        $('#BatchId').html('<option value="">Select Batch</option>');
+
+        if (!semesterId || !courseId || !examId) return;
+
+        $.get(
+            ApiBaseUrl + `Result/GetBatchBySemesterMDMSII/${examId}/${courseId}/${semesterId}`,
+            function (data) {
+
+                let options = '<option value="">Select Batch</option>';
+
+                data.forEach(item => {
+                    options += `<option value="${item.batchName}">
+                                    ${item.batchName}
+                                </option>`;
+                });
+
+                $('#BatchId').html(options);
+            }
+        );
+    });
+
+
+
+ 
+
+
     async function loadResultformdmsII() {
 
-           const courseId = $("#courseId").val();
-           const semester = $("#semester").val();
-           const sessionId = $("#sessionId").val();
-           let BatchId = $("#BatchId").val();
+       const examId = $("#ExamId").val();
+    const courseId = $("#courseId").val();
+    const semester = $("#semester").val();
+    const BatchId = $("#BatchId").val();
 
            const response = await fetch(
                ApiBaseUrl +
-               `Result/GetTabulationRegisterResultReportformdmsII?courseId=${courseId}&semester=${semester}&sessionId=${sessionId}&btcId=${BatchId}`
+               `Result/GetTabulationRegisterResultReportformdmsII?examId=${encodeURIComponent(examId)}&courseId=${encodeURIComponent(courseId)}&semester=${encodeURIComponent(semester)}&btcId=${encodeURIComponent(BatchId)}`
            );
 
            const data = await response.json();
