@@ -594,7 +594,7 @@
     getJson(api + 'GetMdMsResultExams')
         .then(d => fillDropdown(ddl.exam, 'Select Exam', d, 'exId', 'examYear'))
         .then(() => { ddl.exam.disabled = false; })
-        .catch(() => alert('Exam list load nahi hui.'));
+        .catch(() => alert('Exam list is not loaded .'));
 
     ddl.exam.addEventListener('change', function () {
         resetFrom(ddl.course, ddl.sem, ddl.batch);

@@ -1,0 +1,1469 @@
+﻿@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = "Marksheet";
+    Layout = null;
+
+    string apiBaseUrl = Configuration["ApiSettings:BaseUrl"] ?? "";
+    string enrollment = Convert.ToString(ViewBag.enrollment) ?? "";
+    string examId = Convert.ToString(ViewBag.examId) ?? "";
+}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statement of Marks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        var ApiBaseUrl       = @Json.Serialize(apiBaseUrl);
+        var EnrollmentNumber = @Json.Serialize(enrollment);
+        var ExamId           = @Json.Serialize(examId);
+    </script>
+
+    <style>
+        @@page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #d9dde3;
+        }
+
+        body {
+            font-family: "Noto Serif Devanagari", "Times New Roman", Times, serif;
+            color: #111;
+        }
+
+        .en-serif {
+            font-family: "Times New Roman", Times, serif;
+        }
+
+        .en-sans {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* ---------- toolbar (screen only) ---------- */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 10px;
+            text-align: center;
+        }
+
+            .toolbar button {
+                background: #2563eb;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                padding: 9px 26px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+                .toolbar button:hover {
+                    background: #1d4ed8;
+                }
+
+        /* ---------- A4 page ---------- */
+        .sheet-wrap {
+            padding: 18px 0 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #fff;
+            padding: 9mm 10mm 8mm;
+            box-shadow: 0 8px 30px rgba(0,0,0,.25);
+            position: relative;
+        }
+
+        /* ---------- bottom serial (frame ke neeche, right side) ---------- */
+        .serial-bottom {
+            position: absolute;
+            right: 10mm;
+            bottom: 3mm;
+            font-size: 9px;
+            font-weight: 700;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* ---------- grace subject: poori row yellow ---------- */
+        table.marks tr.grace-row > td {
+            background: yellow !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* ---------- PRINT POPUP (Serial / Folio / Bottom Serial) ---------- */
+        .print-modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .print-modal-content {
+            width: 420px;
+            max-width: 90%;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: printModalOpen 0.2s ease;
+        }
+
+        @@keyframes printModalOpen {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .print-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+            .print-modal-header h3 {
+                margin: 0;
+                font-size: 19px;
+                font-weight: 600;
+            }
+
+        .print-modal-close {
+            border: none;
+            background: transparent;
+            font-size: 27px;
+            line-height: 1;
+            cursor: pointer;
+            color: #666;
+        }
+
+            .print-modal-close:hover {
+                color: #000;
+            }
+
+        .print-modal-body {
+            padding: 20px;
+        }
+
+        .print-input-group {
+            margin-bottom: 16px;
+        }
+
+            .print-input-group label {
+                display: block;
+                margin-bottom: 6px;
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+            }
+
+        .print-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+        }
+
+            .print-input:focus {
+                border-color: #2563eb;
+            }
+
+        .print-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 15px 20px;
+            border-top: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        .print-cancel-btn, .print-save-btn {
+            padding: 9px 16px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .print-cancel-btn {
+            background: #e5e5e5;
+            color: #333;
+        }
+
+        .print-save-btn {
+            background: #2563eb;
+            color: #fff;
+        }
+
+            .print-save-btn:hover {
+                background: #1d4ed8;
+            }
+
+        .frame {
+            border: 1.5px solid #000; 
+            outline: 2.5px solid #000;
+            outline-offset: 3px;
+            padding: 4mm 5mm 4mm;
+            min-height: 280mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---------- serial / folio ---------- */
+        .meta-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+            .meta-top .folio {
+                margin-top: 1mm;
+            }
+
+        /* ---------- header ---------- */
+        .hdr {
+            display: grid;
+            grid-template-columns: 1fr 26mm 1fr;
+            align-items: center;
+            gap: 6px;
+            margin-top: -2mm;
+        }
+
+        .hdr-left {
+            text-align: center;
+            line-height: 1.3;
+        }
+
+            .hdr-left .hi-main {
+                font-size: 27px;
+                font-weight: 700;
+                color: #555;
+                line-height: 1.15;
+            }
+
+            .hdr-left .hi-sub {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+            }
+
+            .hdr-left .hi-small {
+                font-size: 12.5px;
+                color: #50c3ee;
+            }
+
+            .hdr-left .hi-addr {
+                font-size: 13px;
+                color: #222;
+            }
+
+        .hdr-logo {
+            text-align: center;
+        }
+
+            .hdr-logo img {
+                width: 24mm;
+                height: 24mm;
+                object-fit: contain;
+            }
+
+        .logo-fallback {
+            width: 24mm;
+            height: 24mm;
+            border: 2px solid #777;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #777;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .hdr-right {
+            text-align: center;
+            line-height: 1.4;
+            font-family: "Times New Roman", Times, serif;
+        }
+
+            .hdr-right .en-main {
+                font-size: 21px;
+                font-weight: 700;
+                color: #444;
+                letter-spacing: .3px;
+            }
+
+            .hdr-right .en-sub {
+                font-size: 14px;
+                color: #333;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .hdr-right .en-small {
+                font-size: 12.5px;
+                color: #50c3ee;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .hdr-right .en-addr {
+                font-size: 13.5px;
+                color: #222;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+        /* ---------- statement title ---------- */
+        .stmt {
+            text-align: center;
+            margin-top: 4mm;
+            line-height: 1.35;
+        }
+
+            .stmt .en {
+                font-size: 14.5px;
+                font-weight: 700;
+                font-family: "Times New Roman", Times, serif;
+                color: #333;
+            }
+
+            .stmt .hi {
+                font-size: 14.5px;
+                font-weight: 600;
+            }
+
+        /* ---------- course block ---------- */
+        .course {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 1.5mm;
+            text-align: center;
+        }
+
+            .course .hi-course {
+                font-size: 21px;
+                font-weight: 700;
+                color: #444;
+                line-height: 1.3;
+            }
+
+            .course .hi-sub {
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+            .course .hi-exam {
+                font-size: 14.5px;
+                font-weight: 600;
+            }
+
+            .course .en-course {
+                font-size: 21px;
+                font-weight: 700;
+                color: #444;
+                font-family: Arial, Helvetica, sans-serif;
+                margin-top: 5px;
+            }
+
+            .course .en-sub {
+                font-size: 17px;
+                font-weight: 700;
+                color: #666;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .course .en-exam {
+                font-size: 14px;
+                font-weight: 600;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+        /* ---------- student info ---------- */
+        .stu {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-top: 0;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+            .stu .left {
+                padding-top: 3mm;
+            }
+
+                .stu .left b, .stu .right b {
+                    font-weight: 600;
+                }
+
+            .stu .val {
+                font-weight: 600;
+                font-family: "Times New Roman", "Noto Serif Devanagari", serif;
+            }
+
+            .stu .right {
+                padding-right: 2mm;
+                white-space: nowrap;
+            }
+
+            .stu sup {
+                font-size: 8px;
+            }
+
+        /* ---------- marks table (ek hi border + ek hi font poori table me) ---------- */
+        table.marks {
+            /* Table ko frame ke border se chipka diya (left + right), original jaisa */
+            width: calc(100% + 10mm); /* 10mm = frame ka left + right padding (5mm + 5mm) */
+            margin: 2mm -5mm 0 -5mm;
+            border-collapse: collapse;
+            font-family: Arial, "Noto Sans Devanagari", Helvetica, sans-serif;
+            font-size: 12px;
+            color: #000;
+        }
+
+            table.marks th, table.marks td {
+                border: 1px solid #000;
+                padding: 4px 5px;
+                text-align: center;
+                vertical-align: middle;
+                font-family: inherit;
+            }
+
+            table.marks th {
+                font-weight: 700;
+                font-size: 12px;
+                line-height: 1.4;
+            }
+
+            table.marks td.sub {
+                text-align: left;
+                font-weight: 700;
+                font-size: 11.5px;
+                line-height: 1.35;
+                padding: 3px 5px;
+            }
+
+            table.marks td.num, table.marks td.tot {
+                font-weight: 700;
+                font-size: 12.5px;
+            }
+
+            table.marks tr.gt td {
+                font-size: 13.5px;
+                font-weight: 700;
+                height: 8mm;
+            }
+
+                table.marks tr.gt td.gt-label {
+                    text-align: right;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                }
+
+            table.marks tr.summary td {
+                text-align: left;
+                font-weight: 700;
+                font-size: 12px;
+                vertical-align: top;
+                height: 13mm;
+            }
+
+                table.marks tr.summary td .en {
+                    display: block;
+                    margin-top: 4px;
+                }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 1mm;
+            font-size: 13px;
+            font-weight: 700;
+            padding-left: 8mm;
+        }
+
+            .result-row .res {
+                font-size: 16px;
+                font-weight: 700;
+            }
+
+                .result-row .res .en-serif {
+                    font-size: 15px;
+                }
+
+        /* ---------- notes ---------- */
+        .notes {
+            margin-top: 1.5mm;
+            font-size: 11.5px;
+            line-height: 1.4;
+        }
+
+            .notes .item {
+                display: grid;
+                grid-template-columns: 5mm 1fr; /* number | text */
+                align-items: start;
+                margin-bottom: 3px;
+            }
+
+            .notes .no {
+                font-weight: 500;
+            }
+
+            .notes .txt .hi {
+                display: block;
+                font-weight: 500;
+            }
+
+            .notes .txt .en {
+                display: block;
+                font-size: 10.5px;
+                font-weight: 700;
+                padding-left: 0;
+                font-family: "Times New Roman", Times, serif;
+            }
+
+            .notes .txt .legend.hi,
+            .notes .txt .legend.en {
+                display: grid;
+                grid-template-columns: 24mm 20mm 20mm auto; /* D | G | F | AB */
+            }
+
+            .notes .txt .legend.hi {
+                font-weight: 500;
+            }
+
+            .notes .txt .legend.en {
+                font-size: 10.5px;
+                font-weight: 700;
+                font-family: "Times New Roman", Times, serif;
+            }
+        /* ---------- footer ---------- */
+        .spacer {
+            flex: 1;
+            min-height: 6mm;
+        }
+
+        .foot {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            align-items: end;
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+
+            .foot .left {
+                display: flex;
+                align-items: flex-end;
+                justify-content: space-between;
+                padding-right: 10mm;
+            }
+
+                .foot .left .place {
+                    line-height: 1.5;
+                }
+
+                    .foot .left .place .small {
+                        font-size: 11px;
+                        display: block;
+                    }
+
+            .foot .qr {
+                width: 17mm;
+                height: 17mm;
+                background: #fff;
+            }
+
+                .foot .qr img, .foot .qr canvas {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+
+                .foot .qr canvas {
+                    display: none !important;
+                }
+
+            .foot .right {
+                text-align: center;
+                margin-right: -22%;
+                font-family: "Times New Roman", Times, serif;
+            }
+
+                .foot .right img {
+                    height: 14mm;
+                    display: block;
+                    margin: 0 auto 3px;
+                }
+
+                .foot .right .coe-hi {
+                    font-family: "Noto Serif Devanagari", serif;
+                    font-size: 14px;
+                }
+
+                .foot .right .coe-en {
+                    font-size: 14px;
+                    letter-spacing: .4px;
+                }
+
+        /* ---------- PRINT: sab kuch ek hi A4 page par, border poora ---------- */
+        @@media print {
+            html, body {
+                background: #fff;
+                width: 210mm;
+                height: 297mm;
+            }
+
+            .toolbar, .print-modal {
+                display: none !important;
+            }
+
+            .serial-bottom {
+                bottom: 2mm;
+                right: 8mm;
+            }
+
+            .sheet-wrap {
+                padding: 0;
+                display: block;
+            }
+
+            .page {
+                box-shadow: none;
+                width: 210mm;
+                height: 297mm;
+                min-height: 0;
+                padding: 7mm 8mm;
+                overflow: hidden;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .frame {
+                height: 283mm; /* 297 - 7 - 7 */
+                min-height: 0;
+                border: 1.5px solid #000;
+                transform-origin: top left;
+            }
+
+            table.marks, table.marks tr, .notes, .foot {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar"><button type="button" onclick="openPrintPopup()">Print Marksheet / प्रिंट करें</button></div>
+
+    <div class="sheet-wrap">
+        <div class="page">
+            <div class="frame">
+
+                <!-- Serial / Folio -->
+                <div class="meta-top">
+                    <div>क्रम संख्या /Serial No.: <span id="serialNo"></span></div>
+                    <div class="folio">फोलियो संख्या /Folio No.: <span id="folioNo"></span></div>
+                </div>
+
+                <!-- Header -->
+                <div class="hdr">
+                    <div class="hdr-left">
+                        <div class="hi-main">राष्ट्रीय आयुर्वेद संस्थान</div>
+                        <div class="hi-sub">मानद विश्वविद्यालय</div>
+                        <div class="hi-small">(आयुष मंत्रालय, भारत सरकार)</div>
+                        <div class="hi-addr">आमेर रोड, जयपुर-302002</div>
+                    </div>
+                    <div class="hdr-logo">
+                        <img src="@Url.Content("~/Logo/nia_logo.png")" alt="NIA Logo"
+                             onerror="this.style.display='none'; document.getElementById('logoFb').style.display='flex';">
+                        <div class="logo-fallback" id="logoFb">NIA<br>LOGO</div>
+                    </div>
+                    <div class="hdr-right">
+                        <div class="en-main">National Institute of Ayurveda</div>
+                        <div class="en-sub">Deemed to be University</div>
+                        <div class="en-small">(Ministry of AYUSH, Govt. of India)</div>
+                        <div class="en-addr">Amer Road, Jaipur-302002</div>
+                    </div>
+                </div>
+
+                <!-- Statement title -->
+                <div class="stmt">
+                    <div class="en" id="stmtEn"></div>
+                    <div class="hi" id="stmtHi"></div>
+                </div>
+
+                <!-- Course block -->
+                <div class="course">
+                    <div>
+                        <div class="hi-course" id="courseHi"></div>
+                        <div class="hi-sub" id="specHi"></div>
+                        <div class="hi-exam" id="examHi"></div>
+                    </div>
+                    <div>
+                        <div class="en-course" id="courseEn"></div>
+                        <div class="en-sub" id="specEn"></div>
+                        <div class="en-exam" id="examEn"></div>
+                    </div>
+                </div>
+
+                <!-- Student info -->
+                <div class="stu">
+                    <div class="left">
+                        <div><b>नाम/Name:</b> <span class="val" id="nameBoth"></span></div>
+                        <div><b>पिता का नाम/Father's Name:</b> <span class="val" id="fatherBoth"></span></div>
+                        <div><b>माता का नाम/Mother's Name:</b> <span class="val" id="motherBoth"></span></div>
+                    </div>
+                    <div class="right">
+                        <div><b>अनुक्रमांक / Roll No.:</b> <span class="val" id="rollNo"></span></div>
+                        <div><b>नामांकन संख्या/Enrollment No.:</b><span class="val" id="enrollNo"></span></div>
+                        <div><b>प्रयास / Attempt:</b> <span class="val" id="attempt"></span></div>
+                    </div>
+                </div>
+
+                <!-- Marks table -->
+                <table class="marks">
+                    <colgroup>
+                        <col style="width:33%">
+                        <col style="width:9%">
+                        <col style="width:8%">
+                        <col style="width:10%">
+                        <col style="width:11%">
+                        <col style="width:10%">
+                        <col style="width:10%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th rowspan="2">विषय<br><span class="en">Subject (s)</span></th>
+                            <th rowspan="2">अधिकतम<br>अंक<br><span class="en">Max.<br>Marks<br><span id="maxAll"></span></span></th>
+                            <th rowspan="2">न्यूनतम<br>अंक<br><span class="en">Min<br>Marks<br><span id="minAll"></span></span></th>
+                            <th colspan="3">प्राप्तांक<br><span class="en">Marks Obtained</span></th>
+                            <th rowspan="2">टिप्पणी<br><span class="en">Remarks</span></th>
+                        </tr>
+                        <tr>
+                            <th>सैद्धांतिक<br><span class="en">Theory</span></th>
+                            <th>प्रायोगिक या<br>साक्षात्कार<br><span class="en">Practical /<br>Viva Voce</span></th>
+                            <th>विषय योग<br><span class="en">Subject<br>Total</span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="rows"></tbody>
+                    <tfoot>
+                        <tr class="gt">
+                            <td colspan="3" class="blank"></td>
+                            <td colspan="2" class="gt-label">कुल योग / GRAND TOTAL</td>
+                            <td class="tot" id="grandTotal"></td>
+                            <td></td>
+                        </tr>
+                        <tr class="summary">
+                            <td colspan="2">
+                                डिस्टिंक्शन प्राप्ति: <span id="distHi"></span>
+                                <span class="en">Distinction secured: <span id="distEn"></span></span>
+                            </td>
+                            <td colspan="3">
+                                कृपांक प्राप्ति: <span id="graceHi"></span>
+                                <span class="en">Grace Marks Awarded: <span id="graceEn"></span></span>
+                            </td>
+                            <td colspan="2">
+                                अनुत्तीर्ण: <span id="failHi"></span>
+                                <span class="en">Failed: <span id="failEn"></span></span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <!-- Note + result -->
+                <div class="result-row">
+                    <div>टिप्पणी:<br><span class="en-serif">Note:</span></div>
+                    <div class="res">परिणाम / <span class="en-serif">RESULT:</span> <span id="resultText"></span></div>
+                </div>
+
+                <div class="notes">
+                    <div class="item">
+                        <span class="no">1.</span>
+                        <div class="txt">
+                        <span class="hi">एक विषय में उत्तीर्ण होने के लिए अभ्यर्थी को सैद्धांतिक और व्यावहारिक परीक्षा में से प्रत्येक में न्यूनतम 50% अंक प्राप्त करना आवश्यक है।</span>
+                        <span class="en">For candidate to pass, he/she shall require to obtain a minimum of 50% marks in each of Theory and Practical examination.</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <span class="no">2.</span>
+                        <div class="txt">
+                        <span class="hi"> किसी विषय में 75% या उससे अधिक अंक प्राप्त करने वाले अभ्यर्थी को उस विषय में डिस्टिंक्शन (D द्वारा चिन्हित) प्राप्त दिखाया जायेगा।</span>
+                        <span class="en">The Candidate securing 75% marks or above in a Subject shall be declared to have obtained distinction (Denoted by D) in that Subject.</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <span class="no">3.</span>
+                        <div class="txt">
+                        <span class="hi"> किसी पेपर के सैद्धांतिक भाग में अनुत्तीर्ण होने वाले अभ्यर्थी को सैद्धांतिक और व्यावहारिक परीक्षा दोनों में अनुत्तीर्ण माना जाएगा।</span>
+                        <span class="en">A candidate failing in the Theory part of a paper will be considered fail in Theory and Practical both.</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <span class="no">4.</span>
+                        <div class="txt">
+                        <span class="hi"> नियमों के तहत अनुमेय अंकों की जांच और/या उत्तर पुस्तिकाओं के पुनर्मूल्यांकन के लिए आवेदन आवश्यक शुल्क के साथ निर्धारित प्रपत्र में परिणाम की घोषणा की तारीख से 5 दिनों के भीतर रजिस्ट्रार के पास पहुंच जाना चाहिए।</span>
+                        <span class="en">Application for scrutiny of marks and /or revaluation of answer-books as permissible under the rules should reach the Registrar on the prescribed form along with the requisite fees within the 5 days from the date of declaration of result.</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <span class="no">5.</span>
+                        <div class="txt">
+                        <span class="hi">अंक - विवरणिका तैयार करने के दौरान यदि कोई त्रुटि हो जाती है और बाद में ध्यान में लाई जाती है, तो उसे ठीक करने का पूर्ण अधिकार विश्वविद्यालय के पास होगा।</span>
+                        <span class="en">In case of any mistake occurred during the preparation of marks-statement brought to notice afterwards, the University will be fully empowered to correct the same.</span>
+                        </div>
+                    </div>
+                    <div class="item">
+                        <span class="no">6.</span>
+                        <div class="txt">
+                            <div class="legend hi"><span>D-डिस्टिंक्शन</span><span>G- कृपांक</span><span>F-अनुत्तीर्ण</span><span>AB-अनुपस्थित</span></div>
+                            <div class="legend en"><span>D-Distinction</span><span>G-Grace</span><span>F-Fail</span><span>Ab-Absent</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spacer"></div>
+
+                <!-- Footer -->
+                <div class="foot">
+                    <div class="left">
+                        <div class="place">
+                            जयपुर<br>
+                            <span class="en-serif">Jaipur</span>
+                            <span class="small">परिणाम घोषित दिनांक</span>
+                            <span class="small"> Result Date: <span id="resultDate"></span></span>
+                        </div>
+                        <div class="qr" id="qr"></div>
+                    </div>
+                    <div class="right">
+                        <img src="@Url.Content("~/images/sig_coe.png")" alt="" onerror="this.style.display='none'">
+                        <div class="coe-hi">परीक्षा नियंत्रक</div>
+                        <div class="coe-en">CONTROLLER OF EXAMINATIONS</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Serial (frame ke neeche) -->
+            <div class="serial-bottom" id="serialbottom"></div>
+        </div>
+    </div>
+
+    <!-- =================== PRINT POPUP =================== -->
+    <div id="printModal" class="print-modal">
+        <div class="print-modal-content">
+
+            <div class="print-modal-header">
+                <h3>Print Marksheet</h3>
+                <button type="button" class="print-modal-close" onclick="closePrintPopup()">&times;</button>
+            </div>
+
+            <div class="print-modal-body">
+                <div class="print-input-group">
+                    <label for="printSerialNo">Serial No.</label>
+                    <input type="text" id="printSerialNo" class="print-input" placeholder="Enter Serial No.">
+                </div>
+
+                <div class="print-input-group">
+                    <label for="printFolioNo">Folio No.</label>
+                    <input type="text" id="printFolioNo" class="print-input" placeholder="Enter Folio No.">
+                </div>
+
+                <div class="print-input-group">
+                    <label for="printBottomSerial">Bottom Serial No.</label>
+                    <input type="text" id="printBottomSerial" class="print-input" placeholder="Enter Bottom Serial No.">
+                </div>
+            </div>
+
+            <div class="print-modal-footer">
+                <button type="button" class="print-cancel-btn" onclick="closePrintPopup()">Cancel</button>
+                <button type="button" class="print-save-btn" onclick="saveAndPrint()">Save &amp; Print</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // =====================================================
+        // CONFIG
+        // =====================================================
+        const VERIFY_URL = 'https://nia.edu.in/resultverification.php?uuid=';
+
+        // =====================================================
+        // FIELD MAPPING  (SP column names - case-insensitive)
+        // Column ka naam alag ho to yahan array me add kar dijiye.
+        // =====================================================
+        const F = {
+            serialNo:   ['SerialNo', 'Serialno', 'SNo'],
+            folioNo:    ['Folio', 'FolioNo', 'UniqueCode'],
+            serialBottom: ['SerialBottom', 'BottomSerialNo', 'BottomSerial'],
+            uuid:       ['UUID', 'Uuid', 'ResultUUID', 'ResultGuid', 'VerificationId', 'GuidId'],
+
+            // Poori exam line, e.g. "M.D. (Ay.) Agada Tantra Part-II Odd BATCH-2022 MAIN EXAM (September 2026)"
+            // -> isi se Course / Specialization / Part / Month-Year nikale jaate hain
+            examFull:   ['Examname', 'ExamFullName'],
+            session:    ['ExaminationName', 'ExamSession'],                     // "September (2026)"
+
+            // Neeche wale SP se aaye to wahi use honge, warna Examname se ban jaayenge
+            stmtEn:     ['StatementEn', 'StatementTitle'],
+            stmtHi:     ['StatementHi', 'StatementTitleHindi'],
+            courseEn:   ['CourseName', 'CourseNameEn'],
+            courseHi:   ['CourseHindiName', 'CourseNameHindi', 'ExamnameHindi'],
+            specEn:     ['SpecializationName', 'Specialization', 'DepartmentName'],
+            specHi:     ['SpecializationHindi', 'SpecializationHindiName', 'DepartmentHindi'],
+            heldOn:     ['ExamHeld', 'ExamHeldOn', 'ExamMonthYear'],
+
+            nameHi:     ['CondidateHindi', 'CandidateHindi', 'CandidateHindiName'],
+            nameEn:     ['CandidateName'],
+            fatherHi:   ['FatherHindiName'],
+            fatherEn:   ['FatherName'],
+            motherHi:   ['MotherHindiName'],
+            motherEn:   ['MotherName'],
+            rollNo:     ['RollNumber', 'RollNo'],
+            enrollNo:   ['EnrollmentNumber', 'EnrollmentNo'],
+            attempt:    ['Attempt'],
+            resultDate: ['Declaredate', 'ResultDate'],
+            result:     ['Result'],
+            grandTotal: ['GrandTotal'],
+
+            // ---- per subject row ----
+            paperEn:    ['PaperName', 'SubjectName', 'SubjectAppearing'],
+            paperHi:    ['PaperHindiName', 'SubjectHindiName', 'SubjectNameHindi', 'SubjectHindiAppearing'],
+            codeEn:     ['SubjectCodeType', 'SubjectCode'],
+            codeHi:     ['SubjectHindiCodeType', 'SubjectHindiCode'],
+            theory:     ['TheoryObtained'],
+            practical:  ['PracticalObtained'],
+            theoryMax:  ['TheoryMax'],
+            practMax:   ['PracticalMax'],
+            theoryMin:  ['TheoryMin'],
+            practMin:   ['PracticalMin'],
+            maxTotal:   ['MarksSchemeTotal', 'MaxMarks'],
+            minTotal:   ['MarksSchemeMin', 'MinMarks'],
+            total:      ['ObtainedTotal', 'SubjectTotal'],
+            distinction:['Distinction'],
+            grace:      ['GraceMarks'],
+            remark:     ['Remarks', 'Remark']
+        };
+
+        // =====================================================
+        // HELPERS
+        // =====================================================
+        const isBlank = v => v === null || v === undefined || String(v).trim() === '';
+
+        // Case-insensitive pick: "CandidateName" / "candidateName" dono chalega
+        function pick(obj, keys) {
+            if (!obj) return '';
+            const lower = {};
+            Object.keys(obj).forEach(k => { lower[k.toLowerCase()] = obj[k]; });
+            for (const k of keys) {
+                const v = (k in obj) ? obj[k] : lower[k.toLowerCase()];
+                if (!isBlank(v)) return String(v).trim();
+            }
+            return '';
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = isBlank(value) ? '' : value;
+        }
+
+        function setHtml(id, html) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
+        }
+
+        function esc(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function num(value) {
+            if (isBlank(value)) return 0;
+            const n = Number(value);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        const isAbsent = v => /^(AB|ABS|ABSENT)$/i.test(String(v ?? '').trim());
+
+        function formatDate(value) {
+            if (!value) return '';
+            const d = new Date(value);
+            if (isNaN(d.getTime())) return value;
+            return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+        }
+
+        const EN_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const HI_MONTHS = {
+            january:'जनवरी', february:'फरवरी', march:'मार्च', april:'अप्रैल', may:'मई', june:'जून',
+            july:'जुलाई', august:'अगस्त', september:'सितम्बर', october:'अक्टूबर', november:'नवम्बर', december:'दिसम्बर'
+        };
+
+        function heldText(v) {
+            if (isBlank(v)) return '';
+            if (/^\d{4}-\d{2}/.test(v)) {
+                const d = new Date(v);
+                if (!isNaN(d.getTime())) return `${EN_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+            }
+            return v;
+        }
+        const toHindiMonth = s => String(s).replace(/[A-Za-z]+/g, w => HI_MONTHS[w.toLowerCase()] || w);
+
+        // =====================================================
+        // EXAM NAME PARSER
+        // "M.D. (Ay.) Agada Tantra Part-II Odd BATCH-2022 MAIN EXAM (September 2026)"
+        //   -> degree MD, spec "Agada Tantra", part II, month September, year 2026
+        // =====================================================
+        const DEGREES = {
+            MD:  { en: 'M.D. (Ayurveda)',  hi: 'आयुर्वेद वाचस्पति', abbrHi: 'एम.डी. (आयुर्वेद)' },
+            MS:  { en: 'M.S. (Ayurveda)',  hi: 'आयुर्वेद धन्वन्तरि', abbrHi: 'एम.एस. (आयुर्वेद)' },
+            PHD: { en: 'Ph.D. (Ayurveda)', hi: 'विद्या वारिधि',     abbrHi: 'पीएच.डी. (आयुर्वेद)' }
+        };
+        const PART_HI = { I: 'प्रथम', II: 'द्वितीय', III: 'तृतीय', IV: 'चतुर्थ' };
+        const ROMAN   = { '1': 'I', '2': 'II', '3': 'III', '4': 'IV' };
+
+        // Specialization -> Hindi (zarurat ho to aur add kar dijiye)
+        const SPEC_HI = [
+            [/agad/i,                    'अगदतंत्र'],
+            [/kaya\s*chikitsa/i,         'कायचिकित्सा'],
+            [/panch\s*karma/i,           'पंचकर्म'],
+            [/rasa\s*shastra/i,          'रसशास्त्र एवं भैषज्य कल्पना'],
+            [/dravya\s*guna/i,           'द्रव्यगुण'],
+            [/kaumar|bal\s*roga/i,       'कौमारभृत्य'],
+            [/prasuti|stri\s*roga/i,     'प्रसूति तंत्र एवं स्त्री रोग'],
+            [/shalakya/i,                'शालाक्य तंत्र'],
+            [/shalya/i,                  'शल्य तंत्र'],
+            [/rachana/i,                 'रचना शारीर'],
+            [/kriya\s*sharir/i,          'क्रिया शारीर'],
+            [/roga\s*nidan|vikriti/i,    'रोग निदान एवं विकृति विज्ञान'],
+            [/swastha/i,                 'स्वस्थवृत्त एवं योग'],
+            [/samhita|siddhant|basic/i,  'संहिता एवं सिद्धांत'],
+            [/manas/i,                   'मानस रोग']
+        ];
+
+        function parseExam(full, session) {
+            const out = { deg: null, part: '', spec: '', month: '', year: '' };
+            const s = String(full || '').replace(/\s+/g, ' ').trim();
+
+            const m = s.match(/^(M\.?\s*D|M\.?\s*S|Ph\.?\s*D)\.?\s*\(\s*(?:Ay|Ayu|Ayurveda)\.?\s*\)\s*(.*?)\s*Part[\s\-–]*([IVX]+|\d)\b/i);
+            if (m) {
+                out.deg  = DEGREES[m[1].replace(/[\s.]/g, '').toUpperCase()] || null;
+                out.spec = m[2].trim();
+                out.part = ROMAN[m[3]] || m[3].toUpperCase();
+            }
+
+            const h = s.match(/\(\s*([A-Za-z]+)[\s,\-]*(\d{4})\s*\)/) ||
+                      String(session || '').match(/([A-Za-z]+)[\s(,\-]*(\d{4})/);
+            if (h) {
+                out.month = h[1].charAt(0).toUpperCase() + h[1].slice(1).toLowerCase();
+                out.year  = h[2];
+            }
+            return out;
+        }
+
+        // QR ke liye Examname sirf "Part-II" tak:
+        // "M.S. (Ay.) Shalya Tantra Part-II Odd BATCH-2022 MAIN EXAM (September 2026)" -> "M.S. (Ay.) Shalya Tantra Part-II"
+        function qrCourse(full) {
+            const s = String(full || '').replace(/\s+/g, ' ').trim();
+            const m = s.match(/^.*?Part[\s\-–]*(?:[IVX]+|\d)\b/i);
+            return m ? m[0].trim() : s;
+        }
+
+        function specToHindi(spec) {
+            for (const [re, hi] of SPEC_HI) if (re.test(spec)) return hi;
+            return '';
+        }
+
+        function toHindiCode(code) {
+            return String(code || '')
+                .replace(/\bMD\b/gi, 'एमडी')
+                .replace(/\bPR\b/gi, 'प्रायो.');
+        }
+
+        function withCode(code, name) {
+            name = String(name || '').trim();
+            code = String(code || '').trim();
+            if (!code || name.startsWith('(')) return name;
+            return `(${code}) ${name}`;
+        }
+
+        function ordinalHtml(v) {
+            const n = parseInt(v, 10);
+            if (isNaN(n)) return esc(v);
+            const s = (n % 100 >= 11 && n % 100 <= 13) ? 'th' : ({ 1: 'st', 2: 'nd', 3: 'rd' }[n % 10] || 'th');
+            return `${n}<sup>${s}</sup>`;
+        }
+
+        function bothNames(hi, en) {
+            en = String(en || '').toUpperCase();
+            if (hi && en) return `${hi} / ${en}`;
+            return hi || en;
+        }
+
+        function markCell(v, max) {
+            if (isBlank(v)) return '-';
+            if (isAbsent(v)) return 'AB';
+            if (max === 0 && num(v) === 0) return '-';
+            return v;
+        }
+
+        // =====================================================
+        // FETCH
+        // =====================================================
+        async function loadMarksheet() {
+
+            const enrollmentNumber = EnrollmentNumber;
+            const examId = ExamId;
+
+            if (!enrollmentNumber || !examId) {
+                alert("Enrollment Number or Exam ID is missing.");
+                return;
+            }
+
+            try {
+
+                const url = ApiBaseUrl +
+                    `Result/GetMarsheetDataBAMSII?enrollmentNumber=${encodeURIComponent(enrollmentNumber)}&examId=${encodeURIComponent(examId)}`;
+
+                console.log("Marksheet API URL:", url);
+
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    let msg = "Unable to fetch marksheet data.";
+                    try {
+                        const e = await response.json();
+                        msg = e.message || msg;
+                    } catch (e) { }
+                    alert(msg);
+                    return;
+                }
+
+                const result = await response.json();
+
+                console.log("Marksheet API Response:", result);
+
+                if (!Array.isArray(result) || result.length === 0) {
+                    alert("No marksheet data found.");
+                    return;
+                }
+
+                bindMarksheet(result);
+            }
+            catch (error) {
+                console.error("Marksheet Error:", error);
+                alert("Something went wrong while loading marksheet.");
+            }
+        }
+
+        // =====================================================
+        // BIND
+        // =====================================================
+        function bindMarksheet(data) {
+            const st = data[0];
+
+            // ---------- Serial / Folio ----------
+            setText('serialNo', pick(st, F.serialNo));
+            setText('folioNo',  pick(st, F.folioNo));
+            setText('serialbottom', pick(st, F.serialBottom));
+
+            // ---------- Examname parse ----------
+            const ex      = parseExam(pick(st, F.examFull), pick(st, F.session));
+            const part    = ex.part;
+            const partHi  = PART_HI[part] || part;
+            const isFinal = part === 'II';
+            const year    = ex.year;
+
+            // ---------- Statement title ----------
+            // "Statement of Marks obtained at the M.D. (AYURVEDA) PART-II (Final) Examination-2026"
+            const stmtEn = pick(st, F.stmtEn) || (ex.deg
+                ? `Statement of Marks obtained at the ${ex.deg.en.toUpperCase()} PART-${part}${isFinal ? ' (Final)' : ''} Examination-${year}`
+                : '');
+            // "एम.डी. (आयुर्वेद) पार्ट-द्वितीय (अंतिम) परीक्षा-2026 में प्राप्त अंकों का विवरण"
+            const stmtHi = pick(st, F.stmtHi) || (ex.deg
+                ? `${ex.deg.abbrHi} पार्ट-${partHi}${isFinal ? ' (अंतिम)' : ''} परीक्षा-${year} में प्राप्त अंकों का विवरण`
+                : '');
+            setText('stmtEn', stmtEn);
+            setText('stmtHi', stmtHi);
+
+            // ---------- Course block ----------
+            const courseEn = pick(st, F.courseEn) || (ex.deg ? `${ex.deg.en} Part-${part}` : pick(st, F.examFull));
+            const courseHi = pick(st, F.courseHi) || (ex.deg ? `${ex.deg.hi} भाग-${partHi}` : '');
+            const specEn   = pick(st, F.specEn)   || ex.spec;
+            const specHi   = pick(st, F.specHi)   || specToHindi(specEn);
+
+            setText('courseEn', courseEn);
+            setText('courseHi', courseHi);
+            setText('specEn',   specEn);
+            setText('specHi',   specHi);
+
+            const held = heldText(pick(st, F.heldOn)) || (ex.month ? `${ex.month} ${ex.year}` : '');
+            setText('examEn', held ? `(Examination Held in ${held})` : '');
+            setText('examHi', held ? `(परीक्षा सम्पादित ${toHindiMonth(held)})` : '');
+
+            // ---------- Student ----------
+            setText('nameBoth',   bothNames(pick(st, F.nameHi),   pick(st, F.nameEn)));
+            setText('fatherBoth', bothNames(pick(st, F.fatherHi), pick(st, F.fatherEn)));
+            setText('motherBoth', bothNames(pick(st, F.motherHi), pick(st, F.motherEn)));
+            setText('rollNo',     pick(st, F.rollNo));
+            setText('enrollNo',   pick(st, F.enrollNo));
+            setHtml('attempt',    ordinalHtml(pick(st, F.attempt)));
+            setText('resultDate', formatDate(pick(st, F.resultDate)));
+
+            // ---------- Subject rows ----------
+            let html = '', sumTotal = 0, sumMax = 0, sumMin = 0;
+            const distHi = [], distEn = [], graceHi = [], graceEn = [], failHi = [], failEn = [];
+
+            data.forEach(s => {
+                const theory    = pick(s, F.theory);
+                const practical = pick(s, F.practical);
+
+                const tMax = num(pick(s, F.theoryMax)), pMax = num(pick(s, F.practMax));
+                const tMin = num(pick(s, F.theoryMin)), pMin = num(pick(s, F.practMin));
+
+                const maxMarks = num(pick(s, F.maxTotal)) || (tMax + pMax);
+                const minMarks = num(pick(s, F.minTotal)) || (tMin + pMin);
+
+                const apiTotal = pick(s, F.total);
+                const total = apiTotal !== '' ? num(apiTotal) : num(theory) + num(practical);
+
+                sumTotal += total; sumMax += maxMarks; sumMin += minMarks;
+
+                const codeEn = pick(s, F.codeEn);
+                const codeHi = pick(s, F.codeHi) || toHindiCode(codeEn);
+
+                // ---- Fail check ----
+                let fail = false;
+                if (!isBlank(theory)    && (tMax > 0 || num(theory) > 0)    && (isAbsent(theory)    || num(theory)    < tMin)) fail = true;
+                if (!isBlank(practical) && (pMax > 0 || num(practical) > 0) && (isAbsent(practical) || num(practical) < pMin)) fail = true;
+
+                const dVal = pick(s, F.distinction).toUpperCase();
+                const isDist = ['D', 'Y', 'YES', 'TRUE', '1'].includes(dVal);
+                const hasGrace = num(pick(s, F.grace)) > 0;
+
+                // ---- Remark: API ka ho to wahi, warna calculate ----
+                let remark = pick(s, F.remark).toUpperCase();
+                if (!remark) {
+                    if (fail) remark = (isAbsent(theory) || isAbsent(practical)) ? 'AB' : 'F';
+                    else if (hasGrace) remark = 'G';
+                    else if (isDist) remark = 'D';
+                }
+
+                if (remark === 'F' || remark === 'AB') { failHi.push(codeHi);  failEn.push(codeEn); }
+                else if (remark === 'G')               { graceHi.push(codeHi); graceEn.push(codeEn); }
+                else if (remark === 'D')               { distHi.push(codeHi);  distEn.push(codeEn); }
+
+                html += `
+                    <tr class="${remark === 'G' ? 'grace-row' : ''}">
+                        <td class="sub">
+                            <div class="hi">${esc(withCode(codeHi, pick(s, F.paperHi)))}</div>
+                            <div class="en">${esc(withCode(codeEn, pick(s, F.paperEn)))}</div>
+                        </td>
+                        <td class="num">${esc(maxMarks)}</td>
+                        <td class="num">${esc(minMarks)}</td>
+                        <td class="num">${esc(markCell(theory, tMax))}</td>
+                        <td class="num">${esc(markCell(practical, pMax))}</td>
+                        <td class="tot">${esc(total)}</td>
+                        <td class="num">${esc(remark)}</td>
+                    </tr>`;
+            });
+
+            setHtml('rows', html);
+
+            // ---------- Totals ----------
+            setText('maxAll', sumMax);
+            setText('minAll', sumMin);
+
+            const apiGT = pick(st, F.grandTotal);
+            const grandTotal = apiGT !== '' ? num(apiGT) : sumTotal;
+            setText('grandTotal', grandTotal);
+
+            // ---------- Summary ----------
+            const join = arr => arr.filter(Boolean).join(', ');
+            setText('distHi',  join(distHi));
+            setText('distEn',  join(distEn));
+            setText('graceHi', join(graceHi));
+            setText('graceEn', join(graceEn));
+            setText('failHi',  join(failHi));
+            setText('failEn',  join(failEn));
+
+            // ---------- Result ----------
+            let res = pick(st, F.result).toUpperCase();
+            if (!res) res = failEn.length ? 'FAIL' : 'PASS';
+
+            const RES_HI = { 'PASS': 'उत्तीर्ण', 'FAIL': 'अनुत्तीर्ण', 'ABSENT': 'अनुपस्थित' };
+            setText('resultText', RES_HI[res] ? `${RES_HI[res]}/${res}` : res);
+
+            // ---------- QR ----------
+            generateQRCode({
+                rollNo:  pick(st, F.rollNo),
+                name:    pick(st, F.nameEn).toUpperCase(),
+                course:  qrCourse(pick(st, F.examFull)) || courseEn,   // "M.S. (Ay.) Shalya Tantra Part-II"
+                result:  res,
+                total:   grandTotal,
+                uuid:    pick(st, F.uuid)
+            });
+        }
+
+        // =====================================================
+        // QR CODE
+        // Format:
+        // Roll No: 2202033; Name: DHARTI; Course: M.D.(Ayurveda) Part-II; Result: PASS; Total Marks: 412;Url: https://nia.edu.in/resultverification.php?uuid=...
+        // =====================================================
+        function generateQRCode(q) {
+            const qr = document.getElementById('qr');
+            if (!qr) return;
+            qr.innerHTML = '';
+
+            if (typeof QRCode === 'undefined') {
+                console.warn('QR Code library not loaded.');
+                return;
+            }
+
+            const text =
+                `Roll No: ${q.rollNo}; ` +
+                `Name: ${q.name}; ` +
+                `Course: ${q.course}; ` +
+                `Result: ${q.result}; ` +
+                `Total Marks: ${q.total};` +
+                `Url: ${VERIFY_URL}${encodeURIComponent(q.uuid)}`;
+
+            console.log("QR Text:", text);
+
+            new QRCode(qr, { text: text, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M });
+        }
+
+        // =====================================================
+        // PRINT FIT: content zyada ho to frame ko chhota (zoom) kar do
+        // taaki border + footer ek hi page par aaye
+        // =====================================================
+        const MM = 96 / 25.4;   // 1mm in px
+
+        function fitForPrint() {
+            const frame = document.querySelector('.frame');
+            if (!frame) return;
+
+            frame.style.zoom = '';
+            frame.style.height = 'auto';
+            frame.style.minHeight = '0';
+
+            const available = 283 * MM;
+            const needed    = frame.scrollHeight;
+
+            const z = needed > available ? (available / needed) : 1;
+
+            frame.style.height = '';
+            frame.style.minHeight = '';
+            if (z < 1) {
+                frame.style.zoom = z.toFixed(3);
+                frame.style.height = (283 / z) + 'mm';
+            }
+        }
+
+        function resetAfterPrint() {
+            const frame = document.querySelector('.frame');
+            if (!frame) return;
+            frame.style.zoom = '';
+            frame.style.height = '';
+            frame.style.minHeight = '';
+        }
+
+        window.addEventListener('beforeprint', fitForPrint);
+        window.addEventListener('afterprint', resetAfterPrint);
+
+        // =====================================================
+        // PRINT POPUP  (Serial No / Folio No / Bottom Serial)
+        // =====================================================
+        const $id = id => document.getElementById(id);
+
+        function openPrintPopup() {
+            $id('printSerialNo').value     = $id('serialNo').textContent.trim();
+            $id('printFolioNo').value      = $id('folioNo').textContent.trim();
+            $id('printBottomSerial').value = $id('serialbottom').textContent.trim();
+
+            $id('printModal').style.display = 'flex';
+            $id('printSerialNo').focus();
+        }
+
+        function closePrintPopup() {
+            $id('printModal').style.display = 'none';
+        }
+
+        function saveAndPrint() {
+            const serialNo  = $id('printSerialNo').value.trim();
+            const folioNo   = $id('printFolioNo').value.trim();
+            const bottomNo  = $id('printBottomSerial').value.trim();
+
+            if (!serialNo) { alert('Please enter Serial No.');        $id('printSerialNo').focus();     return; }
+            if (!folioNo)  { alert('Please enter Folio No.');         $id('printFolioNo').focus();      return; }
+            if (!bottomNo) { alert('Please enter Bottom Serial No.'); $id('printBottomSerial').focus(); return; }
+
+            // Marksheet me set
+            $id('serialNo').textContent     = serialNo;
+            $id('folioNo').textContent      = folioNo;
+            $id('serialbottom').textContent = bottomNo;
+
+            closePrintPopup();
+
+            // DOM update ke baad print
+            setTimeout(() => window.print(), 200);
+        }
+
+        // ESC se band
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && $id('printModal').style.display === 'flex') closePrintPopup();
+        });
+
+        // Bahar click se band
+        document.addEventListener('click', e => {
+            if (e.target && e.target.id === 'printModal') closePrintPopup();
+        });
+
+        // Popup me Enter dabane par Save & Print
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && $id('printModal').style.display === 'flex') {
+                e.preventDefault();
+                saveAndPrint();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', loadMarksheet);
+    </script>
+
+</body>
+</html>

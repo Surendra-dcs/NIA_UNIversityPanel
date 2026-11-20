@@ -1,0 +1,716 @@
+﻿@{
+    ViewData["Title"] = "Result data";
+    Layout = "~/Views/Shared/_UniversityLayout.cshtml";
+}
+<style>
+
+    .search-panel {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 24px;
+        margin: 20px 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+        border: 1px solid #e8edf3;
+    }
+
+    .search-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(180px, 1fr)) auto;
+        gap: 18px;
+        align-items: end;
+        margin-bottom: 25px;
+    }
+
+    .search-group {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+        .search-group label {
+            font-size: 15px;
+            font-weight: 600;
+            color: #344054;
+            margin-bottom: 8px;
+        }
+
+        .search-group select {
+            width: 100%;
+            height: 46px;
+            padding: 0 13px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            background-color: #ffffff;
+            font-size: 14px;
+            color: #344054;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+            .search-group select:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            }
+
+    .search-btn button {
+        height: 46px;
+        min-width: 150px;
+        padding: 0 22px;
+        background: #174ea6;
+        color: #ffffff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+    }
+
+        .search-btn button:hover {
+            background: #103b80;
+        }
+
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #e8edf3;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    #examTable {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+        margin: 0;
+        font-size: 14px;
+    }
+
+        #examTable thead th {
+            background: #174ea6;
+            color: #ffffff;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+            border: 1px solid #174ea6;
+        }
+
+        #examTable tbody td {
+            padding: 13px 16px;
+            color: #344054;
+            border: 1px solid #e8edf3;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        #examTable tbody tr:nth-child(even) {
+            background: #f8faff;
+        }
+
+        #examTable tbody tr:hover {
+            background: #edf4ff;
+        }
+
+        #examTable .enrollment-link {
+            color: #174ea6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            #examTable .enrollment-link:hover {
+                text-decoration: underline;
+            }
+
+    @@media (max-width: 1100px) {
+        .search-row {
+            grid-template-columns: repeat(2, minmax(180px, 1fr));
+        }
+
+        .search-btn button {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .search-panel {
+            padding: 15px;
+        }
+
+        .search-row {
+            grid-template-columns: 1fr;
+            gap: 13px;
+        }
+
+        .table-card {
+            padding: 8px;
+        }
+    }
+
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+        .report-header h3 {
+            font-size: 19px;
+            font-weight: 600;
+            color: #174ea6;
+            margin: 0;
+        }
+
+    .print-btn {
+        background: #198754;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 7px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .print-btn:hover {
+            background: #146c43;
+        }
+
+    @@media print {
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        #printArea,
+        #printArea * {
+            visibility: visible !important;
+        }
+
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            box-shadow: none;
+            background: #fff;
+        }
+
+        .print-btn {
+            display: none !important;
+        }
+
+        #examTable {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            font-size: 11px !important;
+        }
+
+            #examTable th,
+            #examTable td {
+                border: 1px solid #333 !important;
+                padding: 8px !important;
+                color: #000 !important;
+            }
+
+            #examTable thead th {
+                background: #e8edf5 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            #examTable a {
+                color: #000 !important;
+                text-decoration: none !important;
+            }
+
+        @@page {
+            size: A4 landscape;
+            margin: 12mm;
+        }
+    }
+
+</style>
+
+<div class="search-panel">
+
+    <div class="search-row">
+
+        <div class="search-group">
+            <label for="ExamId">Exam Name</label>
+            <select id="ExamId">
+                <option value="">Select Exam</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="courseId">Course</label>
+            <select id="courseId">
+                <option value="">Select Course</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="semester">Semester</label>
+            <select id="semester">
+                <option value="">Select Semester</option>
+            </select>
+        </div>
+
+        <div class="search-group">
+            <label for="BatchId">Batch</label>
+            <select id="BatchId">
+                <option value="">Select Batch</option>
+            </select>
+        </div>
+
+        <div class="search-group search-btn">
+            <button type="button" onclick="loadStudentReoprtMDMSII()">
+                Search Report
+            </button>
+        </div>
+
+    </div>
+
+    <div class="table-card" id="printArea">
+        <div class="report-header">
+            <h3>Student Examination Report</h3>
+
+            <button type="button" class="print-btn" onclick="printStudentReport()">
+                <i class="fa fa-print"></i> Print Report
+            </button>
+        </div>
+        <div class="table-responsive">
+
+            <table id="examTable">
+                <thead>
+                    <tr>
+                        <th>S.No.</th>
+                        <th>Enrollment Number</th>
+                        <th>Roll Number</th>
+                        <th>Candidate Name</th>
+                        <th>Father Name</th>
+                        <th>Date of Birth</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            Please select Exam, Course, Semester and Batch.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js"></script>
+<script>
+    window._allApiRows = [];
+    let table;
+                 $(document).ready(function () {
+            loadExamname();
+        });
+
+
+        // ---------------- API URL HELPER ----------------
+
+        function getApiUrl(url) {
+            return ApiBaseUrl.replace(/\/?$/, '/') + url;
+        }
+
+
+        // ---------------- LOAD EXAM ----------------
+
+        function loadExamname() {
+
+            $.ajax({
+                url: getApiUrl('Result/GetExamNameMDMSII'),
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (res) {
+
+                    let options = '<option value="">Select Exam</option>';
+
+                    $.each(res, function (index, item) {
+                        options += `
+                            <option value="${item.exid}">
+                                ${item.examinationName}
+                            </option>`;
+                    });
+
+                    $('#ExamId').html(options);
+                },
+
+                error: function (xhr) {
+                    console.error("Exam API Error:", xhr.responseText);
+                    alert("Unable to load Exam Name.");
+                }
+            });
+        }
+
+
+        // ---------------- EXAM CHANGE : LOAD COURSE ----------------
+
+        $('#ExamId').on('change', function () {
+
+            let examId = $(this).val();
+
+            $('#courseId').html('<option value="">Select Course</option>');
+            $('#semester').html('<option value="">Select Semester</option>');
+            $('#BatchId').html('<option value="">Select Batch</option>');
+
+            $('#examTable tbody').empty();
+
+            if (!examId) return;
+
+            $.ajax({
+                url: getApiUrl(`Result/GetCourseMDMSII/${encodeURIComponent(examId)}`),
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (data) {
+
+                    let options = '<option value="">Select Course</option>';
+
+                    $.each(data, function (index, item) {
+                        options += `
+                            <option value="${item.courseId}">
+                                ${item.courseName}
+                            </option>`;
+                    });
+
+                    $('#courseId').html(options);
+                },
+
+                error: function (xhr) {
+                    console.error("Course API Error:", xhr.responseText);
+                    alert("Unable to load Courses.");
+                }
+            });
+        });
+
+
+        // ---------------- COURSE CHANGE : LOAD SEMESTER ----------------
+
+        $('#courseId').on('change', function () {
+
+            let courseId = $(this).val();
+            let examId = $('#ExamId').val();
+
+            $('#semester').html('<option value="">Select Semester</option>');
+            $('#BatchId').html('<option value="">Select Batch</option>');
+
+            $('#examTable tbody').empty();
+
+            if (!courseId || !examId) return;
+
+            $.ajax({
+                url: getApiUrl(
+                    `Result/GetSemesterByCourseMDMSII/${encodeURIComponent(examId)}/${encodeURIComponent(courseId)}`
+                ),
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (data) {
+
+                    let options = '<option value="">Select Semester</option>';
+
+                    $.each(data, function (index, item) {
+                        options += `
+                            <option value="${item.semesterId}">
+                                ${item.semesterName}
+                            </option>`;
+                    });
+
+                    $('#semester').html(options);
+                },
+
+                error: function (xhr) {
+                    console.error("Semester API Error:", xhr.responseText);
+                    alert("Unable to load Semesters.");
+                }
+            });
+        });
+
+
+        // ---------------- SEMESTER CHANGE : LOAD BATCH ----------------
+
+        $('#semester').on('change', function () {
+
+            let semesterId = $(this).val();
+            let courseId = $('#courseId').val();
+            let examId = $('#ExamId').val();
+
+            $('#BatchId').html('<option value="">Select Batch</option>');
+            $('#examTable tbody').empty();
+
+            if (!semesterId || !courseId || !examId) return;
+
+            $.ajax({
+                url: getApiUrl(
+                    `Result/GetBatchBySemesterMDMSII/${encodeURIComponent(examId)}/${encodeURIComponent(courseId)}/${encodeURIComponent(semesterId)}`
+                ),
+                type: 'GET',
+                dataType: 'json',
+
+                success: function (data) {
+
+                    let options = '<option value="">Select Batch</option>';
+
+                    $.each(data, function (index, item) {
+                        options += `
+                            <option value="${item.batchName}">
+                                ${item.batchName}
+                            </option>`;
+                    });
+
+                    $('#BatchId').html(options);
+                },
+
+                error: function (xhr) {
+                    console.error("Batch API Error:", xhr.responseText);
+                    alert("Unable to load Batches.");
+                }
+            });
+        });
+
+
+        // ---------------- LOAD STUDENT REPORT ----------------
+
+
+
+    async function loadStudentReoprtMDMSII() {
+
+        const examId = $("#ExamId").val();
+        const courseId = $("#courseId").val();
+        const semester = $("#semester").val();
+        const BatchId = $("#BatchId").val();
+
+        if (!examId || !courseId || !semester || !BatchId) {
+            alert("Please select Exam, Course, Semester and Batch.");
+            return;
+        }
+
+        try {
+
+            $("#examTable tbody").html(`
+                <tr>
+                    <td colspan="6" class="text-center">
+                        Loading student details...
+                    </td>
+                </tr>
+            `);
+
+            const url = ApiBaseUrl +
+                `Result/getdataforresult?examId=${encodeURIComponent(examId)}&courseId=${encodeURIComponent(courseId)}&semester=${encodeURIComponent(semester)}&Batch=${encodeURIComponent(BatchId)}`;
+
+            console.log("Student Details API URL:", url);
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error("API Error: " + response.status);
+            }
+
+            const data = await response.json();
+
+            console.log("Student Details:", data);
+
+            $("#examTable tbody").empty();
+
+            if (!data || data.length === 0) {
+                $("#examTable tbody").html(`
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            No student records found.
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            $.each(data, function (index, item) {
+
+                const enrollmentNumber = item.enrollmentNumber || "";
+
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+
+                        <td>
+                            <a href="javascript:void(0)"
+                               class="enrollment-link"
+                               data-enrollment="${enrollmentNumber}"
+                               data-examid="${examId}">
+                                ${enrollmentNumber}
+                            </a>
+                        </td>
+
+                        <td>${item.rollNumber || ''}</td>
+                        <td>${item.candidateName || ''}</td>
+                        <td>${item.fatherName || ''}</td>
+                        <td>${item.dateOfBirth || ''}</td>
+                    </tr>
+                `;
+
+                $("#examTable tbody").append(row);
+            });
+
+        }
+        catch (error) {
+
+            console.error("Student Details Error:", error);
+
+            $("#examTable tbody").html(`
+                <tr>
+                    <td colspan="6" class="text-center text-danger">
+                        Unable to load student details.
+                    </td>
+                </tr>
+            `);
+        }
+    }
+
+
+    // Enrollment Number Click Event
+    $(document).on("click", ".enrollment-link", function () {
+
+        const enrollmentNumber = $(this).attr("data-enrollment");
+        const examId = $(this).attr("data-examid");
+
+        if (!enrollmentNumber || !examId) {
+            alert("Enrollment Number or Exam Id is missing.");
+            return;
+        }
+
+        window.open(
+            `/Exam/StudentmarksheettMDMSII?enrollmentNumber=${encodeURIComponent(enrollmentNumber)}&examId=${encodeURIComponent(examId)}`,
+            "_blank"
+        );
+    });
+
+
+
+    function printStudentReport() {
+
+        const table = document.getElementById("examTable");
+
+        if (!table || table.querySelectorAll("tbody tr").length === 0) {
+            alert("No student records available.");
+            return;
+        }
+
+        // const { jsPDF } = window.jspdf;
+
+        // const doc = new jsPDF({
+        //     orientation: "landscape",
+        //     unit: "mm",
+        //     format: "a4"
+        // });
+
+        const examName = $("#ExamId option:selected").text();
+        const courseName = $("#courseId option:selected").text();
+        const semesterName = $("#semester option:selected").text();
+        const batchName = $("#BatchId option:selected").text();
+
+        // Institute Heading
+        doc.setFontSize(16);
+        doc.setFont("helvetica", "bold");
+        doc.text("National Institute of Ayurveda", 148, 15, {
+            align: "center"
+        });
+
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.text("Student Examination Report", 148, 22, {
+            align: "center"
+        });
+
+        // Exam Details
+        doc.setFontSize(10);
+
+        doc.text("Exam: " + examName, 14, 34);
+        doc.text("Course: " + courseName, 90, 34);
+        doc.text("Semester: " + semesterName, 170, 34);
+        doc.text("Batch: " + batchName, 250, 34);
+
+        // Student Table
+        doc.autoTable({
+            html: "#examTable",
+            startY: 42,
+            theme: "grid",
+
+            styles: {
+                fontSize: 9,
+                cellPadding: 3,
+                textColor: [0, 0, 0]
+            },
+
+            headStyles: {
+                fillColor: [23, 78, 166],
+                textColor: [255, 255, 255],
+                fontStyle: "bold"
+            },
+
+            alternateRowStyles: {
+                fillColor: [245, 248, 252]
+            },
+
+            margin: {
+                left: 14,
+                right: 14
+            }
+        });
+
+        // Page Number
+        const pageCount = doc.internal.getNumberOfPages();
+
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(9);
+            doc.text(
+                "Page " + i + " of " + pageCount,
+                280,
+                200,
+                { align: "right" }
+            );
+        }
+
+        // Open PDF for printing
+        const pdfBlob = doc.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        const printWindow = window.open(pdfUrl, "_blank");
+
+        if (!printWindow) {
+            URL.revokeObjectURL(pdfUrl);
+            alert("Please allow pop-ups to print the report.");
+            return;
+        }
+
+        printWindow.onload = function () {
+            printWindow.print();
+        };
+    }
+
+
+</script>

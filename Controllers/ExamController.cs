@@ -213,5 +213,19 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult StudentReportForMarsheetMDMSII()
+        {
+            return View();
+        }
+
+        public IActionResult StudentmarksheettMDMSII(string enrollmentNumber,string ExamId)
+        {
+            ViewBag.enrollment=enrollmentNumber;
+            ViewBag.examId=ExamId;
+            return View();
+        }
+        
+
     }
 }
