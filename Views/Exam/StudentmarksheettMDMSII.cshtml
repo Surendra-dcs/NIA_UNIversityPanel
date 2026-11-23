@@ -13,7 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statement of Marks</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
@@ -22,7 +22,67 @@
         var ExamId           = @Json.Serialize(examId);
     </script>
 
+
     <style>
+        /* =====================================================================
+                           SELF-HOSTED FONTS  (wwwroot/fonts/marksheet/)
+                           File na mile to browser apne aap Google Fonts / system font use karega.
+                           ===================================================================== */
+        @@font-face {
+            font-family: "NIA Sans Devanagari";
+            font-weight: 400;
+            font-display: swap;
+            src: url('@Url.Content("~/fonts/marksheet/noto-sans-devanagari-devanagari-400-normal.woff2")') format('woff2');
+            unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF;
+        }
+
+        @@font-face {
+            font-family: "NIA Sans Devanagari";
+            font-weight: 600;
+            font-display: swap;
+            src: url('@Url.Content("~/fonts/marksheet/noto-sans-devanagari-devanagari-600-normal.woff2")') format('woff2');
+            unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF;
+        }
+
+        @@font-face {
+            font-family: "NIA Sans Devanagari";
+            font-weight: 700;
+            font-display: swap;
+            src: url('@Url.Content("~/fonts/marksheet/noto-sans-devanagari-devanagari-700-normal.woff2")') format('woff2');
+            unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+20F0, U+25CC, U+A830-A839, U+A8E0-A8FF;
+        }
+
+        @@font-face {
+            font-family: "NIA Tinos";
+            font-weight: 400;
+            font-display: swap;
+            src: url('@Url.Content("~/fonts/marksheet/tinos-latin-400-normal.woff2")') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        @@font-face {
+            font-family: "NIA Tinos";
+            font-weight: 700;
+            font-display: swap;
+            src: url('@Url.Content("~/fonts/marksheet/tinos-latin-700-normal.woff2")') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
+        /* =====================================================================
+                           FONT SYSTEM  (photo wali marksheet jaisa)
+                           Hindi            : Devanagari sans (Mangal / Nirmala jaisa)
+                           English serif    : Times  (statement, naam, result, notes, footer)
+                           English sans     : Calibri (header sub-lines, course, table)
+                           ===================================================================== */
+        :root {
+            --hi: "NIA Sans Devanagari", "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
+            --serif: "NIA Tinos", "Tinos", "Times New Roman", Times, serif;
+            --sans: Calibri, Carlito, Arial, Helvetica, sans-serif;
+            /* mixed line: English Times me, Hindi Devanagari font me */
+            --serif-mix: "NIA Tinos", "Tinos", "Times New Roman", Times, "NIA Sans Devanagari", "Noto Sans Devanagari", "Nirmala UI", "Mangal", serif;
+            --sans-mix: Calibri, Carlito, Arial, "NIA Sans Devanagari", "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
+        }
+
         @@page {
             size: A4 portrait;
             margin: 0;
@@ -37,20 +97,22 @@
         html, body {
             margin: 0;
             padding: 0;
-            background: #d9dde3;
+            background: #cfd4da;
         }
 
         body {
-            font-family: "Noto Serif Devanagari", "Times New Roman", Times, serif;
-            color: #111;
+            font-family: var(--serif-mix);
+            color: #000;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
 
         .en-serif {
-            font-family: "Times New Roman", Times, serif;
+            font-family: var(--serif);
         }
 
         .en-sans {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: var(--sans);
         }
 
         /* ---------- toolbar (screen only) ---------- */
@@ -60,21 +122,26 @@
             z-index: 10;
             padding: 10px;
             text-align: center;
+            background: rgba(207, 212, 218, .92);
+            backdrop-filter: blur(4px);
         }
 
             .toolbar button {
-                background: #2563eb;
+                background: #1f3a68;
                 color: #fff;
                 border: none;
-                border-radius: 6px;
+                border-radius: 4px;
                 padding: 9px 26px;
                 font-size: 14px;
                 font-weight: 600;
+                letter-spacing: .3px;
                 cursor: pointer;
+                font-family: Arial, var(--hi);
+                box-shadow: 0 2px 6px rgba(0,0,0,.18);
             }
 
                 .toolbar button:hover {
-                    background: #1d4ed8;
+                    background: #162b4f;
                 }
 
         /* ---------- A4 page ---------- */
@@ -88,18 +155,19 @@
             width: 210mm;
             min-height: 297mm;
             background: #fff;
-            padding: 9mm 10mm 8mm;
-            box-shadow: 0 8px 30px rgba(0,0,0,.25);
+            padding: 12mm 12mm;
+            box-shadow: 0 10px 34px rgba(0,0,0,.28);
             position: relative;
         }
 
         /* ---------- bottom serial (frame ke neeche, right side) ---------- */
         .serial-bottom {
             position: absolute;
-            right: 10mm;
-            bottom: 3mm;
-            font-size: 9px;
+            right: 8mm;
+            bottom: 4mm;
+            font-size: 10.5px;
             font-weight: 700;
+            letter-spacing: .4px;
             font-family: Arial, Helvetica, sans-serif;
         }
 
@@ -197,7 +265,7 @@
         }
 
             .print-input:focus {
-                border-color: #2563eb;
+                border-color: #1f3a68;
             }
 
         .print-modal-footer {
@@ -223,20 +291,28 @@
         }
 
         .print-save-btn {
-            background: #2563eb;
+            background: #1f3a68;
             color: #fff;
         }
 
             .print-save-btn:hover {
-                background: #1d4ed8;
+                background: #162b4f;
             }
 
+        /* =====================================================================
+                           OUTER FRAME : bahar 3px + andar 1px
+                           Frame hamesha A4 ke andar ki poori height leta hai (272mm =
+                           297 - 12 top - 12 bottom padding - 1mm safety).
+                           Subjects kam hon to bachi jagah TABLE ki rows me + footer se pehle
+                           baant di jaati hai -> page par khali jagah nahi dikhti.
+                           Subjects zyada hon to purana fitForPrint() JS page ko fit kar deta hai.
+                           ===================================================================== */
         .frame {
-            border: 1.5px solid #000;
-            outline: 2.5px solid #000;
-            outline-offset: 3px;
-            padding: 4mm 5mm 4mm;
-            min-height: 280mm;
+            border: 1px solid #000;
+            outline: 3px solid #000;
+            outline-offset: 2px;
+            padding: 3mm 5mm 3mm;
+            min-height: 272mm;
             display: flex;
             flex-direction: column;
         }
@@ -245,230 +321,329 @@
         .meta-top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            font-size: 12px;
-            font-weight: 600;
+            align-items: baseline;
+            font-family: var(--serif-mix);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.25;
         }
 
-            .meta-top .folio {
-                margin-top: 1mm;
+            .meta-top span {
+                font-family: var(--serif);
+                font-size: 14px;
+                font-weight: 700;
+                padding-left: 2px;
             }
 
-        /* ---------- header ---------- */
+        /* =====================================================================
+                           TOP : header  (Hindi | Logo | English)
+                           ===================================================================== */
         .hdr {
             display: grid;
-            grid-template-columns: 1fr 26mm 1fr;
+            grid-template-columns: 1fr 22mm 1.13fr;
             align-items: center;
-            gap: 18px;
-            margin-top: 3mm;
+            gap: 1.5mm;
+            margin-top: 2mm;
         }
 
-        .hdr-left {
+        .hdr-left, .hdr-right {
             text-align: center;
-            line-height: 1.3;
+            white-space: nowrap;
         }
+
+            /* line 1 : institute name (photo jaisa grey) */
+            .hdr-left .hi-main, .hdr-right .en-main {
+                height: 34px;
+                line-height: 34px;
+                color: #4d4d4d;
+            }
 
             .hdr-left .hi-main {
-                font-size: 30px;
+                font-family: var(--hi);
+                font-size: 27px;
+                font-weight: 600;
+            }
+
+            .hdr-right .en-main {
+                font-family: var(--serif);
+                font-size: 21px;
                 font-weight: 700;
-                color: #555;
-                line-height: 1.15;
+                letter-spacing: 0;
+            }
+
+            /* line 2 : deemed university */
+            .hdr-left .hi-sub, .hdr-right .en-sub {
+                height: 23px;
+                line-height: 22px;
+                color: #1a1a1a;
             }
 
             .hdr-left .hi-sub {
-                font-size: 18px;
+                font-family: var(--hi);
+                font-size: 16px;
                 font-weight: 600;
-                color: #333;
+            }
+
+            .hdr-right .en-sub {
+                font-family: var(--sans);
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            /* line 3 : ministry (halka grey) */
+            .hdr-left .hi-small, .hdr-right .en-small {
+                height: 20px;
+                line-height: 20px;
+                color: #92a4c9;
             }
 
             .hdr-left .hi-small {
+                font-family: var(--hi);
+                font-size: 13.5px;
+                font-weight: 600;
+            }
+
+            .hdr-right .en-small {
+                font-family: var(--sans);
                 font-size: 15px;
-                color: #50c3ee;
+                font-weight: 700;
+            }
+
+            /* line 4 : address */
+            .hdr-left .hi-addr, .hdr-right .en-addr {
+                height: 21px;
+                line-height: 21px;
+                color: #1a1a1a;
             }
 
             .hdr-left .hi-addr {
-                font-size: 15px;
-                color: #222;
+                font-family: var(--hi);
+                font-size: 16px;
+                font-weight: 600;
+            }
+
+            .hdr-right .en-addr {
+                font-family: var(--sans);
+                font-size: 16px;
+                font-weight: 600;
             }
 
         .hdr-logo {
             text-align: center;
+            line-height: 0;
         }
 
             .hdr-logo img {
-                width: 24mm;
-                height: 24mm;
+                width: 22mm;
+                height: 22mm;
                 object-fit: contain;
             }
 
         .logo-fallback {
-            width: 24mm;
-            height: 24mm;
+            width: 21mm;
+            height: 21mm;
             border: 2px solid #777;
             border-radius: 50%;
             display: none;
             align-items: center;
             justify-content: center;
             font-size: 10px;
+            line-height: 1.3;
             color: #777;
             text-align: center;
             margin: 0 auto;
         }
 
-        .hdr-right {
-            text-align: center;
-            line-height: 1.4;
-            font-family: "Times New Roman", Times, serif;
-        }
-
-            .hdr-right .en-main {
-                font-size: 21px;
-                font-weight: 700;
-                color: #444;
-                letter-spacing: .3px;
-            }
-
-            .hdr-right .en-sub {
-                font-size: 18px;
-                font-weight: 600;
-                color: #333;
-            }
-
-            .hdr-right .en-small {
-                font-size: 12.5px;
-                color: #50c3ee;
-                font-family: Arial, Helvetica, sans-serif;
-            }
-
-            .hdr-right .en-addr {
-                font-size: 13.5px;
-                color: #222;
-                font-family: Arial, Helvetica, sans-serif;
-            }
-
-        /* ---------- statement title ---------- */
+        /* =====================================================================
+                           MIDDLE : statement title (English 1 line + Hindi 1 line) + course
+                           ===================================================================== */
         .stmt {
             text-align: center;
-            margin-top: 6mm;
-            line-height: 1.35;
+            margin: 2.5mm -4.5mm 0; /* thodi extra chaudai -> title hamesha ek line */
+            white-space: nowrap;
+            margin-top: 3mm;
         }
 
             .stmt .en {
-                font-size: 17px;
+                font-family: var(--serif);
+                font-size: 16px;
                 font-weight: 700;
-                font-family: "Times New Roman", Times, serif;
-                color: #333;
+                line-height: 21px;
             }
 
             .stmt .hi {
-                font-size: 19.5px;
-                font-weight: 600;
+                font-family: var(--hi);
+                font-size: 16px;
+                font-weight: 700;
+                line-height: 25px;
             }
 
-        /* ---------- course block ---------- */
         .course {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 3.5mm;
+            gap: 4mm;
+            margin-top: 1mm;
             text-align: center;
+            white-space: nowrap;
         }
 
+            .course .hi-course, .course .en-course {
+                height: 29px;
+                line-height: 29px;
+                font-weight: 700;
+            }
+
             .course .hi-course {
-                font-size: 26px;
-                font-weight: 800;
-                color: #444;
-                line-height: 1.3;
+                font-family: var(--hi);
+                font-size: 21px;
+                color: #1a1a1a;
+            }
+
+            .course .en-course {
+                font-family: var(--sans);
+                font-size: 22.5px;
+                color: #333;
+            }
+
+            .course .hi-sub, .course .en-sub {
+                height: 25px;
+                line-height: 25px;
+                font-weight: 700;
             }
 
             .course .hi-sub {
-                font-size: 26px;
+                font-family: var(--hi);
+                font-size: 20px;
+                color: #1a1a1a;
+            }
+
+            .course .en-sub {
+                font-family: var(--sans);
+                font-size: 21.5px;
+                color: #444;
+            }
+
+            .course .hi-exam, .course .en-exam {
+                height: 21px;
+                line-height: 21px;
                 font-weight: 700;
             }
 
             .course .hi-exam {
-                font-size: 19px;
-                font-weight: 600;
-            }
-
-            .course .en-course {
-                font-size: 25px;
-                font-weight: 700;
-                color: #444;
-                line-height: 1.3;
-            }
-
-            .course .en-sub {
-                font-size: 17px;
-                font-weight: 700;
+                font-family: var(--hi);
+                font-size: 14px;
             }
 
             .course .en-exam {
-                font-size: 16px;
-                font-weight: 700;
-                line-height: 2.3;
+                font-family: var(--sans);
+                font-size: 15px;
             }
 
-        /* ---------- student info ---------- */
+        /* =====================================================================
+                           BOTTOM : student info
+                           ===================================================================== */
         .stu {
             display: grid;
             grid-template-columns: 1fr auto;
-            gap: 10px;
-            margin-top: 0;
-            font-size: 12px;
-            line-height: 1.75;
+            gap: 3mm;
+            margin-top: 1.5mm;
+            font-family: var(--serif-mix);
+            font-size: 13.5px;
         }
 
-            .stu .left {
-                padding-top: 3mm;
+            /* har row 19px; lamba naam ho to neat tareeke se agli line me wrap */
+            .stu .left > div, .stu .right > div {
+                min-height: 19px;
+                line-height: 17.5px;
+                padding: .75px 0;
             }
 
-                /* Poora student block (left + right) - label bada + bold */
-                .stu .left b, .stu .right b {
-                    font-size: 14px;
-                    font-weight: 700;
-                }
-
-            .stu .val {
-                font-size: 14px;
-                font-weight: 700;
-                font-family: "Times New Roman", "Noto Serif Devanagari", serif;
-            }
-
-            .stu .right {
-                padding-right: 2mm;
+            .stu .right > div {
                 white-space: nowrap;
             }
 
-            .stu sup {
-                font-size: 9px;
-            }
-
-            /* Hindi naam bada + bold (original jaisa) */
-            .stu .hi-name {
-                font-family: "Noto Serif Devanagari", serif;
-                font-size: 16px;
+            .stu .left b, .stu .right b {
+                font-size: 13px;
                 font-weight: 700;
-                color: #000;
             }
 
-            /* English naam - capital, Times */
-            .stu .en-name {
-                font-family: "Times New Roman", Times, serif;
+            .stu .val {
+                font-family: var(--serif-mix);
                 font-size: 14px;
                 font-weight: 700;
             }
 
-        /* ---------- marks table (ek hi border + ek hi font poori table me) ---------- */
+            .stu #enrollNo {
+                margin-left: .3em;
+            }
+
+            .stu .right {
+                padding-right: 1mm;
+            }
+
+            .stu sup {
+                font-size: 10px;
+                line-height: 0;
+            }
+
+            .stu .hi-name {
+                font-family: var(--hi);
+                font-size: 14.5px;
+                font-weight: 700;
+            }
+
+            .stu .en-name {
+                font-family: var(--serif);
+                font-size: 14px;
+                font-weight: 700;
+            }
+
+        /* =====================================================================
+                           MARKS TABLE
+                           flex-grow: page par bachi hui jagah subject rows me chali jaati hai,
+                           isliye subjects kam hon to rows thodi oonchi ho jaati hain.
+                           ===================================================================== */
         table.marks {
-            /* Table ko frame ke border se chipka diya (left + right), original jaisa */
-            width: calc(100% + 10mm); /* 10mm = frame ka left + right padding (5mm + 5mm) */
-            margin: 2mm -5mm 0 -5mm;
+            /* frame ke left/right border se chipki (ek hi line dikhti hai) */
+            width: calc(100% + 10mm + 2px);
+            margin: 2mm calc(-5mm - 1px) 0;
+            flex: 3 0 auto;
+            position: relative;
+            background: #fff;
             border-collapse: collapse;
-            font-family: Arial, "Noto Sans Devanagari", Helvetica, sans-serif;
-            font-size: 12px;
-            color: #000;
+            table-layout: fixed;
+            font-family: var(--sans-mix);
+            font-size: 13.5px;
+            font-variant-numeric: tabular-nums;
         }
+
+            table.marks col:nth-child(1) {
+                width: 44% !important;
+            }
+
+            table.marks col:nth-child(2) {
+                width: 8% !important;
+            }
+
+            table.marks col:nth-child(3) {
+                width: 8% !important;
+            }
+
+            table.marks col:nth-child(4) {
+                width: 10% !important;
+            }
+
+            table.marks col:nth-child(5) {
+                width: 12% !important;
+            }
+
+            table.marks col:nth-child(6) {
+                width: 9% !important;
+            }
+
+            table.marks col:nth-child(7) {
+                width: 9% !important;
+            }
 
             table.marks th, table.marks td {
                 border: 1px solid #000;
@@ -479,125 +654,168 @@
             }
 
             table.marks th {
+                font-family: var(--hi);
                 font-weight: 700;
-                font-size: 12px;
-                line-height: 1.4;
+                font-size: 11.6px;
+                line-height: 1.15;
+                padding: 1px 2px;
             }
+
+                table.marks th .en {
+                    font-family: var(--sans);
+                    font-weight: 700;
+                    font-size: 12px;
+                }
 
             table.marks td.sub {
                 text-align: left;
-                font-weight: 700;
-                font-size: 11.5px;
-                line-height: 1.35;
-                padding: 3px 5px;
+                line-height: 1.12;
+                padding: 1px 2px;
             }
 
+                table.marks td.sub .hi {
+                    font-family: var(--hi);
+                    font-weight: 700;
+                    font-size: 12px;
+                    line-height: 1.25;
+                }
+
+                table.marks td.sub .en {
+                    font-family: var(--sans);
+                    font-weight: 700;
+                    font-size: 12.5px;
+                }
+
             table.marks td.num, table.marks td.tot {
+                font-family: var(--sans);
                 font-weight: 700;
-                font-size: 12.5px;
+                font-size: 14.5px;
+            }
+
+            table.marks tbody tr > td {
+                height: 7.2mm; /* minimum; jagah bache to apne aap badhti hai */
             }
 
             table.marks tr.gt td {
-                font-size: 13.5px;
                 font-weight: 700;
-                height: 8mm;
+                height: 6.5mm;
             }
 
                 table.marks tr.gt td.gt-label {
+                    font-family: var(--sans-mix);
+                    font-size: 14px;
                     text-align: right;
-                    padding-right: 10px;
+                    padding-right: 6px;
                     white-space: nowrap;
                 }
 
+                table.marks tr.gt td.tot {
+                    font-size: 16px;
+                }
+
             table.marks tr.summary td {
+                font-family: var(--sans-mix);
                 text-align: left;
                 font-weight: 700;
-                font-size: 12px;
+                font-size: 12.5px;
+                line-height: 1.22;
                 vertical-align: top;
-                height: 13mm;
+                height: 8.5mm;
+                padding: 2px 7px;
             }
 
                 table.marks tr.summary td .en {
                     display: block;
-                    margin-top: 4px;
+                    margin-top: 1px;
+                    font-size: 12.5px;
                 }
 
+        /* ---------- note heading + result ---------- */
         .result-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 1mm;
-            font-size: 13px;
+            margin-top: 1.2mm;
+            margin-bottom: 1mm;
+            padding-left: 6mm;
+            font-family: var(--serif-mix);
+            font-size: 14px;
             font-weight: 700;
-            padding-left: 8mm;
+            line-height: 1.2;
         }
 
             .result-row .res {
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: 700;
+                padding-right: 1mm;
             }
 
                 .result-row .res .en-serif {
-                    font-size: 15px;
+                    font-size: 18px;
                 }
 
         /* ---------- notes ---------- */
         .notes {
-            margin-top: 1.5mm;
-            font-size: 11.5px;
-            line-height: 1.4;
+            margin-top: 1mm;
+            font-family: var(--hi);
+            font-size: 10px;
+            line-height: 1.22;
         }
 
             .notes .item {
                 display: grid;
-                grid-template-columns: 5mm 1fr; /* number | text */
+                grid-template-columns: 6mm 1fr; /* number | text */
                 align-items: start;
-                margin-bottom: 3px;
+                margin-bottom: 1px;
             }
 
             .notes .no {
-                font-weight: 500;
+                font-family: var(--hi);
+                font-size: 10px;
+                font-weight: 600;
+                line-height: 1.22;
             }
 
             .notes .txt .hi {
                 display: block;
-                font-weight: 500;
+                font-weight: 600;
             }
 
             .notes .txt .en {
                 display: block;
-                font-size: 10.5px;
+                font-family: var(--serif);
+                font-size: 9px;
                 font-weight: 700;
-                padding-left: 0;
-                font-family: "Times New Roman", Times, serif;
+                line-height: 1.12;
             }
 
             .notes .txt .legend.hi,
             .notes .txt .legend.en {
                 display: grid;
-                grid-template-columns: 24mm 20mm 20mm auto; /* D | G | F | AB */
+                grid-template-columns: 27mm 22mm 22mm auto; /* D | G | F | AB */
             }
 
             .notes .txt .legend.hi {
-                font-weight: 500;
+                font-weight: 600;
             }
 
             .notes .txt .legend.en {
-                font-size: 10.5px;
+                font-family: var(--serif);
+                font-size: 9px;
                 font-weight: 700;
-                font-family: "Times New Roman", Times, serif;
             }
+
         /* ---------- footer ---------- */
         .spacer {
-            flex: 1;
-            min-height: 6mm;
+            flex: 1 0 3mm; /* bachi jagah ka chhota hissa footer se pehle */
         }
 
         .foot {
             display: grid;
             grid-template-columns: 1.1fr 1fr;
             align-items: end;
-            font-size: 12.5px;
+            font-family: var(--serif-mix);
+            font-size: 13.5px;
             font-weight: 700;
         }
 
@@ -609,12 +827,17 @@
             }
 
                 .foot .left .place {
-                    line-height: 1.5;
+                    line-height: 1.28;
                 }
 
                     .foot .left .place .small {
-                        font-size: 11px;
+                        font-size: 12.5px;
                         display: block;
+                    }
+
+                    .foot .left .place #resultDate {
+                        font-family: var(--serif);
+                        font-size: 13px;
                     }
 
             .foot .qr {
@@ -635,40 +858,43 @@
             .foot .right {
                 text-align: center;
                 margin-right: -22%;
-                font-family: "Times New Roman", Times, serif;
+                line-height: 1.25;
             }
 
                 .foot .right img {
-                    height: 14mm;
+                    height: 10mm;
                     display: block;
                     margin: 0 auto 3px;
                 }
 
                 .foot .right .coe-hi {
-                    font-family: "Noto Serif Devanagari", serif;
+                    font-family: var(--hi);
                     font-size: 14px;
+                    font-weight: 600;
                 }
 
                 .foot .right .coe-en {
-                    font-size: 14px;
-                    letter-spacing: .4px;
+                    font-family: var(--serif);
+                    font-size: 13px;
+                    font-weight: 700;
+                    letter-spacing: .5px;
+                    color: #222;
                 }
 
-        /* ---------- PRINT: sab kuch ek hi A4 page par, border poora ---------- */
+        /* =====================================================================
+                           PRINT : exact A4 (210 x 297mm), ek hi page, koi khali jagah nahi
+                           ===================================================================== */
         @@media print {
+            /* 297mm se 1mm kam: printer/rounding ki wajah se khali 2nd page nahi banega */
             html, body {
                 background: #fff;
                 width: 210mm;
-                height: 297mm;
+                height: 296mm;
+                overflow: hidden;
             }
 
             .toolbar, .print-modal {
                 display: none !important;
-            }
-
-            .serial-bottom {
-                bottom: 2mm;
-                right: 8mm;
             }
 
             .sheet-wrap {
@@ -679,9 +905,9 @@
             .page {
                 box-shadow: none;
                 width: 210mm;
-                height: 297mm;
+                height: 296mm;
                 min-height: 0;
-                padding: 7mm 8mm;
+                padding: 12mm 12mm;
                 overflow: hidden;
                 page-break-after: avoid;
                 page-break-inside: avoid;
@@ -689,9 +915,8 @@
             }
 
             .frame {
-                height: 283mm; /* 297 - 7 - 7 */
+                height: 272mm; /* 296 - 12 - 12 (page padding) */
                 min-height: 0;
-                border: 1.5px solid #000;
                 transform-origin: top left;
             }
 
@@ -1182,6 +1407,7 @@
             const examId = ExamId;
 
             if (!enrollmentNumber || !examId) {
+
                 alert("Enrollment Number or Exam ID is missing.");
                 return;
             }
@@ -1412,6 +1638,7 @@
         // taaki border + footer ek hi page par aaye
         // =====================================================
         const MM = 96 / 25.4;   // 1mm in px
+        const FRAME_MM = 272;   // A4 296mm - 12mm upar - 12mm neeche (page padding)
 
         function fitForPrint() {
             const frame = document.querySelector('.frame');
@@ -1421,16 +1648,17 @@
             frame.style.height = 'auto';
             frame.style.minHeight = '0';
 
-            const available = 283 * MM;
-            const needed    = frame.scrollHeight;
+            const available = FRAME_MM * MM;
+            const needed    = Math.max(frame.scrollHeight, frame.offsetHeight);
 
-            const z = needed > available ? (available / needed) : 1;
+            // neeche round karo (upar round hone se content 1-2px bahar nikal jaata tha)
+            const z = needed > available ? Math.floor((available / needed) * 1000) / 1000 : 1;
 
             frame.style.height = '';
             frame.style.minHeight = '';
             if (z < 1) {
-                frame.style.zoom = z.toFixed(3);
-                frame.style.height = (283 / z) + 'mm';
+                frame.style.zoom = String(z);
+                frame.style.height = (FRAME_MM / z) + 'mm';
             }
         }
 
