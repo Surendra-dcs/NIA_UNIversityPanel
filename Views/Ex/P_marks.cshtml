@@ -322,6 +322,17 @@
         });
     document.getElementById("courseId").addEventListener("change", function () {
            let courseId = this.value;
+
+            // var course_Id = '@Context.Session.GetInt32("course_Id")';
+            // var course_name = '@Context.Session.GetString("course_name")';
+            // if (courseId != course_Id) {
+            //   alert("Please select " + course_name + " course.");
+            //   this.value = courseId;
+            //   $("#semester").html('<option value="">Select Semester</option>');
+            //   $("#BatchId").html('<option value="">Select Batch</option>');
+            //   $("#subjectId").html('<option value="">Select Subject</option>');
+            //   return;
+            //  }
            $("#semester").val('');
            $("#BatchId").val('');
            $("#subjectId").val('');

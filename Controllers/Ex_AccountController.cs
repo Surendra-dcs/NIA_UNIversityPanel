@@ -35,6 +35,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
                 HttpContext.Session.SetString("Email", response.email ?? "");
                 HttpContext.Session.SetString("Role", response.stringrole ?? "");
                 HttpContext.Session.SetString("course_name", response.course_name ?? "");
+                HttpContext.Session.SetInt32("course_Id", response.course_Id);
                 HttpContext.Session.SetString("semyearcode", response.semyearcode ?? "");
                 HttpContext.Session.SetString("subject_name", response.subject_name ?? "");
                 HttpContext.Session.SetString("Examname", response.Examname ?? "");
@@ -53,6 +54,7 @@ namespace NIAUNIVERSITYPANEL.Controllers
                 HttpContext.Session.SetString("Email", response.email ?? "");
                 HttpContext.Session.SetString("Role", response.stringrole ?? "");
                 HttpContext.Session.SetString("course_name", response.course_name ?? "");
+                HttpContext.Session.SetInt32("course_Id", response.course_Id);
                 HttpContext.Session.SetString("semyearcode", response.semyearcode ?? "");
                 HttpContext.Session.SetString("subject_name", response.subject_name ?? "");
                 HttpContext.Session.SetString("Examname", response.Examname ?? "");

@@ -10,6 +10,7 @@
         public string username { get; set; } = "";
         public string email { get; set; } = "";
         public string course_name { get; set; } = "";
+        public int course_Id { get; set; }
         public string semyearcode { get; set; } = "";
         public string subject_name { get; set; } = "";
         public string Examname { get; set; } = "";
