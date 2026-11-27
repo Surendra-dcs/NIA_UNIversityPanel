@@ -145,6 +145,11 @@ namespace NIAUNIVERSITYPANEL.Controllers
         {
             return View();
         }
+
+        public IActionResult resulttrugPNK()
+        {
+            return View();
+        }
         public IActionResult resulttrugIV()
         {
             return View();
